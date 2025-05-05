@@ -3,11 +3,19 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-    const {profileImage} = req.file ? req.file.path : null;
+    const { name, email, password, role,age } = req.body;
+    // const {profileImage} = req.file ? req.file.path : null;
     // Basic validation
-    if (!name || !email || !password) {
+    if (!name || !email || !password || (role === 'teacher' && !age)) {
       return res.status(400).json({ message: 'All fields are required' });
+    }
+    if (role === 'teacher') {
+      if (!age) {
+        return res.status(400).json({ message: 'Age is required for teachers' });
+      }
+      if (parseInt(age) < 18) {
+        return res.status(403).json({ message: 'Teachers must be at least 18 years old' });
+      }
     }
 
     // Check if user already exists
@@ -17,7 +25,8 @@ const register = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10); 
     // Save user
-    const newUser = new User({ name, email, password: hashedPassword, role });
+    const newUser = new User({ name, email, password: hashedPassword, role: role || 'student',
+      age: role === 'teacher' ? age : undefined, profileImage: req.file ? req.file.path : null  });
     await newUser.save();
 
     return res.status(201).json({ message: 'User registered successfully' });

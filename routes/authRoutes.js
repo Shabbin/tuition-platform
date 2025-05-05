@@ -1,17 +1,16 @@
-const upload = require('../middleware/upload');
 const express = require('express');
-const { register } = require('../controllers/authController');  // Import the register function
-const { login } = require('../controllers/authController');
+const { register, login } = require('../controllers/authController');
+const upload = require('../middleware/upload');
+const studentRoutes = require('./studentRoutes');
+const teacherRoutes = require('./teacherRoutes');
 const router = express.Router();
-const auth = require('../middleware/auth');
-// Define the POST route for registration
-router.post('/register',upload.single('profileImage'), register);
+
+// Register and login routes
+router.post('/register', upload.single('profileImage'), register);
 router.post('/login', login);
-router.get('/student/dashboard', auth('student'), (req, res) => {
-    res.json({ message: 'Welcome Student', user: req.user });
-  });
-  
-  router.get('/teacher/dashboard', auth('teacher'), (req, res) => {
-    res.json({ message: 'Welcome Teacher', user: req.user });
-  });
+
+// Use the student and teacher routes
+router.use('/student', studentRoutes);
+router.use('/teacher', teacherRoutes);
+
 module.exports = router;

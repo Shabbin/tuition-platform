@@ -21,12 +21,26 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'teacher'],
     default: 'student'
   },
-
   profileImage: {
     type: String,
     default: null,
   },
+
+  // ➕ New fields for teachers
+  age: {
+    type: Number,
+    required: function () {
+      return this.role === 'teacher';
+    },
+    min: 18
+    
+  },
   
+  isEligible: {
+    type: Boolean,
+    default: false // teacher must pass exam to become eligible
+  }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
