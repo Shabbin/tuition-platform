@@ -1,4 +1,5 @@
 const express = require('express');
+const { getEligibleTeachers } = require('../controllers/studentController');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
@@ -6,5 +7,5 @@ const router = express.Router();
 router.get('/dashboard', auth('student'), (req, res) => {
   res.json({ message: 'Welcome Student', user: req.user });
 });
-
+router.get('/teachers', auth('student'), getEligibleTeachers);
 module.exports = router;
