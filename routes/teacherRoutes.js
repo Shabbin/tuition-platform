@@ -2,7 +2,7 @@ const express = require('express');
 const auth = require('../middleware/auth');
 const router = express.Router();
 const User = require('../models/User'); // Assuming you're using this model
-
+const { approveTeacherEligibility } = require('../controllers/teacherController');
 // Teacher dashboard
 router.get('/dashboard', auth('teacher'), async (req, res) => {
   try {
@@ -45,21 +45,10 @@ router.post('/apply/:mediaId', auth('teacher'), async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
+router.patch('/approve/:teacherId', approveTeacherEligibility);
 module.exports = router;
 
 
 
 
 
-
-// const express = require('express');
-// const auth = require('../middleware/auth');
-// const router = express.Router();
-
-// // Route for teachers
-// router.get('/dashboard', auth('teacher'), (req, res) => {
-//   res.json({ message: 'Welcome to the teacher dashboard' });
-// });
-
-// module.exports = router;
