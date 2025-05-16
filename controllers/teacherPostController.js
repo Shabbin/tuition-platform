@@ -1,5 +1,5 @@
-const TeacherPost = require('../models/TeacherPost');
-const User = require('../models/User');
+const TeacherPost = require('../models/teacherPost');
+const User = require('../models/user');
 
 // Create a post (only for eligible teachers)
 const createPost = async (req, res) => {
@@ -31,7 +31,7 @@ const createPost = async (req, res) => {
 const getAllPosts = async (req, res) => {
   try {
     const posts = await TeacherPost.find()
-      .populate('teacher', 'name email isEligible')
+      .populate('teacher', 'name email isEligible profileImage') // 👈 added profileImage
       .exec();
 
     const filtered = posts.filter(post => post.teacher.isEligible);
@@ -42,6 +42,7 @@ const getAllPosts = async (req, res) => {
     res.status(500).json({ message: 'Error fetching posts' });
   }
 };
+
 
 module.exports = {
   createPost,

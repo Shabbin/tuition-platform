@@ -1,5 +1,5 @@
-const User = require('../models/User');
-
+const User = require('../models/user');
+const TuitionPost = require('../models/teacherPost');
 // Manually approve teacher eligibility
 const approveTeacherEligibility = async (req, res) => {
   try {
@@ -20,8 +20,51 @@ const approveTeacherEligibility = async (req, res) => {
     res.status(500).json({ message: 'Error approving teacher eligibility' });
   }
 };
+const getTeacherProfileWithPosts = async (req, res) => {
+  try {
+    const teacherId = req.params.id;
+
+    const teacher = await User.findById(teacherId).select('-password'); // Hide password
+    if (!teacher || teacher.role !== 'teacher') {
+      return res.status(404).json({ message: 'Teacher not found or not a teacher' });
+    }
+
+    const posts = await TuitionPost.find({ teacher: teacherId });
+
+    res.json({ teacher, posts });
+  } catch (err) {
+    console.error('Error fetching teacher profile:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+const updateProfilePicture = async (req, res) => {
+  try {
+    const teacher = await User.findById(req.user.userId);
+
+    if (!teacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    // Build the full image URL (e.g., http://localhost:5000/uploads/12345.png)
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+    teacher.profileImage = imageUrl;
+    await teacher.save();
+
+    res.status(200).json({
+      message: 'Profile picture updated successfully',
+      profileImage: teacher.profileImage,
+    });
+  } catch (err) {
+    console.error('Profile picture update error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 
 module.exports = {
-  approveTeacherEligibility
+  approveTeacherEligibility,
+  getTeacherProfileWithPosts,
+  updateProfilePicture
 };
 //temporary

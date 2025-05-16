@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { createPost, getAllPosts } = require('../controllers/teacherPostController');
+const { createPost, getAllPosts } = require('../controllers/teacherPostController.js');
 
 // Teacher (eligible) creates a post
 router.post('/', auth('teacher'), createPost);
