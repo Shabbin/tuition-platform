@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../models/user');
 
 // Fetch eligible teachers
 const getEligibleTeachers = async (req, res) => {

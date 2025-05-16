@@ -1,21 +1,32 @@
 const express = require('express');
 const auth = require('../middleware/auth');
 const router = express.Router();
-const User = require('../models/User'); // Assuming you're using this model
+const User = require('../models/user'); // Assuming you're using this model
 const { approveTeacherEligibility } = require('../controllers/teacherController');
+const { getTeacherProfileWithPosts } = require('../controllers/teacherController');
+const upload = require('../middleware/upload');
+const { updateProfilePicture } = require('../controllers/teacherController');
 // Teacher dashboard
 router.get('/dashboard', auth('teacher'), async (req, res) => {
   try {
-    const teacher = await User.findById(req.user.userId).select('name email role isEligible');
+    const teacher = await User.findById(req.user.userId).select('name email role isEligible profileImage');
     if (!teacher) {
       return res.status(404).json({ message: 'Teacher not found' });
     }
 
-    res.json({
-      message: 'Welcome to the teacher dashboard',
-      teacher,
-      canApplyToTuitions: teacher.isEligible === true,
-    });
+   res.json({
+  message: "Welcome to the teacher dashboard",
+  teacher: {
+    _id: teacher._id,
+    name: teacher.name,
+    email: teacher.email,
+    role: teacher.role,
+    isEligible: teacher.isEligible,
+    profileImage: teacher.profileImage, // <-- include this
+  },
+  canApplyToTuitions: false
+});
+
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -45,7 +56,9 @@ router.post('/apply/:mediaId', auth('teacher'), async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+router.get('/:id/profile', getTeacherProfileWithPosts);
 router.patch('/approve/:teacherId', approveTeacherEligibility);
+router.put('/profile-picture', auth('teacher'), upload.single('profileImage'), updateProfilePicture);
 module.exports = router;
 
 
