@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  coverImage: { type: String, default: '' },
 
   // ➕ New fields for teachers
   age: {

@@ -60,11 +60,32 @@ const updateProfilePicture = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+const updateCoverImage = async (req, res) => {
+  try {
+    const teacherId = req.user.userId;
+    const coverImageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
 
+    const updatedTeacher = await User.findByIdAndUpdate(
+      teacherId,
+      { coverImage: coverImageUrl },
+      { new: true }
+    );
+
+    if (!updatedTeacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    res.status(200).json(updatedTeacher);
+  } catch (error) {
+    console.error('Error updating cover image:', error);
+    res.status(500).json({ message: 'Failed to update cover image' });
+  }
+};
 
 module.exports = {
   approveTeacherEligibility,
   getTeacherProfileWithPosts,
-  updateProfilePicture
+  updateProfilePicture,
+  updateCoverImage
 };
 //temporary
