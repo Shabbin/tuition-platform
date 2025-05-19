@@ -5,7 +5,8 @@ const User = require('../models/user'); // Assuming you're using this model
 const { approveTeacherEligibility } = require('../controllers/teacherController');
 const { getTeacherProfileWithPosts } = require('../controllers/teacherController');
 const upload = require('../middleware/upload');
-const { updateProfilePicture } = require('../controllers/teacherController');
+
+const { updateProfilePicture, updateCoverImage  } = require('../controllers/teacherController');
 // Teacher dashboard
 router.get('/dashboard', auth('teacher'), async (req, res) => {
   try {
@@ -59,6 +60,7 @@ router.post('/apply/:mediaId', auth('teacher'), async (req, res) => {
 router.get('/:id/profile', getTeacherProfileWithPosts);
 router.patch('/approve/:teacherId', approveTeacherEligibility);
 router.put('/profile-picture', auth('teacher'), upload.single('profileImage'), updateProfilePicture);
+router.put('/cover-image', auth('teacher'), upload.single('coverImage'), updateCoverImage);
 module.exports = router;
 
 

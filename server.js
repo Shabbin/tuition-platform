@@ -26,8 +26,8 @@ app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api/teachers', require('./routes/teacherRoutes'));
 app.use('/api/posts', require('./routes/teacherPostRoutes'));
 app.use('/api/session-requests', require('./routes/sessionRequest'));
-app.use('/api/chat', require('./routes/chat'));
-app.use('/api/messages', require('./routes/messageRoutes'));
+
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Create HTTP server
