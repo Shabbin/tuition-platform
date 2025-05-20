@@ -81,11 +81,32 @@ const updateCoverImage = async (req, res) => {
     res.status(500).json({ message: 'Failed to update cover image' });
   }
 };
+const updateProfileInfo = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const { name, bio, hourlyRate, skills, location, availability } = req.body;
+
+    if (name) user.name = name;
+    if (bio) user.bio = bio;
+    if (hourlyRate) user.hourlyRate = hourlyRate;
+    if (skills) user.skills = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim());
+    if (location) user.location = location;
+    if (availability) user.availability = availability;
+
+    await user.save();
+    res.json({ message: 'Profile updated successfully', user });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 module.exports = {
   approveTeacherEligibility,
   getTeacherProfileWithPosts,
   updateProfilePicture,
-  updateCoverImage
+  updateCoverImage,
+  updateProfileInfo
 };
 //temporary

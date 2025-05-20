@@ -3,7 +3,8 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 const User = require('../models/user'); // Assuming you're using this model
 const { approveTeacherEligibility } = require('../controllers/teacherController');
-const { getTeacherProfileWithPosts } = require('../controllers/teacherController');
+  
+const { getTeacherProfileWithPosts, updateProfileInfo} = require('../controllers/teacherController');
 const upload = require('../middleware/upload');
 
 const { updateProfilePicture, updateCoverImage  } = require('../controllers/teacherController');
@@ -61,6 +62,7 @@ router.get('/:id/profile', getTeacherProfileWithPosts);
 router.patch('/approve/:teacherId', approveTeacherEligibility);
 router.put('/profile-picture', auth('teacher'), upload.single('profileImage'), updateProfilePicture);
 router.put('/cover-image', auth('teacher'), upload.single('coverImage'), updateCoverImage);
+router.put('/profile-info', auth('teacher'), updateProfileInfo);
 module.exports = router;
 
 
