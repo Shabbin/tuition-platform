@@ -23,9 +23,11 @@ const approveTeacherEligibility = async (req, res) => {
 const getTeacherProfileWithPosts = async (req, res) => {
   try {
     const teacherId = req.params.id;
+    console.log(teacherId)
 
     const teacher = await User.findById(teacherId).select('-password'); // Hide password
     if (!teacher || teacher.role !== 'teacher') {
+      console.log(teacher)
       return res.status(404).json({ message: 'Teacher not found or not a teacher' });
     }
 
