@@ -1,14 +1,19 @@
 const express = require('express');
-const auth = require('../middleware/auth');
 const router = express.Router();
-const User = require('../models/user'); // Assuming you're using this model
-const { approveTeacherEligibility } = require('../controllers/teacherController');
-  
-const { getTeacherProfileWithPosts, updateProfileInfo} = require('../controllers/teacherController');
+const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
-const { updateProfilePicture, updateCoverImage  } = require('../controllers/teacherController');
-// Teacher dashboard
+const {
+  approveTeacherEligibility,
+  getTeacherProfileWithPosts,
+  updateProfilePicture,
+  updateCoverImage,
+  updateProfileInfo,
+} = require('../controllers/teacherController');
+
+const User = require('../models/user');
+
+// ✅ GET: Teacher dashboard
 router.get('/dashboard', auth('teacher'), async (req, res) => {
   try {
     const teacher = await User.findById(req.user.userId).select('name email role isEligible profileImage');
@@ -16,56 +21,63 @@ router.get('/dashboard', auth('teacher'), async (req, res) => {
       return res.status(404).json({ message: 'Teacher not found' });
     }
 
-   res.json({
-  message: "Welcome to the teacher dashboard",
-  teacher: {
-    _id: teacher._id,
-    name: teacher.name,
-    email: teacher.email,
-    role: teacher.role,
-    isEligible: teacher.isEligible,
-    profileImage: teacher.profileImage, // <-- include this
-  },
-  canApplyToTuitions: false
-});
-
+    res.json({
+      message: 'Welcome to the teacher dashboard',
+      teacher: {
+        _id: teacher._id,
+        name: teacher.name,
+        email: teacher.email,
+        role: teacher.role,
+        isEligible: teacher.isEligible,
+        profileImage: teacher.profileImage,
+      },
+      canApplyToTuitions: teacher.isEligible,
+    });
   } catch (err) {
+    console.error('Error fetching teacher dashboard:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Tuition media ads (visible to all teachers)
+// ✅ GET: Tuition media listings (visible to teachers)
 router.get('/tuition-media', auth('teacher'), (req, res) => {
-  // Dummy data for now
-  res.json([
+  const mockAds = [
     { id: 1, title: 'Need Physics Teacher for Grade 11', subject: 'Physics' },
     { id: 2, title: 'Math Tutor Required (In-Person)', subject: 'Mathematics' },
-  ]);
+  ];
+  res.json(mockAds);
 });
 
-// Tuition application route (only for eligible teachers)
+// ✅ POST: Apply to tuition ad (only if eligible)
 router.post('/apply/:mediaId', auth('teacher'), async (req, res) => {
   try {
     const teacher = await User.findById(req.user.userId);
 
-    if (!teacher.isEligible) {
+    if (!teacher || !teacher.isEligible) {
       return res.status(403).json({ message: 'You are not eligible to apply for tuitions yet' });
     }
 
-    // Logic to apply to the tuition media with ID req.params.mediaId
+    // TODO: Replace with real application logic
     res.status(200).json({ message: `Applied to tuition media ID ${req.params.mediaId}` });
   } catch (err) {
+    console.error('Error applying to tuition media:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// ✅ GET: Public teacher profile with posts
 router.get('/:id/profile', getTeacherProfileWithPosts);
+
+// ✅ PATCH: Manually approve a teacher
 router.patch('/approve/:teacherId', approveTeacherEligibility);
+
+// ✅ PUT: Update profile picture
 router.put('/profile-picture', auth('teacher'), upload.single('profileImage'), updateProfilePicture);
+
+// ✅ PUT: Update cover image
 router.put('/cover-image', auth('teacher'), upload.single('coverImage'), updateCoverImage);
+
+// ✅ PUT: Update profile info (text fields)
 router.put('/profile-info', auth('teacher'), updateProfileInfo);
+
 module.exports = router;
-
-
-
-
-

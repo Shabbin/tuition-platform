@@ -1,12 +1,18 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // or configure memory storage as needed
+
 const auth = require('../middleware/auth');
-const { createPost, getAllPosts } = require('../controllers/teacherPostController.js');
+const {
+  createPost,
+  getAllPosts
+} = require('../controllers/teacherPostController');
 
-// Teacher (eligible) creates a post
-router.post('/', auth('teacher'), createPost);
+// ✅ POST: Create a new post (only by eligible teachers)
+router.post('/', auth('teacher'), upload.single('file'), createPost);
 
-// Anyone (students, guests) can view posts
+// ✅ GET: Public route - fetch all teacher posts
 router.get('/', getAllPosts);
 
 module.exports = router;
