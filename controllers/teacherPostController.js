@@ -4,7 +4,16 @@ const User = require('../models/user');
 // Create a post (only for eligible teachers)
 const createPost = async (req, res) => {
   try {
-    const { title, subject, description } = req.body;
+    const {
+      title,
+      description,
+      subjects, // Expecting an array
+      location,
+      language,
+      hourlyRate,
+      youtubeLink
+    } = req.body;
+
     const teacherId = req.user.userId;
 
     const teacher = await User.findById(teacherId);
@@ -12,15 +21,27 @@ const createPost = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to post' });
     }
 
+    // Handle file upload (optional)
+    let videoUrl = null;
+    if (req.file) {
+      videoUrl = `/uploads/videos/${req.file.filename}`;
+    }
+
     const post = new TeacherPost({
       teacher: teacherId,
       title,
-      subject,
-      description
+      description,
+      subjects: Array.isArray(subjects) ? subjects : [subjects],
+      location,
+      language,
+      hourlyRate,
+      videoUrl,
+      youtubeLink
     });
 
     await post.save();
     res.status(201).json({ message: 'Post created', post });
+
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: 'Error creating post' });
@@ -31,7 +52,7 @@ const createPost = async (req, res) => {
 const getAllPosts = async (req, res) => {
   try {
     const posts = await TeacherPost.find()
-      .populate('teacher', 'name email isEligible profileImage') // 👈 added profileImage
+      .populate('teacher', 'name email isEligible profileImage')
       .exec();
 
     const filtered = posts.filter(post => post.teacher.isEligible);
@@ -42,7 +63,6 @@ const getAllPosts = async (req, res) => {
     res.status(500).json({ message: 'Error fetching posts' });
   }
 };
-
 
 module.exports = {
   createPost,

@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const TuitionPost = require('../models/teacherPost');
+const delay = require('../utils/delay'); // Add at top
 // Manually approve teacher eligibility
 const approveTeacherEligibility = async (req, res) => {
   try {
@@ -47,11 +48,11 @@ const updateProfilePicture = async (req, res) => {
       return res.status(404).json({ message: 'Teacher not found' });
     }
 
-    // Build the full image URL (e.g., http://localhost:5000/uploads/12345.png)
     const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-
     teacher.profileImage = imageUrl;
     await teacher.save();
+
+    await delay(1500); // ⏳ simulate slow propagation (like Facebook)
 
     res.status(200).json({
       message: 'Profile picture updated successfully',
@@ -65,7 +66,7 @@ const updateProfilePicture = async (req, res) => {
 const updateCoverImage = async (req, res) => {
   try {
     const teacherId = req.user.userId;
-    const coverImageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    const coverImageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
     const updatedTeacher = await User.findByIdAndUpdate(
       teacherId,
@@ -76,6 +77,8 @@ const updateCoverImage = async (req, res) => {
     if (!updatedTeacher) {
       return res.status(404).json({ message: 'Teacher not found' });
     }
+
+    await delay(1500); // ⏳ simulate delay for image propagation
 
     res.status(200).json(updatedTeacher);
   } catch (error) {
