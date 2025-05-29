@@ -11,7 +11,11 @@ exports.register = async (req, res, next) => {
     if (existingUser) return next(handleError(400, 'Email already exists'));
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const profileImage = req.file ? req.file.filename : null;
+
+    // Build full URL if file is uploaded
+    const profileImage = req.file
+      ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+      : null;
 
     const user = await User.create({
       name,
@@ -22,13 +26,18 @@ exports.register = async (req, res, next) => {
       profileImage,
     });
 
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
 
     res.status(201).json({ token, user });
   } catch (err) {
     next(err);
   }
 };
+
 
 exports.login = async (req, res, next) => {
   try {
