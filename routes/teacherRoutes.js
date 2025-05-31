@@ -12,13 +12,30 @@ const {
 } = require('../controllers/teacherController');
 
 const User = require('../models/user');
+const Post = require('../models/teacherPost'); // Make sure you have this model
+const Session = require('../models/sessionRequest'); // Optional: only if you use sessions
 
-// ✅ GET: Teacher dashboard
+// ✅ GET: Teacher dashboard (now includes posts and upcoming sessions)
 router.get('/dashboard', auth('teacher'), async (req, res) => {
   try {
-    const teacher = await User.findById(req.user.userId).select('name email role isEligible profileImage');
+    const teacher = await User.findById(req.user.userId).select('name email role isEligible profileImage hasPaid');
+
     if (!teacher) {
       return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    // Get teacher's posts
+    const teacherPosts = await Post.find({ teacher: teacher._id }).sort({ createdAt: -1 });
+
+    // Optional: Get upcoming sessions
+    let upcomingSessions = [];
+    try {
+      upcomingSessions = await Session.find({
+        teacher: teacher._id,
+        date: { $gte: new Date() },
+      }).sort({ date: 1 });
+    } catch (sessionErr) {
+      console.warn('Skipping upcomingSessions — model or query failed:', sessionErr.message);
     }
 
     res.json({
@@ -29,9 +46,12 @@ router.get('/dashboard', auth('teacher'), async (req, res) => {
         email: teacher.email,
         role: teacher.role,
         isEligible: teacher.isEligible,
+        hasPaid: teacher.hasPaid || false, // in case it's not in DB
         profileImage: teacher.profileImage,
       },
-      canApplyToTuitions: teacher.isEligible,
+      canApplyToTuitions: teacher.isEligible && teacher.hasPaid,
+      teacherPosts,
+      upcomingSessions,
     });
   } catch (err) {
     console.error('Error fetching teacher dashboard:', err);
