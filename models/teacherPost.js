@@ -57,7 +57,9 @@ const teacherPostSchema = new mongoose.Schema({
       },
       message: 'Must be a valid YouTube URL'
     }
-  }
+  },
+  tags: [String],
+  
 }, {
   timestamps: true
 });
