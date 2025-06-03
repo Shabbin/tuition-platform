@@ -126,8 +126,46 @@ const getAllPosts = async (req, res) => {
     res.status(500).json({ message: 'Error fetching posts' });
   }
 };
+const getTeacherPostBySubject = async (req, res) => {
+  const { teacherId } = req.params;
+  const subjectName = req.params.subjectName?.trim().toLowerCase();
+
+  try {
+    const post = await TeacherPost.findOne({
+      teacher: teacherId,
+      subjects: { $elemMatch: { $regex: new RegExp(`^${subjectName}$`, 'i') } },
+    }).populate('teacher', 'name profileImage isEligible');
+
+    if (!post || !post.teacher || !post.teacher.isEligible) {
+      console.log('No post or teacher not eligible:', { teacherId, subjectName });
+      return res.status(404).json({ message: 'Post not found or teacher not eligible' });
+    }
+
+    res.status(200).json(post);
+  } catch (err) {
+    console.error('Error fetching teacher subject post:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+const getPostsByTeacher = async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+
+    const posts = await TeacherPost.find({ teacher: teacherId });
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 
 module.exports = {
   createPost,
-  getAllPosts
+  getAllPosts,
+  getTeacherPostBySubject,
+  getPostsByTeacher
 };
