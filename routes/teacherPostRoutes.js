@@ -1,20 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // or configure memory storage as needed
-const { getTeacherPostBySubject, getPostsByTeacher } = require('../controllers/teacherPostController');
+const upload = multer({ dest: 'uploads/' });
 
 const auth = require('../middleware/auth');
 const {
   createPost,
-  getAllPosts
+  getAllPosts,
+  getPostsByTeacher,
+  getTeacherPostBySubject,
+  getPostById,
+  updatePost,
+  deleteTeacherPost
 } = require('../controllers/teacherPostController');
 
-// ✅ POST: Create a new post (only by eligible teachers)
+// ✅ Create new post (eligible teachers only)
 router.post('/', auth('teacher'), upload.single('file'), createPost);
 
-// ✅ GET: Public route - fetch all teacher posts
+// ✅ Get all public posts
 router.get('/', getAllPosts);
+
+// ✅ Get post by ID (must be before dynamic teacher routes)
+router.get('/:postId', getPostById);
+
+// ✅ Get all posts by a teacher
 router.get('/teacher/:teacherId', getPostsByTeacher);
+
+// ✅ Get specific teacher post by subject
 router.get('/teacher/:teacherId/subject/:subjectName', getTeacherPostBySubject);
+router.put('/:postId', auth('teacher'), updatePost);
+router.delete('/:id',auth('teacher') , deleteTeacherPost);
 module.exports = router;
