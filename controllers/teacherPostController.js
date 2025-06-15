@@ -1,6 +1,6 @@
 const TeacherPost = require('../models/teacherPost');
 const User = require('../models/user');
-
+const Post = require('../models/teacherPost');
 // Helper to safely normalize incoming arrays
 const normalizeArrayField = (field) => {
   if (Array.isArray(field)) {
@@ -161,11 +161,88 @@ const getPostsByTeacher = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+const getPostById = async (req, res) => {
+  try {
+    const { postId } = req.params;
 
+    const post = await TeacherPost.findById(postId)
+      .populate('teacher', 'name email isEligible profileImage');
+
+    if (!post || !post.teacher?.isEligible) {
+      return res.status(404).json({ message: 'Post not found or teacher not eligible' });
+    }
+
+    res.status(200).json(post);
+  } catch (err) {
+    console.error('Fetch post by ID error:', err.message);
+    res.status(500).json({ message: 'Error fetching post' });
+  }
+};
+// =========================
+// UPDATE POST
+// =========================
+const updatePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const teacherId = req.user.userId;
+
+    const post = await TeacherPost.findById(postId);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    if (post.teacher.toString() !== teacherId) {
+      return res.status(403).json({ message: 'You are not authorized to update this post' });
+    }
+
+    const updates = {
+      title: req.body.title,
+      description: req.body.description,
+      subjects: normalizeArrayField(req.body.subjects),
+      location: req.body.location,
+      language: req.body.language,
+      hourlyRate: req.body.hourlyRate,
+      youtubeLink: req.body.youtubeLink,
+      tags: normalizeArrayField(req.body.tags)
+    };
+
+    await TeacherPost.findByIdAndUpdate(postId, updates, { new: true });
+    res.status(200).json({ message: 'Post updated successfully' });
+
+  } catch (err) {
+    console.error('Update post error:', err.message);
+    res.status(500).json({ message: 'Error updating post' });
+  }
+};
+// DELETE /api/posts/:id
+const deleteTeacherPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Ensure teacher field exists before comparing
+   if (!post.teacher || typeof post.teacher.toString !== 'function') {
+  return res.status(400).json({ message: 'Post is missing valid teacher reference' });
+}
+
+    await Post.findByIdAndDelete(postId);
+
+    res.status(200).json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    res.status(500).json({ message: 'Server error deleting post' });
+  }
+};
 
 module.exports = {
   createPost,
   getAllPosts,
   getTeacherPostBySubject,
-  getPostsByTeacher
+  getPostsByTeacher,
+  getPostById,
+ updatePost,
+ deleteTeacherPost
 };
