@@ -1,13 +1,15 @@
 const User = require('../models/user');
 const TuitionPost = require('../models/teacherPost');
-const delay = require('../utils/delay'); // Add at top
-// Manually approve teacher eligibility
+const delay = require('../utils/delay');
+
+// ==============================
+// MANUALLY APPROVE TEACHER
+// ==============================
 const approveTeacherEligibility = async (req, res) => {
   try {
     const { teacherId } = req.params;
 
     const teacher = await User.findById(teacherId);
-
     if (!teacher || teacher.role !== 'teacher') {
       return res.status(404).json({ message: 'Teacher not found' });
     }
@@ -21,39 +23,43 @@ const approveTeacherEligibility = async (req, res) => {
     res.status(500).json({ message: 'Error approving teacher eligibility' });
   }
 };
+
+// ==============================
+// GET TEACHER PROFILE + POSTS
+// ==============================
 const getTeacherProfileWithPosts = async (req, res) => {
   try {
     const teacherId = req.params.id;
-    console.log(teacherId)
+    const teacher = await User.findById(teacherId).select('-password');
 
-    const teacher = await User.findById(teacherId).select('-password'); // Hide password
     if (!teacher || teacher.role !== 'teacher') {
-      console.log(teacher)
       return res.status(404).json({ message: 'Teacher not found or not a teacher' });
     }
 
     const posts = await TuitionPost.find({ teacher: teacherId });
-
     res.json({ teacher, posts });
   } catch (err) {
     console.error('Error fetching teacher profile:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// ==============================
+// UPDATE PROFILE PICTURE
+// ==============================
 const updateProfilePicture = async (req, res) => {
   try {
     const teacher = await User.findById(req.user.userId);
 
-    if (!teacher) {
-      return res.status(404).json({ message: 'Teacher not found' });
+    if (!teacher || teacher.role !== 'teacher') {
+      return res.status(403).json({ message: 'Unauthorized' });
     }
 
     const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     teacher.profileImage = imageUrl;
     await teacher.save();
 
-    await delay(1500); // ⏳ simulate slow propagation (like Facebook)
-
+    await delay(1500); // optional delay simulation
     res.status(200).json({
       message: 'Profile picture updated successfully',
       profileImage: teacher.profileImage,
@@ -63,46 +69,54 @@ const updateProfilePicture = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// ==============================
+// UPDATE COVER IMAGE
+// ==============================
 const updateCoverImage = async (req, res) => {
   try {
     const teacherId = req.user.userId;
-    const coverImageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
-    const updatedTeacher = await User.findByIdAndUpdate(
-      teacherId,
-      { coverImage: coverImageUrl },
-      { new: true }
-    );
-
-    if (!updatedTeacher) {
-      return res.status(404).json({ message: 'Teacher not found' });
+    const teacher = await User.findById(teacherId);
+    if (!teacher || teacher.role !== 'teacher') {
+      return res.status(403).json({ message: 'Unauthorized' });
     }
 
-    await delay(1500); // ⏳ simulate delay for image propagation
+    const coverImageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    teacher.coverImage = coverImageUrl;
+    await teacher.save();
 
-    res.status(200).json(updatedTeacher);
+    await delay(1500);
+    res.status(200).json({ message: 'Cover image updated', coverImage: teacher.coverImage });
   } catch (error) {
     console.error('Error updating cover image:', error);
     res.status(500).json({ message: 'Failed to update cover image' });
   }
 };
+
+// ==============================
+// UPDATE PROFILE INFO
+// ==============================
 const updateProfileInfo = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const teacher = await User.findById(req.user.userId);
+    if (!teacher || teacher.role !== 'teacher') {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
 
     const { name, bio, hourlyRate, skills, location, availability } = req.body;
 
-    if (name) user.name = name;
-    if (bio) user.bio = bio;
-    if (hourlyRate) user.hourlyRate = hourlyRate;
-    if (skills) user.skills = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim());
-    if (location) user.location = location;
-    if (availability) user.availability = availability;
+    if (name) teacher.name = name;
+    if (bio) teacher.bio = bio;
+    if (hourlyRate) teacher.hourlyRate = hourlyRate;
+    if (skills) teacher.skills = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim());
+    if (location) teacher.location = location;
+    if (availability) teacher.availability = availability;
 
-    await user.save();
-    res.json({ message: 'Profile updated successfully', user });
+    await teacher.save();
+    res.json({ message: 'Profile updated successfully', user: teacher });
   } catch (err) {
+    console.error('Update profile info error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -114,4 +128,3 @@ module.exports = {
   updateCoverImage,
   updateProfileInfo
 };
-//temporary
