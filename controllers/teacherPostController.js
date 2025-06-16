@@ -236,7 +236,15 @@ const deleteTeacherPost = async (req, res) => {
     res.status(500).json({ message: 'Server error deleting post' });
   }
 };
-
+const getMyPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ teacher: req.user.userId }).sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    console.error('Error fetching my posts:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 module.exports = {
   createPost,
   getAllPosts,
@@ -244,5 +252,6 @@ module.exports = {
   getPostsByTeacher,
   getPostById,
  updatePost,
- deleteTeacherPost
+ deleteTeacherPost,
+ getMyPosts
 };
