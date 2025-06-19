@@ -1,35 +1,37 @@
 const TeacherPost = require('../models/teacherPost');
 const User = require('../models/user');
 const Post = require('../models/teacherPost');
+const { flattenSubjects } = require('../utils/normalize');
+
 // Helper to safely normalize incoming arrays
-const normalizeArrayField = (field) => {
-  if (Array.isArray(field)) {
-    try {
-      if (field.length === 1 && typeof field[0] === 'string' && field[0].trim().startsWith('[')) {
-        const parsed = JSON.parse(field[0]);
-        return Array.isArray(parsed) ? parsed : [parsed];
-      }
-    } catch (err) {
-      return field;
-    }
-    return field;
-  }
+// const normalizeArrayField = (field) => {
+//   if (Array.isArray(field)) {
+//     try {
+//       if (field.length === 1 && typeof field[0] === 'string' && field[0].trim().startsWith('[')) {
+//         const parsed = JSON.parse(field[0]);
+//         return Array.isArray(parsed) ? parsed : [parsed];
+//       }
+//     } catch (err) {
+//       return field;
+//     }
+//     return field;
+//   }
 
-  if (typeof field === 'string') {
-    try {
-      if (field.trim().startsWith('[')) {
-        const parsed = JSON.parse(field);
-        return Array.isArray(parsed) ? parsed : [parsed];
-      } else {
-        return field.split(',').map(f => f.trim());
-      }
-    } catch (err) {
-      return [field];
-    }
-  }
+//   if (typeof field === 'string') {
+//     try {
+//       if (field.trim().startsWith('[')) {
+//         const parsed = JSON.parse(field);
+//         return Array.isArray(parsed) ? parsed : [parsed];
+//       } else {
+//         return field.split(',').map(f => f.trim());
+//       }
+//     } catch (err) {
+//       return [field];
+//     }
+//   }
 
-  return [field];
-};
+//   return [field];
+// };
 
 // =========================
 // CREATE TEACHER POST
@@ -61,21 +63,20 @@ const createPost = async (req, res) => {
       videoUrl = `/uploads/videos/${req.file.filename}`;
     }
 
-    const postData = {
-      teacher: teacherId,
-      postType,
-      title,
-      description,
-      subjects: normalizeArrayField(subjects),
-      location,
-      language,
-      hourlyRate,
-      videoFile: videoUrl || '',
-      youtubeLink,
-      tags: normalizeArrayField(tags),
-      topicDetails: postType === 'topic' ? topicDetails : undefined
-    };
-
+   const postData = {
+  teacher: teacherId,
+  postType,
+  title,
+  description,
+  subjects: flattenSubjects(subjects), // 🔄 cleaner!
+  location,
+  language,
+  hourlyRate,
+  videoFile: videoUrl || '',
+  youtubeLink,
+  tags: flattenSubjects(tags), // 🔄 also cleaned
+  topicDetails: postType === 'topic' ? topicDetails : undefined
+};
     const post = new TeacherPost(postData);
 
     await post.save();
@@ -92,42 +93,34 @@ const createPost = async (req, res) => {
 // =========================
 const getAllPosts = async (req, res) => {
   try {
-    let subjectTags = req.query.subject;
+    // 🔍 Extract filters
+    const subjectTags = req.query.subject;
+    const teacherIds = req.query.teacher;
+
+    // ✅ Normalize subject filters
     const selectedSubjects = Array.isArray(subjectTags)
       ? subjectTags
-      : subjectTags
-      ? [subjectTags]
-      : [];
+      : subjectTags ? [subjectTags] : [];
 
-    const filter = selectedSubjects.length
-      ? { subjects: { $in: selectedSubjects } }
-      : {};
+    const selectedTeachers = Array.isArray(teacherIds)
+      ? teacherIds
+      : teacherIds ? [teacherIds] : [];
 
-    // 🔧 CLEANUP MALFORMED SUBJECTS - one-time fix
-    const allPosts = await TeacherPost.find();
-    for (const post of allPosts) {
-      const fixedSubjects = post.subjects.flatMap(sub => {
-        try {
-          const parsed = JSON.parse(sub);
-          return Array.isArray(parsed) ? parsed : [parsed];
-        } catch {
-          return [sub];
-        }
-      });
+    // 🔧 Build dynamic filter
+    const filter = {
+      ...(selectedSubjects.length && { subjects: { $in: selectedSubjects } }),
+      ...(selectedTeachers.length && { teacher: { $in: selectedTeachers } }),
+    };
 
-      if (JSON.stringify(post.subjects) !== JSON.stringify(fixedSubjects)) {
-        post.subjects = fixedSubjects;
-        await post.save();
-      }
-    }
-
-    // ⬇ Do not change this line as requested
+    // 🔍 Fetch only matching posts
     const posts = await TeacherPost.find(filter)
-      .populate('teacher', 'name email isEligible profileImage')
+      .populate('teacher', 'name email isEligible profileImage location language')
       .exec();
 
-    const filtered = posts.filter(post => post.teacher.isEligible);
-    res.status(200).json(filtered);
+    // ✅ Filter eligible teachers only
+    const eligiblePosts = posts.filter(post => post.teacher?.isEligible);
+
+    res.status(200).json(eligiblePosts);
   } catch (err) {
     console.error('Fetch posts error:', err.message);
     res.status(500).json({ message: 'Error fetching posts' });
@@ -204,12 +197,13 @@ const updatePost = async (req, res) => {
       postType: req.body.postType,
       title: req.body.title,
       description: req.body.description,
-      subjects: normalizeArrayField(req.body.subjects),
+      subjects: flattenSubjects(req.body.subjects),
+
       location: req.body.location,
       language: req.body.language,
       hourlyRate: req.body.hourlyRate,
       youtubeLink: req.body.youtubeLink,
-      tags: normalizeArrayField(req.body.tags),
+     tags: flattenSubjects(req.body.tags),
       topicDetails: req.body.postType === 'topic' ? req.body.topicDetails : undefined
     };
 
