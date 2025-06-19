@@ -44,7 +44,9 @@ const createPost = async (req, res) => {
       language,
       hourlyRate,
       youtubeLink,
-      tags
+      tags,
+      postType,
+      topicDetails
     } = req.body;
 
     const teacherId = req.user.userId;
@@ -59,18 +61,22 @@ const createPost = async (req, res) => {
       videoUrl = `/uploads/videos/${req.file.filename}`;
     }
 
-    const post = new TeacherPost({
+    const postData = {
       teacher: teacherId,
+      postType,
       title,
       description,
       subjects: normalizeArrayField(subjects),
       location,
       language,
       hourlyRate,
-      videoUrl,
+      videoFile: videoUrl || '',
       youtubeLink,
       tags: normalizeArrayField(tags),
-    });
+      topicDetails: postType === 'topic' ? topicDetails : undefined
+    };
+
+    const post = new TeacherPost(postData);
 
     await post.save();
     res.status(201).json({ message: 'Post created', post });
@@ -79,6 +85,7 @@ const createPost = async (req, res) => {
     res.status(500).json({ message: 'Error creating post' });
   }
 };
+
 
 // =========================
 // GET ALL POSTS
@@ -194,6 +201,7 @@ const updatePost = async (req, res) => {
     }
 
     const updates = {
+      postType: req.body.postType,
       title: req.body.title,
       description: req.body.description,
       subjects: normalizeArrayField(req.body.subjects),
@@ -201,8 +209,13 @@ const updatePost = async (req, res) => {
       language: req.body.language,
       hourlyRate: req.body.hourlyRate,
       youtubeLink: req.body.youtubeLink,
-      tags: normalizeArrayField(req.body.tags)
+      tags: normalizeArrayField(req.body.tags),
+      topicDetails: req.body.postType === 'topic' ? req.body.topicDetails : undefined
     };
+
+    if (req.file) {
+      updates.videoFile = `/uploads/videos/${req.file.filename}`;
+    }
 
     await TeacherPost.findByIdAndUpdate(postId, updates, { new: true });
     res.status(200).json({ message: 'Post updated successfully' });
@@ -212,6 +225,7 @@ const updatePost = async (req, res) => {
     res.status(500).json({ message: 'Error updating post' });
   }
 };
+
 // DELETE /api/posts/:id
 const deleteTeacherPost = async (req, res) => {
   try {

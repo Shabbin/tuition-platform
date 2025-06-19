@@ -3,31 +3,26 @@ const mongoose = require('mongoose');
 const teacherPostSchema = new mongoose.Schema({
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // 🔄 Updated from 'Teacher' to 'User' since you're using a unified User model
+    ref: 'User',
+    required: true
+  },
+  postType: {
+    type: String,
+    enum: ['general', 'topic'],
     required: true
   },
   title: {
     type: String,
-    required: [true, 'Title is required'],
     trim: true,
-    maxlength: [150, 'Title can be up to 150 characters']
+    maxlength: 150,
   },
   description: {
     type: String,
-    required: [true, 'Description is required'],
-    maxlength: [2000, 'Description can be up to 2000 characters']
+    maxlength: 2000,
   },
   subjects: {
     type: [String],
     required: true,
-    validate: [
-      {
-        validator: function (arr) {
-          return arr.length > 0 && arr.length <= 5;
-        },
-        message: 'You must select at least 1 and no more than 5 subjects'
-      }
-    ]
   },
   location: {
     type: String,
@@ -41,8 +36,8 @@ const teacherPostSchema = new mongoose.Schema({
   },
   hourlyRate: {
     type: Number,
-    min: [0, 'Hourly rate cannot be negative'],
-    required: [true, 'Hourly rate is required']
+    min: 0,
+    required: true
   },
   videoFile: {
     type: String,
@@ -51,17 +46,21 @@ const teacherPostSchema = new mongoose.Schema({
   youtubeLink: {
     type: String,
     default: '',
-    validate: {
-      validator: function (v) {
-        return !v || /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/.test(v);
-      },
-      message: 'Must be a valid YouTube URL'
-    }
   },
   tags: [String],
-  
+  topicDetails: {
+    topicTitle: { type: String, trim: true, maxlength: 150 },
+    syllabusTag: { type: String, trim: true },
+    studentTypes: [String],
+    weeklyPlan: [{
+      week: { type: Number, min: 1 },
+      title: { type: String, trim: true },
+      description: { type: String, trim: true }
+    }]
+  }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Post', teacherPostSchema);
+// ✅ Fix: Use mongoose.models to avoid overwrite errors in dev
+module.exports = mongoose.models.TeacherPost || mongoose.model('TeacherPost', teacherPostSchema);
