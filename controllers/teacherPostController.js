@@ -2,7 +2,7 @@ const TeacherPost = require('../models/teacherPost');
 const User = require('../models/user');
 const Post = require('../models/teacherPost');
 const { flattenSubjects } = require('../utils/normalize');
-
+const { subjectMatchesContent } = require('../utils/validateSubjectMatch');
 // Helper to safely normalize incoming arrays
 // const normalizeArrayField = (field) => {
 //   if (Array.isArray(field)) {
@@ -62,7 +62,14 @@ const createPost = async (req, res) => {
     if (req.file) {
       videoUrl = `/uploads/videos/${req.file.filename}`;
     }
+const normalizedSubjects = flattenSubjects(subjects);
+const invalidSubjects = subjectMatchesContent(normalizedSubjects, title, description);
 
+if (invalidSubjects.length > 0) {
+  return res.status(400).json({
+    message: `These subject(s) don't match your content: ${invalidSubjects.join(', ')}. Please remove or revise them.`,
+  });
+}
    const postData = {
   teacher: teacherId,
   postType,
@@ -74,7 +81,7 @@ const createPost = async (req, res) => {
   hourlyRate,
   videoFile: videoUrl || '',
   youtubeLink,
-  tags: flattenSubjects(tags), // 🔄 also cleaned
+  tags: flattenSubjects(tags || []), // 🔄 also cleaned
   topicDetails: postType === 'topic' ? topicDetails : undefined
 };
     const post = new TeacherPost(postData);
