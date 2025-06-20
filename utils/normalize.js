@@ -3,6 +3,7 @@ function flattenSubjects(subjects) {
   const flat = [];
 
   const flatten = (arr) => {
+    if (!Array.isArray(arr)) return; // prevent crash on non-arrays
     arr.forEach((item) => {
       if (typeof item === 'string') {
         try {
@@ -20,7 +21,7 @@ function flattenSubjects(subjects) {
     });
   };
 
-  flatten(subjects);
+  if (subjects) flatten(subjects); // protect against null/undefined
   return Array.from(new Set(flat)); // Remove duplicates
 }
 
