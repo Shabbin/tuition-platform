@@ -2,7 +2,7 @@ const TeacherPost = require('../models/teacherPost');
 const User = require('../models/user');
 const { flattenSubjects } = require('../utils/normalize');
 const isMeaningfulText = require('../utils/isMeaningfulText');
-
+const { validateSubjectsHeuristically } = require('../utils/validateSubjectHeuristic');
 // =========================
 // CREATE TEACHER POST
 // =========================
@@ -28,10 +28,20 @@ const createPost = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to post' });
     }
 
-    // Only validate meaningful text for non-topic posts
-    if (postType !== 'topic' && !isMeaningfulText(description)) {
+    console.log('Creating post:', { title, description, subjects, tags });
+
+    if (!isMeaningfulText(description)) {
+      return res.status(400).json({ message: 'Description appears to be nonsensical or gibberish. Please provide meaningful content.' });
+    }
+
+    const invalidSubjects = validateSubjectsHeuristically(subjects, title, description);
+    const invalidTags = validateSubjectsHeuristically(tags || [], title, description);
+
+    console.log('Invalid subjects:', invalidSubjects, 'Invalid tags:', invalidTags);
+
+    if (invalidSubjects.length > 0 || invalidTags.length > 0) {
       return res.status(400).json({
-        message: 'Description appears to be nonsensical or gibberish. Please provide meaningful content.'
+        message: `The following subject(s) or tag(s) don't seem relevant to your content: ${[...invalidSubjects, ...invalidTags].join(', ')}. Please revise.`
       });
     }
 
@@ -57,12 +67,15 @@ const createPost = async (req, res) => {
 
     const post = new TeacherPost(postData);
     await post.save();
+
     res.status(201).json({ message: 'Post created', post });
   } catch (err) {
     console.error('Create post error:', err.message);
     res.status(500).json({ message: 'Error creating post' });
   }
 };
+
+
 
 // =========================
 // UPDATE POST
@@ -79,24 +92,47 @@ const updatePost = async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to update this post' });
     }
 
-    // Only validate meaningful text for non-topic posts
-    if (req.body.postType !== 'topic' && !isMeaningfulText(req.body.description)) {
+    const {
+      title,
+      description,
+      subjects,
+      location,
+      language,
+      hourlyRate,
+      youtubeLink,
+      tags,
+      postType,
+      topicDetails
+    } = req.body;
+
+    console.log('Updating post:', { title, description, subjects, tags });
+
+    if (!isMeaningfulText(description)) {
+      return res.status(400).json({ message: 'Description appears to be nonsensical or gibberish. Please provide meaningful content.' });
+    }
+
+    const invalidSubjects = validateSubjectsHeuristically(subjects, title, description);
+    const invalidTags = validateSubjectsHeuristically(tags || [], title, description);
+
+    console.log('Invalid subjects:', invalidSubjects, 'Invalid tags:', invalidTags);
+
+    if (invalidSubjects.length > 0 || invalidTags.length > 0) {
       return res.status(400).json({
-        message: 'Description appears to be nonsensical or gibberish. Please provide meaningful content.'
+        message: `The following subject(s) or tag(s) don't seem relevant to your content: ${[...invalidSubjects, ...invalidTags].join(', ')}. Please revise.`
       });
     }
 
     const updates = {
-      postType: req.body.postType,
-      title: req.body.title,
-      description: req.body.description,
-      subjects: flattenSubjects(req.body.subjects),
-      location: req.body.location,
-      language: req.body.language,
-      hourlyRate: req.body.hourlyRate,
-      youtubeLink: req.body.youtubeLink,
-      tags: flattenSubjects(req.body.tags),
-      topicDetails: req.body.postType === 'topic' ? req.body.topicDetails : undefined,
+      postType,
+      title,
+      description,
+      subjects: flattenSubjects(subjects),
+      location,
+      language,
+      hourlyRate,
+      youtubeLink,
+      tags: flattenSubjects(tags || []),
+      topicDetails: postType === 'topic' ? topicDetails : undefined
     };
 
     if (req.file) {
