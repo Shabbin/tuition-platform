@@ -1,32 +1,21 @@
-function isLikelyWord(word) {
-  // Basic heuristic: word length >= 3, has vowels, mostly letters
-  if (word.length < 3) return true; // small words like "is", "of", etc.
-  if (!/[aeiou]/i.test(word)) return false; // no vowels → likely gibberish
-  if (!/^[a-z]+$/i.test(word)) return false; // contains non-alpha chars
-  return true;
+function isProbablyGibberish(word) {
+  if (!/[aeiou]/i.test(word)) return true; // No vowels → gibberish
+  if (/([a-z])\1{2,}/i.test(word)) return true; // Repeated chars like "aaaa"
+  if (/[^a-z]/i.test(word)) return true; // Symbols/numbers
+  return false;
 }
 function isMeaningfulText(text) {
-  if (!text) return false;
+  if (!text || typeof text !== 'string') return false;
 
-  // Minimum length check
-  if (text.trim().length < 20) return false;
+  const cleaned = text.trim();
+  if (cleaned.length < 30) return false;  // lowered from 50
 
-  // Count English words present (simple dictionary of common English words)
-  const commonWords = ['the', 'and', 'is', 'in', 'to', 'of', 'that', 'it', 'with', 'as', 'for', 'on', 'this', 'are'];
-  const textWords = text.toLowerCase().split(/\W+/);
+  const words = cleaned.split(/\s+/);
+  if (words.length < 10) return false;  // lowered from 15
 
-  const commonWordCount = textWords.filter(word => commonWords.includes(word)).length;
+  const filteredWords = words.filter(w => w.length >= 3 && !isProbablyGibberish(w));
+  const uniqueWords = new Set(filteredWords.map(w => w.toLowerCase()));
 
-  // Heuristic: if common words < 2, likely gibberish
-  if (commonWordCount < 2) return false;
-
-  // Check if text has mostly letters (not all symbols or digits)
-  const letterCount = (text.match(/[a-zA-Z]/g) || []).length;
-  const totalLength = text.length;
-
-  if (letterCount / totalLength < 0.6) return false; // at least 60% letters
-
-  return true;
+  return uniqueWords.size >= 5;  // lowered from 10
 }
-
 module.exports = isMeaningfulText;
