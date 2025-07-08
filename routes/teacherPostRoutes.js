@@ -12,36 +12,31 @@ const {
   getPostById,
   updatePost,
   deleteTeacherPost,
-   getMyPosts,
+  getMyPosts,
 } = require('../controllers/teacherPostController');
 
-// ✅ Create new post (eligible teachers only)
+// Create new post (authenticated & authorized teacher)
 router.post('/', auth('teacher'), upload.single('file'), createPost);
 
-// ✅ Get all public posts
+// Get all public posts (no auth)
 router.get('/', getAllPosts);
 
-// ✅ Get posts belonging to the logged-in teacher (secure)
-router.get('/mine', auth('teacher'), async (req, res, next) => {
-  try {
-    const posts = await require('../models/teacherPost').find({ teacher: req.user.userId }).sort({ createdAt: -1 });
-    res.json(posts);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// ✅ Get all posts by a specific teacher
-router.get('/teacher/:teacherId/subject/:subjectName', getTeacherPostBySubject);
-router.get('/teacher/:teacherId', getPostsByTeacher);
+// Get posts by logged-in teacher (secure)
 router.get('/mine', auth('teacher'), getMyPosts);
-// ✅ Get post by ID (must be after more specific routes)
+
+// Get posts by a specific teacher and subject
+router.get('/teacher/:teacherId/subject/:subjectName', getTeacherPostBySubject);
+
+// Get all posts by a specific teacher
+router.get('/teacher/:teacherId', getPostsByTeacher);
+
+// Get post by ID (should be after more specific routes)
 router.get('/:postId', getPostById);
 
-// ✅ Update post by ID
+// Update post by ID (authenticated & authorized teacher)
 router.put('/:postId', auth('teacher'), updatePost);
 
-// ✅ Delete post by ID
+// Delete post by ID (authenticated & authorized teacher)
 router.delete('/:id', auth('teacher'), deleteTeacherPost);
 
 module.exports = router;

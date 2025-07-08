@@ -10,24 +10,8 @@
 //   'History': ['history', 'war', 'empire', 'ancient', 'revolution'],
 //   'Geography': ['geography', 'earth', 'climate', 'region', 'map', 'continent', 'location', 'environment'],
 // };
-// function validateSubjectsHeuristically(subjects, title, description) {
-//   const content = `${title} ${description}`.toLowerCase();
-//   const invalidSubjects = [];
 
-//   for (const subject of subjects) {
-//     const keywords = SUBJECT_KEYWORDS[subject]; // Match with exact casing
-//     if (!keywords) {
-//       console.warn(`Unrecognized subject: ${subject}`);
-//       invalidSubjects.push(subject);
-//       continue;
-//     }
-
-//     const found = keywords.some(word => content.includes(word));
-//     if (!found) {
-//       invalidSubjects.push(subject); // didn't detect even 1 relevant word
-//     }
-//   }
-
-//   return invalidSubjects;
-// }
-// module.exports = { validateSubjectsHeuristically };
+// module.exports = {
+//   SUBJECT_KEYWORDS,
+//   SUBJECT_LIST: Object.keys(SUBJECT_KEYWORDS),
+// };

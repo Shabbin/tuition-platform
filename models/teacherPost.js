@@ -1,66 +1,113 @@
 const mongoose = require('mongoose');
 
+function arrayLimit(val) {
+  return val.length <= 5;
+}
+
 const teacherPostSchema = new mongoose.Schema({
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
-  postType: {
-    type: String,
-    enum: ['general', 'topic'],
-    required: true
-  },
-  title: {
-    type: String,
-    trim: true,
-    maxlength: 150,
-  },
-  description: {
-    type: String,
-    maxlength: 2000,
-  },
+  title: { type: String, required: true, trim: true },
+
+  description: { type: String, required: true, trim: true },
+
+  // Remove single 'subject' field
+
   subjects: {
     type: [String],
     required: true,
+    validate: [arrayLimit, '{PATH} exceeds the limit of 5'],
   },
+
+  educationSystem: {
+    type: String,
+    enum: ['English-Medium', 'Bangla-Medium', 'University-Admission', 'GED', 'Entrance-Exams', 'BCS'],
+    required: true,
+  },
+
+board: {
+  type: String,
+  enum: [
+    'CIE', 'Edexcel', 'IB', 'Others', 
+    'IELTS', 'PTE', 'SAT', 'GRE', 'GMAT', 'TOEFL', // add Entrance-Exams here
+    'Public-University', 'Engineering', 'Medical', 'IBA',"Preliminary","Written","Viva" 
+  ],
+  required: function() {
+    // board required only if educationSystem !== 'Bangla-Medium'
+    return this.educationSystem !== 'Bangla-Medium' && this.educationSystem !== 'GED';
+  }
+},
+group: {
+  type: String,
+  enum: ['Science', 'Commerce', 'Arts', 'General', 'Technical', 'Both', ""], // Add BCS groups
+  required: false,
+  default: undefined,
+  validate: {
+    validator: function (value) {
+      if (this.educationSystem === 'Bangla-Medium') {
+        return ['Science', 'Commerce', 'Arts'].includes(value);
+      }
+      if (this.educationSystem === 'BCS') {
+        return ['General', 'Technical', 'Both'].includes(value);
+      }
+      // For others, allow empty/undefined
+      return value === undefined || value === '';
+    },
+    message: props => `Invalid group "${props.value}" for education system "${props.instance.educationSystem}"`
+  }
+},
+level: {
+  type: String,
+  required: function () {
+    return this.educationSystem === 'English-Medium' || this.educationSystem === 'Bangla-Medium';
+  },
+  default: undefined,
+},
+
+  subLevel: {
+    type: String,
+    enum: ['AS_Level', 'A_Level', 'Both', ''], // allow '' if not required
+    default: '',
+  },
+
   location: {
     type: String,
     trim: true,
-    default: ''
+    default: '',
   },
+
   language: {
     type: String,
     trim: true,
-    default: ''
+    default: '',
   },
+
   hourlyRate: {
     type: Number,
     min: 0,
-    required: true
+    required: true,
   },
+
   videoFile: {
     type: String,
-    default: ''
+    default: '',
   },
+
   youtubeLink: {
     type: String,
     default: '',
   },
+
   tags: [String],
-  topicDetails: {
-    topicTitle: { type: String, trim: true, maxlength: 150 },
-    syllabusTag: { type: String, trim: true },
-    studentTypes: [String],
-    weeklyPlan: [{
-      week: { type: Number, min: 1 },
-      title: { type: String, trim: true },
-      description: { type: String, trim: true }
-    }]
-  }
-}, {
-  timestamps: true
+
+
+},
+
+{
+  timestamps: true,
 });
 
-// ✅ Fix: Use mongoose.models to avoid overwrite errors in dev
 module.exports = mongoose.models.TeacherPost || mongoose.model('TeacherPost', teacherPostSchema);

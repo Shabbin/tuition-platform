@@ -1,14 +1,18 @@
 const TeacherPost = require('../models/teacherPost');
 const User = require('../models/user');
 const { flattenSubjects } = require('../utils/normalize');
-const isMeaningfulText = require('../utils/isMeaningfulText');
-const { validateSubjectsHeuristically } = require('../utils/validateSubjectHeuristic');
+const { isMeaningfulText } = require('../utils/isMeaningfulText');
+const { validateEducationPath } = require('../utils/validateEducationPath');
+
+const { checkDuplicateSubjectCombination } = require('../utils/checkDuplicateSubjectCombination');
+
+
 // =========================
-// CREATE TEACHER POST
+// CREATE POST
 // =========================
 const createPost = async (req, res) => {
   try {
-    const {
+    let {
       title,
       description,
       subjects,
@@ -17,65 +21,88 @@ const createPost = async (req, res) => {
       hourlyRate,
       youtubeLink,
       tags,
-      postType,
-      topicDetails
+      educationSystem,
+      board,
+      level,
+      subLevel,
+      group,
     } = req.body;
+
+    subjects = Array.isArray(subjects) ? subjects : [subjects];
+    console.log("is an array?",subjects);
+    tags = Array.isArray(tags) ? tags : [tags];
+
+    const normalizedSubjects = flattenSubjects(subjects).map(s => s.trim()).sort();
+    const normalizedTags = flattenSubjects(tags).map(t => t.trim()).filter(Boolean);
+
+    const eduValidation = validateEducationPath({
+      educationSystem,
+      board,
+      level,
+      group,
+      subjects: normalizedSubjects,
+      subLevel,
+    });
+
+    if (!eduValidation.valid) {
+      return res.status(400).json({ message: eduValidation.message });
+    }
+
+   const requiresBoard = educationSystem === 'English-Medium' || educationSystem === 'University-Admission';
+
+if (requiresBoard && (!board || board.trim() === '')) {
+  return res.status(400).json({ message: `${educationSystem === 'English-Medium' ? 'Board' : 'Track'} is required for ${educationSystem}.` });
+}
 
     const teacherId = req.user.userId;
     const teacher = await User.findById(teacherId);
-
     if (!teacher || teacher.role !== 'teacher' || !teacher.isEligible) {
       return res.status(403).json({ message: 'Not authorized to post' });
     }
 
-    console.log('Creating post:', { title, description, subjects, tags });
-
-    if (!isMeaningfulText(description)) {
-      return res.status(400).json({ message: 'Description appears to be nonsensical or gibberish. Please provide meaningful content.' });
-    }
-
-    const invalidSubjects = validateSubjectsHeuristically(subjects, title, description);
-    const invalidTags = validateSubjectsHeuristically(tags || [], title, description);
-
-    console.log('Invalid subjects:', invalidSubjects, 'Invalid tags:', invalidTags);
-
-    if (invalidSubjects.length > 0 || invalidTags.length > 0) {
+    const comboExists = await checkDuplicateSubjectCombination(
+      TeacherPost, teacherId, normalizedSubjects
+    );
+    if (comboExists.exists) {
       return res.status(400).json({
-        message: `The following subject(s) or tag(s) don't seem relevant to your content: ${[...invalidSubjects, ...invalidTags].join(', ')}. Please revise.`
+        message: `You have already created a post with the same subject combination: ${normalizedSubjects.join(', ')}`,
       });
     }
 
-    let videoUrl = null;
-    if (req.file) {
-      videoUrl = `/uploads/videos/${req.file.filename}`;
+    if (!isMeaningfulText(description)) {
+      return res.status(400).json({ message: 'Please provide meaningful description content.' });
     }
+
+    const videoUrl = req.file ? `/uploads/videos/${req.file.filename}` : '';
 
     const postData = {
       teacher: teacherId,
-      postType,
       title,
       description,
-      subjects: flattenSubjects(subjects),
+      subjects: normalizedSubjects,
       location,
       language,
       hourlyRate,
-      videoFile: videoUrl || '',
+      videoFile: videoUrl,
       youtubeLink,
-      tags: flattenSubjects(tags || []),
-      topicDetails: postType === 'topic' ? topicDetails : undefined
+      tags: normalizedTags,
+      educationSystem,
+      board,
+      level,
+      subLevel,
+      group,
     };
 
     const post = new TeacherPost(postData);
     await post.save();
 
-    res.status(201).json({ message: 'Post created', post });
+    res.status(201).json({ message: 'Post created successfully', post });
+
   } catch (err) {
-    console.error('Create post error:', err.message);
+    console.error('Create post error:', err);
     res.status(500).json({ message: 'Error creating post' });
   }
 };
-
-
 
 // =========================
 // UPDATE POST
@@ -92,7 +119,7 @@ const updatePost = async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to update this post' });
     }
 
-    const {
+    let {
       title,
       description,
       subjects,
@@ -101,38 +128,63 @@ const updatePost = async (req, res) => {
       hourlyRate,
       youtubeLink,
       tags,
-      postType,
-      topicDetails
+      educationSystem,
+      board,
+      level,
+      subLevel,
+      group,
     } = req.body;
 
-    console.log('Updating post:', { title, description, subjects, tags });
+    subjects = Array.isArray(subjects) ? subjects : [subjects];
+    tags = Array.isArray(tags) ? tags : [tags];
 
-    if (!isMeaningfulText(description)) {
-      return res.status(400).json({ message: 'Description appears to be nonsensical or gibberish. Please provide meaningful content.' });
+    const normalizedSubjects = flattenSubjects(subjects).map(s => s.trim()).sort();
+    const normalizedTags = flattenSubjects(tags).map(t => t.trim());
+
+    const eduValidation = validateEducationPath({
+      educationSystem,
+      board,
+      level,
+      group,
+      subjects: normalizedSubjects,
+      subLevel,
+    });
+
+    if (!eduValidation.valid) {
+      return res.status(400).json({ message: eduValidation.message });
     }
 
-    const invalidSubjects = validateSubjectsHeuristically(subjects, title, description);
-    const invalidTags = validateSubjectsHeuristically(tags || [], title, description);
+    if (!isMeaningfulText(description)) {
+      return res.status(400).json({ message: 'Please provide meaningful description content.' });
+    }
 
-    console.log('Invalid subjects:', invalidSubjects, 'Invalid tags:', invalidTags);
+    const { exists, matchedSubjects } = await checkDuplicateSubjectCombination(
+      TeacherPost,
+      teacherId,
+      normalizedSubjects,
+      postId
+    );
 
-    if (invalidSubjects.length > 0 || invalidTags.length > 0) {
+    if (exists) {
       return res.status(400).json({
-        message: `The following subject(s) or tag(s) don't seem relevant to your content: ${[...invalidSubjects, ...invalidTags].join(', ')}. Please revise.`
+        message: `You have already created another post with the same subject combination: ${matchedSubjects.join(', ')}`,
       });
     }
 
     const updates = {
-      postType,
       title,
       description,
-      subjects: flattenSubjects(subjects),
+      subjects: normalizedSubjects,
       location,
       language,
       hourlyRate,
       youtubeLink,
-      tags: flattenSubjects(tags || []),
-      topicDetails: postType === 'topic' ? topicDetails : undefined
+      tags: normalizedTags,
+      educationSystem,
+      board,
+      level,
+      subLevel,
+      group,
     };
 
     if (req.file) {
@@ -141,6 +193,7 @@ const updatePost = async (req, res) => {
 
     await TeacherPost.findByIdAndUpdate(postId, updates, { new: true });
     res.status(200).json({ message: 'Post updated successfully' });
+
   } catch (err) {
     console.error('Update post error:', err.message);
     res.status(500).json({ message: 'Error updating post' });
@@ -150,9 +203,8 @@ const updatePost = async (req, res) => {
 
 
 // =========================
-// The rest of your controller stays unchanged
+// GET ALL POSTS
 // =========================
-
 const getAllPosts = async (req, res) => {
   try {
     const subjectTags = req.query.subject;
@@ -168,12 +220,11 @@ const getAllPosts = async (req, res) => {
 
     const filter = {
       ...(selectedSubjects.length && { subjects: { $in: selectedSubjects } }),
-      ...(selectedTeachers.length && { teacher: { $in: selectedTeachers } }),
+      ...(selectedTeachers.length && { teacher: { $in: selectedTeachers } })
     };
 
     const posts = await TeacherPost.find(filter)
-      .populate('teacher', 'name email isEligible profileImage location language')
-      .exec();
+      .populate('teacher', 'name email isEligible profileImage location language');
 
     const eligiblePosts = posts.filter(post => post.teacher?.isEligible);
 
@@ -184,41 +235,9 @@ const getAllPosts = async (req, res) => {
   }
 };
 
-const getTeacherPostBySubject = async (req, res) => {
-  const { teacherId } = req.params;
-  const subjectName = req.params.subjectName?.trim().toLowerCase();
-
-  try {
-    const post = await TeacherPost.findOne({
-      teacher: teacherId,
-      subjects: { $elemMatch: { $regex: new RegExp(`^${subjectName}$`, 'i') } },
-    }).populate('teacher', 'name profileImage isEligible');
-
-    if (!post || !post.teacher || !post.teacher.isEligible) {
-      console.log('No post or teacher not eligible:', { teacherId, subjectName });
-      return res.status(404).json({ message: 'Post not found or teacher not eligible' });
-    }
-
-    res.status(200).json(post);
-  } catch (err) {
-    console.error('Error fetching teacher subject post:', err.message);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-const getPostsByTeacher = async (req, res) => {
-  try {
-    const { teacherId } = req.params;
-
-    const posts = await TeacherPost.find({ teacher: teacherId });
-
-    res.status(200).json(posts);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
-  }
-};
-
+// =========================
+// GET POST BY ID
+// =========================
 const getPostById = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -237,18 +256,58 @@ const getPostById = async (req, res) => {
   }
 };
 
+// =========================
+// GET POSTS BY TEACHER
+// =========================
+const getPostsByTeacher = async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+
+    const posts = await TeacherPost.find({ teacher: teacherId });
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// =========================
+// GET TEACHER POST BY SUBJECT
+// =========================
+const getTeacherPostBySubject = async (req, res) => {
+  const { teacherId } = req.params;
+  const subjectName = req.params.subjectName?.trim().toLowerCase();
+
+  try {
+    const post = await TeacherPost.findOne({
+      teacher: teacherId,
+      subjects: { $elemMatch: { $regex: new RegExp(`^${subjectName}$`, 'i') } },
+    }).populate('teacher', 'name profileImage isEligible');
+
+    if (!post || !post.teacher || !post.teacher.isEligible) {
+      return res.status(404).json({ message: 'Post not found or teacher not eligible' });
+    }
+
+    res.status(200).json(post);
+  } catch (err) {
+    console.error('Error fetching teacher subject post:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// =========================
+// DELETE POST
+// =========================
 const deleteTeacherPost = async (req, res) => {
   try {
     const postId = req.params.id;
 
     const post = await TeacherPost.findById(postId);
-
-    if (!post) {
-      return res.status(404).json({ message: 'Post not found' });
-    }
+    if (!post) return res.status(404).json({ message: 'Post not found' });
 
     if (!post.teacher || typeof post.teacher.toString !== 'function') {
-      return res.status(400).json({ message: 'Post is missing valid teacher reference' });
+      return res.status(400).json({ message: 'Invalid teacher reference' });
     }
 
     await TeacherPost.findByIdAndDelete(postId);
@@ -260,6 +319,9 @@ const deleteTeacherPost = async (req, res) => {
   }
 };
 
+// =========================
+// GET MY POSTS
+// =========================
 const getMyPosts = async (req, res) => {
   try {
     const posts = await TeacherPost.find({ teacher: req.user.userId }).sort({ createdAt: -1 });
@@ -272,11 +334,11 @@ const getMyPosts = async (req, res) => {
 
 module.exports = {
   createPost,
-  getAllPosts,
-  getTeacherPostBySubject,
-  getPostsByTeacher,
-  getPostById,
   updatePost,
+  getAllPosts,
+  getPostById,
+  getPostsByTeacher,
+  getTeacherPostBySubject,
   deleteTeacherPost,
   getMyPosts
 };
