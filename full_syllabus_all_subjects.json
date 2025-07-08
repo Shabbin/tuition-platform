@@ -1,0 +1,3240 @@
+{
+    "English-Medium": {
+        "CIE": {
+            "O_Level": {
+                "Physics-5054": {
+                    "1 Physical quantities and measurement": [
+                        "Units and standards",
+                        "Measurement errors"
+                    ],
+                    "2 Kinematics": [
+                        "Speed and velocity",
+                        "Acceleration"
+                    ],
+                    "3 Dynamics": [
+                        "Newton's laws",
+                        "Forces and motion"
+                    ],
+                    "4 Energy and work": [
+                        "Work done",
+                        "Power and energy"
+                    ]
+                },
+                "Chemistry-5070": {
+                    "1 Atoms, molecules and stoichiometry": [
+                        "Atomic structure and isotopes",
+                        "Chemical symbols and formulae",
+                        "Mole concept and calculations",
+                        "Balancing chemical equations"
+                    ],
+                    "2 States of matter": [
+                        "Properties of solids, liquids, and gases",
+                        "Changes of state and phase diagrams",
+                        "Gas laws",
+                        "Diffusion and evaporation"
+                    ],
+                    "3 Periodic table and bonding": [
+                        "Groups and periods",
+                        "Types of chemical bonds",
+                        "Properties of metals and non-metals",
+                        "Periodic trends in properties"
+                    ],
+                    "4 Acids, bases and salts": [
+                        "Properties of acids and bases",
+                        "pH scale and indicators",
+                        "Neutralisation reactions",
+                        "Preparation and uses of salts"
+                    ],
+                    "5 Chemical reactions": [
+                        "Types of chemical reactions",
+                        "Reaction rates and factors",
+                        "Exothermic and endothermic reactions",
+                        "Catalysts"
+                    ],
+                    "6 Organic chemistry basics": [
+                        "Introduction to hydrocarbons",
+                        "Functional groups",
+                        "Isomerism",
+                        "Basic organic reactions"
+                    ]
+                },
+                "Biology-5090": {
+                    "1 Cell structure and function": [
+                        "Cell theory",
+                        "Organelles and their functions",
+                        "Differences between plant and animal cells",
+                        "Microscope use"
+                    ],
+                    "2 Biological molecules": [
+                        "Carbohydrates",
+                        "Proteins",
+                        "Lipids",
+                        "Enzymes"
+                    ],
+                    "3 Enzymes": [
+                        "Enzyme structure and function",
+                        "Factors affecting enzyme activity",
+                        "Enzyme-substrate complex",
+                        "Industrial uses of enzymes"
+                    ],
+                    "4 Transport in plants and animals": [
+                        "Transport in xylem and phloem",
+                        "Circulatory system basics",
+                        "Gas exchange in plants and animals",
+                        "Osmosis and diffusion"
+                    ],
+                    "5 Genetics and inheritance": [
+                        "Mendelian inheritance",
+                        "DNA structure and replication",
+                        "Genetic mutations",
+                        "Genetic disorders"
+                    ]
+                },
+                "Mathematics-D-4024": {
+                    "1 Numbers and arithmetic": [
+                        "Types of numbers",
+                        "Prime factorisation",
+                        "Fractions and decimals",
+                        "Ratio and proportion"
+                    ],
+                    "2 Algebra": [
+                        "Algebraic expressions",
+                        "Solving equations",
+                        "Inequalities",
+                        "Graphs of linear equations"
+                    ],
+                    "3 Geometry": [
+                        "Properties of angles",
+                        "Triangles and polygons",
+                        "Circles",
+                        "Coordinate geometry"
+                    ],
+                    "4 Trigonometry": [
+                        "Trigonometric ratios",
+                        "Solving right-angled triangles",
+                        "Sine and cosine rules",
+                        "Applications in real life"
+                    ],
+                    "5 Mensuration": [
+                        "Perimeter and area of plane figures",
+                        "Surface area and volume of solids",
+                        "Units of measurement",
+                        "Conversion between units"
+                    ],
+                    "6 Statistics and probability": [
+                        "Data collection and representation",
+                        "Measures of central tendency",
+                        "Probability basics",
+                        "Interpretation of data"
+                    ]
+                },
+                "Additional-Mathematics-4037": {
+                    "1 Complex numbers": [
+                        "Definition and representation",
+                        "Operations on complex numbers",
+                        "Complex conjugates",
+                        "Polar form"
+                    ],
+                    "2 Sequences and series": [
+                        "Arithmetic progressions",
+                        "Geometric progressions",
+                        "Sum of series",
+                        "Applications"
+                    ],
+                    "3 Calculus": [
+                        "Differentiation basics",
+                        "Integration basics",
+                        "Applications of calculus",
+                        "Limits and continuity"
+                    ],
+                    "4 Matrices": [
+                        "Matrix operations",
+                        "Determinants",
+                        "Inverse matrices",
+                        "Applications"
+                    ],
+                    "5 Vectors": [
+                        "Vector addition and subtraction",
+                        "Scalar and vector products",
+                        "Applications in geometry",
+                        "3D vectors"
+                    ]
+                },
+                "Bangla-3204": {
+                    "1 Grammar and vocabulary": [
+                        "Parts of speech",
+                        "Sentence structure",
+                        "Common vocabulary",
+                        "Idioms and phrases"
+                    ],
+                    "2 Reading comprehension": [
+                        "Understanding passages",
+                        "Answering questions",
+                        "Summarising texts",
+                        "Inference making"
+                    ],
+                    "3 Writing skills": [
+                        "Paragraph writing",
+                        "Letter writing",
+                        "Essay writing",
+                        "Creative writing"
+                    ],
+                    "4 Literature and poetry": [
+                        "Famous poets and writers",
+                        "Poetry analysis",
+                        "Literary devices",
+                        "Story summaries"
+                    ]
+                },
+                "English": {
+                    "1 Reading comprehension": [
+                        "Skimming and scanning",
+                        "Answering multiple-choice questions",
+                        "Identifying main ideas",
+                        "Making inferences"
+                    ],
+                    "2 Writing skills": [
+                        "Essay writing",
+                        "Report writing",
+                        "Formal and informal letters",
+                        "Creative writing"
+                    ],
+                    "3 Grammar and vocabulary": [
+                        "Tenses",
+                        "Parts of speech",
+                        "Common mistakes",
+                        "Phrasal verbs"
+                    ],
+                    "4 Literature analysis": [
+                        "Prose and poetry",
+                        "Drama and plays",
+                        "Themes and motifs",
+                        "Character analysis"
+                    ]
+                },
+                "Business-Studies-7115": {
+                    "1 Business activity and environment": [
+                        "Types of businesses",
+                        "Business objectives",
+                        "Stakeholders",
+                        "External environment"
+                    ],
+                    "2 Marketing": [
+                        "Marketing mix",
+                        "Market research",
+                        "Product life cycle",
+                        "Pricing strategies"
+                    ],
+                    "3 Finance": [
+                        "Sources of finance",
+                        "Financial statements",
+                        "Budgeting",
+                        "Cash flow management"
+                    ],
+                    "4 Human resources": [
+                        "Recruitment and selection",
+                        "Training and development",
+                        "Motivation theories",
+                        "Employment laws"
+                    ],
+                    "5 Business operations": [
+                        "Production methods",
+                        "Quality control",
+                        "Inventory management",
+                        "Health and safety"
+                    ]
+                },
+                "Accounting-7707": {
+                    "1 Accounting principles": [
+                        "Fundamental accounting concepts",
+                        "Double-entry system",
+                        "Accruals and prepayments",
+                        "Consistency and prudence"
+                    ],
+                    "2 Financial statements": [
+                        "Income statement",
+                        "Balance sheet",
+                        "Cash flow statement",
+                        "Statement of changes in equity"
+                    ],
+                    "3 Books of prime entry": [
+                        "Sales and purchases journals",
+                        "Cash book",
+                        "Petty cash book",
+                        "Returns journals"
+                    ],
+                    "4 Trial balance and errors": [
+                        "Preparing trial balance",
+                        "Types of errors",
+                        "Suspense accounts",
+                        "Correction of errors"
+                    ],
+                    "5 Control accounts and reconciliation": [
+                        "Control accounts",
+                        "Bank reconciliation statements",
+                        "Importance of reconciliations",
+                        "Common reconciliation issues"
+                    ]
+                },
+                "Economics-2281": {
+                    "1 Basic economic concepts": [
+                        "Scarcity and choice",
+                        "Opportunity cost",
+                        "Factors of production",
+                        "Economic systems"
+                    ],
+                    "2 Demand and supply": [
+                        "Law of demand",
+                        "Law of supply",
+                        "Market equilibrium",
+                        "Elasticity"
+                    ],
+                    "3 Market structures": [
+                        "Perfect competition",
+                        "Monopoly",
+                        "Oligopoly",
+                        "Monopolistic competition"
+                    ],
+                    "4 Government intervention": [
+                        "Taxes and subsidies",
+                        "Price controls",
+                        "Regulation",
+                        "Government failure"
+                    ],
+                    "5 Macroeconomic objectives": [
+                        "Inflation",
+                        "Unemployment",
+                        "Economic growth",
+                        "Balance of payments"
+                    ]
+                },
+                "Commerce-7100": {
+                    "1 Trade and commerce basics": [
+                        "Types of trade",
+                        "Role of commerce",
+                        "Trade policies",
+                        "Globalization effects"
+                    ],
+                    "2 Business organization": [
+                        "Forms of business ownership",
+                        "Organizational structures",
+                        "Management functions",
+                        "Corporate governance"
+                    ],
+                    "3 Marketing and sales": [
+                        "Marketing strategies",
+                        "Sales techniques",
+                        "Customer service",
+                        "Advertising and promotion"
+                    ],
+                    "4 Business finance": [
+                        "Financial planning",
+                        "Sources of business finance",
+                        "Investment appraisal",
+                        "Working capital management"
+                    ],
+                    "5 International trade": [
+                        "Trade theories",
+                        "Trade barriers",
+                        "Exchange rates",
+                        "Balance of trade"
+                    ]
+                },
+                "Computer-Science-2210": {
+                    "1 Data representation": [
+                        "Binary and hexadecimal systems",
+                        "Character encoding",
+                        "Data storage units",
+                        "Data compression"
+                    ],
+                    "2 Hardware and software": [
+                        "Computer components",
+                        "Operating systems",
+                        "Software types",
+                        "Input and output devices"
+                    ],
+                    "3 Programming concepts": [
+                        "Variables and data types",
+                        "Control structures",
+                        "Functions and procedures",
+                        "Debugging techniques"
+                    ],
+                    "4 Databases": [
+                        "Database models",
+                        "SQL basics",
+                        "Normalization",
+                        "Data security"
+                    ],
+                    "5 Networks and security": [
+                        "Types of networks",
+                        "Network protocols",
+                        "Cybersecurity basics",
+                        "Firewall and antivirus"
+                    ]
+                }
+            },
+            "IGCSE": {
+                "Physics-0625": {
+                    "1 Physical quantities and measurement": [
+                        "Units and standards",
+                        "Measurement errors",
+                        "SI units and prefixes",
+                        "Measurement instruments"
+                    ],
+                    "2 Kinematics": [
+                        "Speed and velocity",
+                        "Acceleration",
+                        "Distance-time graphs",
+                        "Velocity-time graphs"
+                    ],
+                    "3 Dynamics": [
+                        "Newton's laws",
+                        "Forces and motion",
+                        "Friction",
+                        "Momentum"
+                    ],
+                    "4 Energy and work": [
+                        "Work done",
+                        "Power and energy",
+                        "Conservation of energy",
+                        "Energy transfer methods"
+                    ]
+                },
+                "Chemistry-0620": {
+                    "1 Atoms, molecules and stoichiometry": [
+                        "Atomic structure",
+                        "Chemical symbols and formulae",
+                        "Mole concept",
+                        "Balancing equations"
+                    ],
+                    "2 States of matter": [
+                        "Properties of solids, liquids, gases",
+                        "Changes of state",
+                        "Gas laws",
+                        "Diffusion"
+                    ],
+                    "3 Periodic table and bonding": [
+                        "Periodic trends",
+                        "Ionic bonding",
+                        "Covalent bonding",
+                        "Metallic bonding"
+                    ],
+                    "4 Acids, bases and salts": [
+                        "Properties of acids and bases",
+                        "pH scale",
+                        "Neutralisation",
+                        "Preparation of salts"
+                    ],
+                    "5 Chemical reactions": [
+                        "Types of reactions",
+                        "Reaction rates",
+                        "Energy changes",
+                        "Catalysts"
+                    ],
+                    "6 Organic chemistry basics": [
+                        "Hydrocarbons",
+                        "Isomerism",
+                        "Functional groups",
+                        "Basic organic reactions"
+                    ]
+                },
+                "Biology-0610": {
+                    "1 Cell structure and function": [
+                        "Cell theory",
+                        "Cell organelles",
+                        "Plant vs animal cells",
+                        "Microscopy"
+                    ],
+                    "2 Biological molecules": [
+                        "Carbohydrates",
+                        "Proteins",
+                        "Lipids",
+                        "Enzymes"
+                    ],
+                    "3 Enzymes": [
+                        "Enzyme structure",
+                        "Enzyme activity factors",
+                        "Enzyme-substrate complex",
+                        "Applications of enzymes"
+                    ],
+                    "4 Transport in plants and animals": [
+                        "Xylem and phloem",
+                        "Circulatory system",
+                        "Gas exchange",
+                        "Osmosis and diffusion"
+                    ],
+                    "5 Genetics and inheritance": [
+                        "Mendelian genetics",
+                        "DNA structure",
+                        "Genetic variation",
+                        "Inheritance patterns"
+                    ]
+                },
+                "Mathematics-0580": {
+                    "1 Numbers and arithmetic": [
+                        "Number types",
+                        "Fractions and decimals",
+                        "Ratio and proportion",
+                        "Percentages"
+                    ],
+                    "2 Algebra": [
+                        "Expressions and equations",
+                        "Inequalities",
+                        "Sequences",
+                        "Graphs"
+                    ],
+                    "3 Geometry": [
+                        "Angles and lines",
+                        "Triangles and polygons",
+                        "Circles",
+                        "Coordinate geometry"
+                    ],
+                    "4 Trigonometry": [
+                        "Basic trig ratios",
+                        "Solving triangles",
+                        "Sine and cosine rules",
+                        "Applications"
+                    ],
+                    "5 Mensuration": [
+                        "Area and perimeter",
+                        "Surface area and volume",
+                        "Units conversion",
+                        "Measurement problems"
+                    ],
+                    "6 Statistics and probability": [
+                        "Data representation",
+                        "Measures of central tendency",
+                        "Probability basics",
+                        "Data interpretation"
+                    ]
+                },
+                "Additional-Mathematics-0606": {
+                    "1 Complex numbers": [
+                        "Definition and form",
+                        "Operations",
+                        "Polar form",
+                        "Applications"
+                    ],
+                    "2 Sequences and series": [
+                        "Arithmetic sequences",
+                        "Geometric sequences",
+                        "Sum formulas",
+                        "Applications"
+                    ],
+                    "3 Calculus": [
+                        "Limits",
+                        "Differentiation",
+                        "Integration",
+                        "Applications"
+                    ],
+                    "4 Matrices": [
+                        "Matrix operations",
+                        "Determinants",
+                        "Inverse matrices",
+                        "Applications"
+                    ],
+                    "5 Vectors": [
+                        "Vector addition",
+                        "Scalar and vector products",
+                        "3D vectors",
+                        "Applications"
+                    ]
+                },
+                "Bangla": {
+                    "1 Grammar and vocabulary": [
+                        "Parts of speech",
+                        "Sentence structure",
+                        "Common idioms",
+                        "Vocabulary building"
+                    ],
+                    "2 Reading comprehension": [
+                        "Passage understanding",
+                        "Answering questions",
+                        "Summarising texts",
+                        "Inference skills"
+                    ],
+                    "3 Writing skills": [
+                        "Paragraph writing",
+                        "Letter writing",
+                        "Essay writing",
+                        "Creative writing"
+                    ],
+                    "4 Literature and poetry": [
+                        "Famous poets and writers",
+                        "Poetry analysis",
+                        "Literary devices",
+                        "Short stories"
+                    ]
+                },
+                "Business-Studies-0450": {
+                    "1 Business activity and environment": [
+                        "Types of business",
+                        "Business objectives",
+                        "Stakeholders",
+                        "Business environment"
+                    ],
+                    "2 Marketing": [
+                        "Marketing mix",
+                        "Market research",
+                        "Product life cycle",
+                        "Pricing strategies"
+                    ],
+                    "3 Finance": [
+                        "Sources of finance",
+                        "Financial statements",
+                        "Budgeting",
+                        "Cash flow"
+                    ],
+                    "4 Human resources": [
+                        "Recruitment",
+                        "Training",
+                        "Motivation",
+                        "Labour laws"
+                    ],
+                    "5 Business operations": [
+                        "Production methods",
+                        "Quality control",
+                        "Inventory",
+                        "Health and safety"
+                    ]
+                },
+                "Economics-0455": {
+                    "1 Basic economic concepts": [
+                        "Scarcity and choice",
+                        "Opportunity cost",
+                        "Factors of production",
+                        "Economic systems"
+                    ],
+                    "2 Demand and supply": [
+                        "Law of demand",
+                        "Law of supply",
+                        "Market equilibrium",
+                        "Elasticity"
+                    ],
+                    "3 Market structures": [
+                        "Perfect competition",
+                        "Monopoly",
+                        "Oligopoly",
+                        "Monopolistic competition"
+                    ],
+                    "4 Government intervention": [
+                        "Taxes and subsidies",
+                        "Price controls",
+                        "Regulations",
+                        "Government failure"
+                    ],
+                    "5 Macroeconomic objectives": [
+                        "Inflation",
+                        "Unemployment",
+                        "Economic growth",
+                        "Balance of payments"
+                    ]
+                },
+                "Accounting-0452": {
+                    "1 Accounting principles": [
+                        "Accounting concepts",
+                        "Double-entry system",
+                        "Accruals and prepayments",
+                        "Consistency and prudence"
+                    ],
+                    "2 Financial statements": [
+                        "Income statement",
+                        "Balance sheet",
+                        "Cash flow statement",
+                        "Statement of changes"
+                    ],
+                    "3 Books of prime entry": [
+                        "Sales journal",
+                        "Purchases journal",
+                        "Cash book",
+                        "Returns journals"
+                    ],
+                    "4 Trial balance and errors": [
+                        "Preparing trial balance",
+                        "Types of errors",
+                        "Suspense accounts",
+                        "Error correction"
+                    ],
+                    "5 Control accounts and reconciliation": [
+                        "Control accounts",
+                        "Bank reconciliation",
+                        "Importance of reconciliation",
+                        "Common issues"
+                    ]
+                },
+                "Commerce-7100": {
+                    "1 Trade and commerce basics": [
+                        "Types of trade",
+                        "Role of commerce",
+                        "Trade policies",
+                        "Globalization"
+                    ],
+                    "2 Business organization": [
+                        "Business types",
+                        "Organizational structure",
+                        "Management functions",
+                        "Corporate governance"
+                    ],
+                    "3 Marketing and sales": [
+                        "Marketing strategies",
+                        "Sales techniques",
+                        "Customer service",
+                        "Advertising"
+                    ],
+                    "4 Business finance": [
+                        "Financial planning",
+                        "Sources of finance",
+                        "Investment appraisal",
+                        "Working capital"
+                    ],
+                    "5 International trade": [
+                        "Trade theories",
+                        "Trade barriers",
+                        "Exchange rates",
+                        "Balance of trade"
+                    ]
+                },
+                "Computer-Science-0478": {
+                    "1 Data representation": [
+                        "Binary and hexadecimal",
+                        "Character encoding",
+                        "Data storage",
+                        "Compression techniques"
+                    ],
+                    "2 Hardware and software": [
+                        "Computer components",
+                        "Operating systems",
+                        "Software types",
+                        "Input/output devices"
+                    ],
+                    "3 Programming concepts": [
+                        "Variables and data types",
+                        "Control structures",
+                        "Functions and procedures",
+                        "Debugging"
+                    ],
+                    "4 Databases": [
+                        "Database models",
+                        "SQL basics",
+                        "Normalization",
+                        "Data security"
+                    ],
+                    "5 Networks and security": [
+                        "Types of networks",
+                        "Network protocols",
+                        "Cybersecurity",
+                        "Firewalls and antivirus"
+                    ]
+                }
+            },
+            "A_Level": {
+                "Chemistry-9701": {
+                    "AS_Level": {
+                        "1 Atomic structure": [
+                            "1.1 Particles in the atom and atomic radius",
+                            "1.2 Isotopes",
+                            "1.3 Electrons, energy levels and atomic orbitals",
+                            "1.4 Ionisation energy"
+                        ],
+                        "2 Atoms, molecules and stoichiometry": [
+                            "2.1 Relative masses of atoms and molecules",
+                            "2.2 The mole and the Avogadro constant",
+                            "2.3 Formulas",
+                            "2.4 Reacting masses and volumes (of solutions and gases)"
+                        ],
+                        "3 Chemical bonding": [
+                            "3.1 Electronegativity and bonding",
+                            "3.2 Ionic bonding",
+                            "3.3 Metallic bonding",
+                            "3.4 Covalent bonding and coordinate (dative covalent) bonding"
+                        ],
+                        "4 state that, in general, ionic, covalent and metallic bonding are stronger than intermolecular forces": [],
+                        "5 Chemical energetics": [
+                            "5.1 Enthalpy change, ΔH",
+                            "5.2 Hess’s law"
+                        ],
+                        "6 Electrochemistry": [
+                            "6.1 Redox processes: electron transfer and changes in oxidation number (oxidation state)"
+                        ],
+                        "7 Equilibria": [
+                            "7.1 Chemical equilibria: reversible reactions, dynamic equilibrium",
+                            "7.2 Brønsted–Lowry theory of acids and bases"
+                        ],
+                        "8 Reaction kinetics": [
+                            "8.1 Rate of reaction",
+                            "8.2 Effect of temperature on reaction rates and the concept of activation energy",
+                            "8.3 Homogeneous and heterogeneous catalysts"
+                        ],
+                        "9 The Periodic Table: chemical periodicity": [
+                            "9.1 Periodicity of physical properties of the elements in Period 3",
+                            "9.2 Periodicity of chemical properties of the elements in Period 3",
+                            "9.3 Chemical periodicity of other elements"
+                        ],
+                        "10 Group 2": [
+                            "10.1 Similarities and trends in the properties of the Group 2 metals, magnesium to barium"
+                        ],
+                        "11 Group 17": [
+                            "11.1 Physical properties of the Group 17 elements",
+                            "11.2 The chemical properties of the halogen elements and the hydrogen halides",
+                            "11.3 Some reactions of the halide ions",
+                            "11.4 The reactions of chlorine"
+                        ],
+                        "12 Nitrogen and sulfur": [
+                            "12.1 Nitrogen and sulfur"
+                        ],
+                        "13 An introduction to AS Level organic chemistry": [
+                            "13.1 Formulas, functional groups and the naming of organic compounds",
+                            "13.2 Characteristic organic reactions",
+                            "13.3 Shapes of organic molecules; σ and π bonds",
+                            "13.4 Isomerism: structural isomerism and stereoisomerism"
+                        ],
+                        "14 Hydrocarbons": [
+                            "14.1 Alkanes",
+                            "14.2 Alkenes"
+                        ],
+                        "15 Halogen compounds": [
+                            "15.1 Halogenoalkanes"
+                        ],
+                        "16 Hydroxy compounds": [
+                            "16.1 Alcohols"
+                        ],
+                        "17 Carbonyl compounds": [
+                            "17.1 Aldehydes and ketones"
+                        ],
+                        "18 Carboxylic acids and derivatives": [
+                            "18.1 Carboxylic acids",
+                            "18.2 Esters"
+                        ],
+                        "19 Nitrogen compounds": [
+                            "19.1 Primary amines",
+                            "19.2 Nitriles and hydroxynitriles"
+                        ],
+                        "20 Polymerisation": [
+                            "20.1 Addition polymerisation"
+                        ],
+                        "21 Organic synthesis": [
+                            "21.1 Organic synthesis"
+                        ],
+                        "22 Analytical techniques": [
+                            "22.1 Infrared spectroscopy",
+                            "22.2 Mass spectrometry"
+                        ]
+                    },
+                    "A_Level": {
+                        "23 Chemical energetics": [
+                            "23.1 Lattice energy and Born-Haber cycles",
+                            "23.2 Enthalpies of solution and hydration",
+                            "23.3 Entropy change, ΔS",
+                            "23.4 Gibbs free energy change, ΔG"
+                        ],
+                        "24 Electrochemistry": [
+                            "24.1 Electrolysis",
+                            "24.2 Standard electrode potentials E, standard cell potentials E and the Nernst equation"
+                        ],
+                        "25 Equilibria": [
+                            "25.1 Acids and bases",
+                            "25.2 Partition coefficients"
+                        ],
+                        "26 Reaction kinetics": [
+                            "26.1 Simple rate equations, orders of reaction and rate constants",
+                            "26.2 Homogeneous and heterogeneous catalysts"
+                        ],
+                        "27 Group 2": [
+                            "27.1 Similarities and trends in the properties of the Group 2 metals, magnesium to barium"
+                        ],
+                        "28 Chemistry of transition elements": [
+                            "28.1 General physical and chemical properties of the first row of transition elements, titanium to …",
+                            "28.2 General characteristic chemical properties of the first set of transition elements, titanium to …",
+                            "28.3 Colour of complexes",
+                            "28.4 Stereoisomerism in transition element complexes",
+                            "28.5 Stability constants, K"
+                        ],
+                        "29 An introduction to A Level organic chemistry": [
+                            "29.1 Formulas, functional groups and the naming of organic compounds",
+                            "29.2 Characteristic organic reactions",
+                            "29.3 Shapes of aromatic organic molecules; σ and π bonds",
+                            "29.4 Isomerism: optical"
+                        ],
+                        "30 Hydrocarbons": [
+                            "30.1 Arenes"
+                        ],
+                        "31 Halogen compounds": [
+                            "31.1 Halogen compounds"
+                        ],
+                        "32 Hydroxy compounds": [
+                            "32.1 Alcohols",
+                            "32.2 Phenol"
+                        ],
+                        "33 Carboxylic acids and derivatives": [
+                            "33.1 Carboxylic acids",
+                            "33.2 Esters",
+                            "33.3 Acyl chlorides"
+                        ],
+                        "34 Nitrogen compounds": [
+                            "34.1 Primary and secondary amines",
+                            "34.2 Phenylamine and azo compounds",
+                            "34.3 Amides",
+                            "34.4 Amino acids"
+                        ],
+                        "35 Polymerisation": [
+                            "35.1 Condensation polymerisation",
+                            "35.2 Predicting the type of polymerisation",
+                            "35.3 Degradable polymers"
+                        ],
+                        "36 Organic synthesis": [],
+                        "37 Analytical techniques": [
+                            "37.1 Thin-layer chromatography",
+                            "37.2 Gas / liquid chromatography",
+                            "37.3 Carbon-13 NMR spectroscopy",
+                            "37.4 Proton (1H) NMR spectroscopy"
+                        ]
+                    }
+                },
+                "Physics-9702": {
+                    "AS_Level": {
+                        "1 Physical quantities and units": [
+                            "1.1 Physical quantities",
+                            "1.2 SI units",
+                            "1.3 Errors and uncertainties",
+                            "1.4 Scalars and vectors"
+                        ],
+                        "2 Kinematics": [
+                            "2.1 Equations of motion"
+                        ],
+                        "3 Dynamics": [
+                            "3.1 Momentum and Newton’s laws of motion",
+                            "3.2 Non-uniform motion",
+                            "3.3 Linear momentum and its conservation"
+                        ],
+                        "4 Forces, density and pressure": [
+                            "4.1 Turning effects of forces",
+                            "4.2 Equilibrium of forces",
+                            "4.3 Density and pressure"
+                        ],
+                        "5 Work, energy and power": [
+                            "5.1 Energy conservation",
+                            "5.2 Gravitational potential energy and kinetic energy"
+                        ],
+                        "6 Deformation of solids": [
+                            "6.1 Stress and strain",
+                            "6.2 Elastic and plastic behaviour"
+                        ],
+                        "7 Waves": [
+                            "7.1 Progressive waves",
+                            "7.2 Transverse and longitudinal waves",
+                            "7.3 Doppler effect for sound waves",
+                            "7.4 Electromagnetic spectrum",
+                            "7.5 Polarisation"
+                        ],
+                        "8 Superposition": [
+                            "8.1 Stationary waves",
+                            "8.2 Diffraction",
+                            "8.3 Interference",
+                            "8.4 The diffraction grating"
+                        ],
+                        "9 Electricity": [
+                            "9.1 Electric current",
+                            "9.2 Potential difference and power",
+                            "9.3 Resistance and resistivity"
+                        ],
+                        "10 D.C. circuits": [
+                            "10.1 Practical circuits",
+                            "10.2 Kirchhoff’s laws",
+                            "10.3 Potential dividers"
+                        ],
+                        "11 Particle physics": [
+                            "11.1 Atoms, nuclei and radiation",
+                            "11.2 Fundamental particles"
+                        ]
+                    },
+                    "A_Level": {
+                        "12 Motion in a circle": [
+                            "12.1 Kinematics of uniform circular motion",
+                            "12.2 Centripetal acceleration"
+                        ],
+                        "13 Gravitational fields": [
+                            "13.1 Gravitational field",
+                            "13.2 Gravitational force between point masses",
+                            "13.3 Gravitational field of a point mass",
+                            "13.4 Gravitational potential"
+                        ],
+                        "14 Temperature": [
+                            "14.1 Thermal equilibrium",
+                            "14.2 Temperature scales",
+                            "14.3 Specific heat capacity and specific latent heat"
+                        ],
+                        "15 Ideal gases": [
+                            "15.1 The mole",
+                            "15.2 Equation of state",
+                            "15.3 Kinetic theory of gases"
+                        ],
+                        "16 Thermodynamics": [
+                            "16.1 Internal energy",
+                            "16.2 The first law of thermodynamics"
+                        ],
+                        "17 Oscillations": [
+                            "17.1 Simple harmonic oscillations",
+                            "17.2 Energy in simple harmonic motion",
+                            "17.3 Damped and forced oscillations, resonance"
+                        ],
+                        "18 Electric fields": [
+                            "18.1 Electric fields and field lines",
+                            "18.2 Uniform electric fields",
+                            "18.3 Electric force between point charges",
+                            "18.4 Electric field of a point charge",
+                            "18.5 Electric potential"
+                        ],
+                        "19 Capacitance": [
+                            "19.1 Capacitors and capacitance",
+                            "19.2 Energy stored in a capacitor",
+                            "19.3 Discharging a capacitor"
+                        ],
+                        "20 Magnetic fields": [
+                            "20.1 Concept of a magnetic field",
+                            "20.2 Force on a current-carrying conductor",
+                            "20.3 Force on a moving charge",
+                            "20.4 Magnetic fields due to currents",
+                            "20.5 Electromagnetic induction"
+                        ],
+                        "21 Alternating currents": [
+                            "21.1 Characteristics of alternating currents",
+                            "21.2 Rectification and smoothing"
+                        ],
+                        "22 Quantum physics": [
+                            "22.1 Energy and momentum of a photon",
+                            "22.2 Photoelectric effect",
+                            "22.3 Wave-particle duality",
+                            "22.4 Energy levels in atoms and line spectra"
+                        ],
+                        "23 Nuclear physics": [
+                            "23.1 Mass defect and nuclear binding energy",
+                            "23.2 Radioactive decay"
+                        ],
+                        "24 Medical physics": [
+                            "24.1 Production and use of ultrasound",
+                            "24.2 Production and use of X-rays",
+                            "24.3 PET scanning"
+                        ],
+                        "25 Astronomy and cosmology": [
+                            "25.1 Standard candles",
+                            "25.2 Stellar radii",
+                            "25.3 Hubble’s law and the Big Bang theory"
+                        ]
+                    }
+                },
+                "Mathematics-9709": {
+                    "AS_Level": {
+                        "Pure_Mathematics_1": {
+                            "1 Quadratics": [],
+                            "2 Functions": [],
+                            "3 Coordinate geometry": [],
+                            "4 Circular measure": [],
+                            "5 Trigonometry": [],
+                            "6 Differentiation": [],
+                            "7 Integration": []
+                        },
+                        "Mechanics_1": {
+                            "1 Forces and equilibrium": [],
+                            "2 Kinematics of motion in a straight line": [],
+                            "3 Newton’s laws of motion": [],
+                            "4 Energy, work and power": [],
+                            "5 Momentum": []
+                        },
+                        "Statistics_1": {
+                            "1 Representation of data": [],
+                            "2 Measures of central tendency and variation": [],
+                            "3 Probability": [],
+                            "4 Discrete random variables": [],
+                            "5 The normal distribution": []
+                        }
+                    },
+                    "A_Level": {
+                        "Pure_Mathematics_2": {
+                            "1 Algebra": [],
+                            "2 Logarithmic and exponential functions": [],
+                            "3 Trigonometry": [],
+                            "4 Differentiation": [],
+                            "5 Integration": [],
+                            "6 Numerical solution of equations": []
+                        },
+                        "Pure_Mathematics_3": {
+                            "1 Algebra": [],
+                            "2 Logarithmic and exponential functions": [],
+                            "3 Trigonometry": [],
+                            "4 Differentiation": [],
+                            "5 Integration": [],
+                            "6 Numerical solution of equations": [],
+                            "7 Vectors": []
+                        },
+                        "Mechanics_2": {
+                            "1 Motion of a projectile": [],
+                            "2 Equilibrium of a rigid body": [],
+                            "3 Circular motion": [],
+                            "4 Hooke’s law": [],
+                            "5 Linear motion under a variable force": []
+                        },
+                        "Statistics_2": {
+                            "1 The Poisson distribution": [],
+                            "2 Linear combinations of random variables": [],
+                            "3 Continuous random variables": [],
+                            "4 Sampling and estimation": [],
+                            "5 Hypothesis tests": []
+                        }
+                    }
+                },
+                "Economics-9708": {
+                    "AS_Level": {
+                        "1 Basic economic ideas and resource allocation": [
+                            "1.1 Scarcity, choice and opportunity cost",
+                            "1.2 Economic methodology",
+                            "1.3 Factors of production",
+                            "1.4 Resource allocation in different economic systems",
+                            "1.5 Production possibility curves",
+                            "1.6 Classification of goods and services"
+                        ],
+                        "2 The price system and the microeconomy": [
+                            "2.1 Demand and supply curves",
+                            "2.2 Price elasticity, income elasticity and cross elasticity of demand",
+                            "2.3 Price elasticity of supply",
+                            "2.4 The interaction of demand and supply",
+                            "2.5 Consumer and producer surplus"
+                        ],
+                        "3 Government microeconomic intervention": [
+                            "3.1 Reasons for government intervention in markets",
+                            "3.2 Methods and effects of government intervention in markets",
+                            "3.3 Addressing income and wealth inequality"
+                        ],
+                        "4 The macroeconomy": [
+                            "4.1 National income statistics",
+                            "4.2 Introduction to the circular flow of income",
+                            "4.3 Aggregate Demand and Aggregate Supply analysis",
+                            "4.4 Economic growth",
+                            "4.5 Unemployment",
+                            "4.6 Price stability"
+                        ],
+                        "5 Government macroeconomic intervention": [
+                            "5.1 Government macroeconomic policy objectives",
+                            "5.2 Fiscal policy",
+                            "5.3 Monetary policy",
+                            "5.4 Supply-side policy"
+                        ],
+                        "6 International economic issues": [
+                            "6.1 The reasons for international trade",
+                            "6.2 Protectionism",
+                            "6.3 Current account of the balance of payments",
+                            "6.4 Exchange rates",
+                            "6.5 Policies to correct imbalances in the current account of the balance of payments"
+                        ]
+                    },
+                    "A_Level": {
+                        "7 The price system and the microeconomy": [
+                            "7.1 Utility",
+                            "7.2 Indifference curves and budget lines",
+                            "7.3 Efficiency and market failure",
+                            "7.4 Private costs and benefits, externalities and social costs and benefits",
+                            "7.5 Types of cost, revenue and profit, short-run and long-run production",
+                            "7.6 Different market structures",
+                            "7.7 Growth and survival of firms",
+                            "7.8 Differing objectives and policies of firms"
+                        ],
+                        "8 Government microeconomic intervention": [
+                            "8.1 Government policies to achieve efficient resource allocation and correct market failure",
+                            "8.2 Equity and redistribution of income and wealth",
+                            "8.3 Labour market forces and government intervention"
+                        ],
+                        "9 The macroeconomy": [
+                            "9.1 The circular flow of income",
+                            "9.2 Economic growth and sustainability",
+                            "9.3 Employment/unemployment",
+                            "9.4 Money and banking"
+                        ],
+                        "10 Government macroeconomic intervention": [
+                            "10.1 Government macroeconomic policy objectives",
+                            "10.2 Links between macroeconomic problems and their interrelatedness",
+                            "10.3 Effectiveness of policy options to meet all macroeconomic objectives"
+                        ],
+                        "11 International economic issues": [
+                            "11.1 Policies to correct disequilibrium in the balance of payments",
+                            "11.2 Exchange rates",
+                            "11.3 Economic development",
+                            "11.4 Characteristics of countries at different levels of development",
+                            "11.5 Relationship between countries at different levels of development",
+                            "11.6 Globalisation"
+                        ]
+                    }
+                },
+                "Accounting-9706": {
+                    "AS_Level": {
+                        "1 The fundamentals of accounting": [
+                            "Purpose of accounting",
+                            "Users of accounting information",
+                            "Principles and concepts of accounting",
+                            "The accounting equation",
+                            "The double-entry system of book-keeping"
+                        ],
+                        "2 Financial accounting": [
+                            "Books of prime entry and ledgers",
+                            "Bank reconciliation statements",
+                            "Correction of errors and suspense accounts",
+                            "Capital and revenue expenditure and receipts",
+                            "Depreciation",
+                            "Irrecoverable debts and allowance for doubtful debts",
+                            "Valuation of inventory",
+                            "Control accounts",
+                            "Incomplete records",
+                            "Preparation of financial statements for sole traders",
+                            "Partnership accounts",
+                            "Accounts of clubs and societies",
+                            "Manufacturing accounts",
+                            "Accounts of limited companies (introduction)"
+                        ],
+                        "3 Principles of costing": [
+                            "Costing terms",
+                            "Cost classification",
+                            "Overhead absorption",
+                            "Job costing",
+                            "Break-even analysis",
+                            "Marginal and absorption costing"
+                        ],
+                        "4 Accounting for management": [
+                            "Budgeting",
+                            "Standard costing",
+                            "Decision making"
+                        ]
+                    },
+                    "A_Level": {
+                        "5 Preparation of financial statements": [
+                            "Advanced partnership accounts",
+                            "Limited company accounts",
+                            "Cash flow statements (IAS 7)",
+                            "Statement of profit or loss and other comprehensive income",
+                            "Statement of financial position"
+                        ],
+                        "6 Analysis and interpretation": [
+                            "Accounting ratios",
+                            "Interpretation of financial statements",
+                            "Limitations of ratio analysis"
+                        ],
+                        "7 Accounting principles and policies": [
+                            "Accounting principles",
+                            "Accounting policies",
+                            "International Accounting Standards (IASs)"
+                        ],
+                        "8 Cost and management accounting": [
+                            "Activity-based costing",
+                            "Marginal and absorption costing (revisited)",
+                            "Standard costing and variance analysis",
+                            "Capital investment appraisal",
+                            "Decision making for management"
+                        ]
+                    }
+                },
+                "Computer-Science-9618": {
+                    "AS_Level": {
+                        "1 Information representation": [
+                            "Data Representation",
+                            "Multimedia Graphics",
+                            "Compression"
+                        ],
+                        "2 Communication": [
+                            "Networks including the internet"
+                        ],
+                        "3 Hardware": [
+                            "Computers and their components",
+                            "Logic Gates and Logic Circuits"
+                        ],
+                        "4 Processor Fundamentals": [
+                            "CPU Architecture",
+                            "Assembly Language",
+                            "Bit manipulation"
+                        ],
+                        "5 System Software": [
+                            "Operating Systems",
+                            "Language Translators"
+                        ],
+                        "6 Security, privacy and data integrity": [
+                            "Data Security",
+                            "Data Integrity"
+                        ],
+                        "7 Ethics and Ownership": [
+                            "Ethics and Ownership"
+                        ],
+                        "8 Databases": [
+                            "Database Concepts",
+                            "DBMS",
+                            "DDL and DML"
+                        ],
+                        "9 Algorithm Design and Problem-solving": [
+                            "Computational Thinking Skills",
+                            "Algorithms"
+                        ],
+                        "10 Data Types and Structures": [
+                            "Data Types and Records",
+                            "Arrays",
+                            "Files",
+                            "Intro to ADTs"
+                        ],
+                        "11 Programming": [
+                            "Programming Basics",
+                            "Constructs",
+                            "Structured Programming"
+                        ],
+                        "12 Software Development": [
+                            "PDLC",
+                            "Design",
+                            "Testing and Maintenance"
+                        ]
+                    },
+                    "A_Level": {
+                        "13 Advanced Data Representation": [
+                            "User-defined data types",
+                            "File organisation and access",
+                            "Floating-point numbers"
+                        ],
+                        "14 Advanced Communication": [
+                            "Protocols",
+                            "Circuit vs Packet Switching"
+                        ],
+                        "15 Hardware and Virtual Machines": [
+                            "Processors, Parallelism",
+                            "Boolean Algebra"
+                        ],
+                        "16 System Software": [
+                            "OS Purposes",
+                            "Translation Software"
+                        ],
+                        "17 Security": [
+                            "Encryption and Certificates"
+                        ],
+                        "18 AI": [
+                            "Artificial Intelligence"
+                        ],
+                        "19 Problem Solving": [
+                            "Algorithms",
+                            "Recursion"
+                        ],
+                        "20 Further Programming": [
+                            "Paradigms",
+                            "File Handling, Exceptions"
+                        ]
+                    }
+                },
+                "Biology-9700": {
+                    "AS_Level": {
+                        "1 Cell structure": [
+                            "The microscope in cell studies",
+                            "Cells as the basic units of living organisms",
+                            "The structure and ultrastructure of plant and animal cells",
+                            "The functions of the structures of plant and animal cells",
+                            "The differences between prokaryotic and eukaryotic cells",
+                            "The structures and functions of viruses"
+                        ],
+                        "2 Biological molecules": [
+                            "Structure of carbohydrates",
+                            "Structure of lipids",
+                            "Structure of proteins",
+                            "Structure and role of water",
+                            "The importance of biological molecules"
+                        ],
+                        "3 Enzymes": [
+                            "Mode of action of enzymes",
+                            "Factors that affect enzyme action",
+                            "Practical investigations of enzyme action"
+                        ],
+                        "4 Cell membranes and transport": [
+                            "Structure and properties of cell membranes",
+                            "Movement of substances into and out of cells"
+                        ],
+                        "5 The mitotic cell cycle": [
+                            "Replicating cells",
+                            "Stages of mitosis",
+                            "Cytokinesis",
+                            "Control of the cell cycle",
+                            "Asexual reproduction"
+                        ],
+                        "6 Nucleic acids and protein synthesis": [
+                            "Structure of nucleic acids",
+                            "Replication and the genetic code",
+                            "Protein synthesis"
+                        ],
+                        "7 Transport in plants": [
+                            "Structure of xylem and phloem",
+                            "Transport mechanisms",
+                            "Transpiration"
+                        ],
+                        "8 Transport in mammals": [
+                            "The circulatory system",
+                            "Structure and function of the heart",
+                            "Blood and lymphatic vessels",
+                            "Blood components"
+                        ],
+                        "9 Gas exchange": [
+                            "The need for gas exchange systems",
+                            "The structure of the human gas exchange system",
+                            "Ventilation of the lungs",
+                            "Gas exchange in other organisms"
+                        ],
+                        "10 Infectious diseases": [
+                            "Cholera, malaria, tuberculosis (TB), HIV/AIDS",
+                            "Transmission, prevention, and treatment",
+                            "The global impact of disease"
+                        ],
+                        "11 Immunity": [
+                            "The immune system",
+                            "Antibodies and vaccination",
+                            "Monoclonal antibodies"
+                        ]
+                    },
+                    "A_Level": {
+                        "12 Energy and respiration": [
+                            "The need for energy in living organisms",
+                            "Respiration as an energy transfer process",
+                            "Glycolysis",
+                            "The link reaction and Krebs cycle",
+                            "Oxidative phosphorylation"
+                        ],
+                        "13 Photosynthesis": [
+                            "The importance of photosynthesis",
+                            "Chloroplast structure and function",
+                            "The light-dependent and light-independent reactions"
+                        ],
+                        "14 Homeostasis": [
+                            "Homeostasis in mammals",
+                            "Regulation of blood glucose",
+                            "Thermoregulation"
+                        ],
+                        "15 Control and coordination": [
+                            "Nervous and endocrine systems",
+                            "Structure and function of neurons",
+                            "Synapses",
+                            "The role of hormones"
+                        ],
+                        "16 Inherited change": [
+                            "Structure of chromosomes, DNA, and genes",
+                            "Mitosis and meiosis",
+                            "Gene expression and mutation"
+                        ],
+                        "17 Selection and evolution": [
+                            "Variation",
+                            "Natural and artificial selection",
+                            "Speciation"
+                        ],
+                        "18 Classification, biodiversity and conservation": [
+                            "Classification systems",
+                            "Taxonomy and phylogeny",
+                            "Conservation and biodiversity"
+                        ],
+                        "19 Genetic technology": [
+                            "Principles of genetic technology",
+                            "Genetic modification and its ethical implications",
+                            "Gene therapy"
+                        ]
+                    }
+                },
+                "Design and Technology-9705": {
+                    "AS_Level": {
+                        "1 The design process": [],
+                        "2 Design principles": [],
+                        "3 Communication": [],
+                        "4 Design and society": [],
+                        "5 Sustainable design": [],
+                        "6 Health and safety": [],
+                        "7 Aesthetics and ergonomics": [],
+                        "8 Materials and components": [],
+                        "9 Stages in materials processing": [],
+                        "10 Materials processing": [],
+                        "11 Energy and control systems": [],
+                        "12 Technology": []
+                    },
+                    "A_Level": {
+                        "13 Industrial practices": [],
+                        "14 Business and commercial practices": [],
+                        "15 Quantity production": [],
+                        "16 Materials processing in industry": [],
+                        "17 Quality systems": [],
+                        "18 Digital technology": []
+                    }
+                }
+            }
+        },
+        "Edexcel": {
+            "O_Level": {
+                "Accounting-4AC0": {
+      
+                        "Financial Accounting": [
+                            "Recording Transactions",
+                            "Trial Balance Preparation",
+                            "Final Accounts"
+                        ],
+                        "Cost Accounting": [
+                            "Classification of Costs",
+                            "Budgeting",
+                            "Break-even Analysis"
+                        ]
+               
+                },
+                "Bangladesh_Studies-4BN0": {
+                    
+                        "History": [
+                            "Liberation War of 1971",
+                            "British Colonial Period",
+                            "Cultural Heritage"
+                        ],
+                        "Geography": [
+                            "Physical Features",
+                            "Climate and Weather",
+                            "Natural Resources"
+                        ]
+                 
+                },
+                "Bengali-4BE0": {
+                 
+                        "Language Skills": [
+                            "Grammar",
+                            "Vocabulary Development",
+                            "Essay Writing"
+                        ],
+                        "Literature": [
+                            "Poetry",
+                            "Short Stories",
+                            "Drama"
+                        ]
+                   
+                },
+                "Biology-4B10R": {
+                    
+                        "Cell Biology": [
+                            "Cell Structure",
+                            "Cell Functions",
+                            "Microscopy"
+                        ],
+                        "Human Physiology": [
+                            "Digestive System",
+                            "Circulatory System",
+                            "Respiratory System"
+                        ],
+                        "Ecology": [
+                            "Ecosystems",
+                            "Food Chains and Webs",
+                            "Conservation"
+                        ]
+               
+                },
+                "Business_Studies-4BS0": {
+                
+                        "Business Environment": [
+                            "Types of Business Organizations",
+                            "Business Objectives",
+                            "Stakeholders"
+                        ],
+                        "Marketing": [
+                            "Market Research",
+                            "Product Life Cycle",
+                            "Pricing Strategies"
+                        ],
+                        "Finance": [
+                            "Sources of Finance",
+                            "Budgeting",
+                            "Financial Statements"
+                        ]
+                  
+                },
+                "Chemistry-4CH0R": {
+          
+                        "Physical Chemistry": [
+                            "Atomic Structure",
+                            "Periodic Table",
+                            "Chemical Bonding"
+                        ],
+                        "Organic Chemistry": [
+                            "Hydrocarbons",
+                            "Alcohols and Acids",
+                            "Polymers"
+                        ],
+                        "Inorganic Chemistry": [
+                            "Metals and Non-metals",
+                            "Acids, Bases and Salts",
+                            "Chemical Reactions"
+                        ]
+               
+                },
+                "Commerce-4CM0": {
+                 
+                        "Trade": [
+                            "Domestic Trade",
+                            "International Trade",
+                            "Trade Barriers"
+                        ],
+                        "Banking": [
+                            "Functions of Banks",
+                            "Types of Accounts",
+                            "Loans and Advances"
+                        ],
+                        "Insurance": [
+                            "Types of Insurance",
+                            "Risk Management"
+                        ]
+              
+                },
+                "Economics-4EC0": {
+                  
+                        "Microeconomics": [
+                            "Demand and Supply",
+                            "Elasticity",
+                            "Market Structures"
+                        ],
+                        "Macroeconomics": [
+                            "National Income",
+                            "Inflation",
+                            "Unemployment"
+                        ],
+                        "International Economics": [
+                            "Trade Policies",
+                            "Exchange Rates"
+                        ]
+                
+                },
+                "English_as_a_Second_Language-4ES0": {
+            
+                        "Listening and Speaking": [
+                            "Comprehension",
+                            "Pronunciation",
+                            "Dialogue Practice"
+                        ],
+                        "Reading": [
+                            "Skimming and Scanning",
+                            "Understanding Context"
+                        ],
+                        "Writing": [
+                            "Paragraph Writing",
+                            "Letter Writing",
+                            "Essay Writing"
+                        ]
+                
+                },
+                "French-4FR0": {
+                
+                        "Language Skills": [
+                            "Grammar",
+                            "Vocabulary",
+                            "Conversation"
+                        ],
+                        "Culture and Literature": [
+                            "French History",
+                            "French Literature",
+                            "Customs and Traditions"
+                        ]
+                    
+                },
+                "Further_Pure_Mathematics-4PM0": {
+                   
+                        "Algebra": [
+                            "Polynomials",
+                            "Complex Numbers",
+                            "Matrices"
+                        ],
+                        "Calculus": [
+                            "Differentiation",
+                            "Integration"
+                        ],
+                        "Vectors": [
+                            "Vector Algebra",
+                            "Applications of Vectors"
+                        ]
+                   
+                },
+                "Geography-4GE0": {
+                    
+                        "Physical Geography": [
+                            "Landforms",
+                            "Weather and Climate",
+                            "Natural Hazards"
+                        ],
+                        "Human Geography": [
+                            "Population",
+                            "Urbanization",
+                            "Economic Activities"
+                        ],
+                        "Environmental Geography": [
+                            "Conservation",
+                            "Pollution"
+                        ]
+                 
+                },
+                "German-4GE0": {
+                  
+                        "Language Skills": [
+                            "Grammar",
+                            "Vocabulary",
+                            "Speaking and Listening"
+                        ],
+                        "Culture": [
+                            "German Traditions",
+                            "Literature and Media"
+                        ]
+                  
+                },
+                "Mathematics_Spec_A-4MA0R": {
+            
+                        "Algebra and Functions": [
+                            "Quadratic Functions",
+                            "Polynomials",
+                            "Sequences and Series"
+                        ],
+                        "Calculus": [
+                            "Differentiation",
+                            "Integration"
+                        ],
+                        "Coordinate Geometry": [
+                            "Lines and Circles",
+                            "Conic Sections"
+                        ]
+                   
+                },
+                "Mathematics_Spec_B-4MB0R": {
+                  
+                        "Pure Mathematics": [
+                            "Algebra",
+                            "Trigonometry",
+                            "Calculus"
+                        ],
+                        "Mechanics": [
+                            "Vectors",
+                            "Kinematics",
+                            "Forces"
+                        ],
+                        "Statistics": [
+                            "Data Analysis",
+                            "Probability"
+                        ]
+               
+                },
+                "Modern_Greek-4MG0": {
+                
+                        "Language": [
+                            "Grammar",
+                            "Vocabulary",
+                            "Conversation"
+                        ],
+                        "Culture": [
+                            "Greek History",
+                            "Literature"
+                        ]
+               
+                },
+                "Physics-4PH0R": {
+                 
+                        "Mechanics": [
+                            "Motion",
+                            "Forces",
+                            "Energy"
+                        ],
+                        "Waves and Optics": [
+                            "Wave Properties",
+                            "Light",
+                            "Sound"
+                        ],
+                        "Electricity and Magnetism": [
+                            "Electric Circuits",
+                            "Magnetism",
+                            "Electromagnetism"
+                        ]
+               
+                },
+                "Science_Double_Award-4SC0R": {
+               
+                        "Biology": [
+                            "Cell Biology",
+                            "Human Physiology"
+                        ],
+                        "Chemistry": [
+                            "Atoms and Elements",
+                            "Chemical Reactions"
+                        ],
+                        "Physics": [
+                            "Forces and Motion",
+                            "Energy"
+                        ]
+                  
+                }
+            },
+            "A_Level": {
+                "Accounting-WAC01": {
+                    "AS_Level": {
+                        "Financial Accounting": [
+                            "Basic Accounting Principles",
+                            "Recording Financial Transactions",
+                            "Trial Balance and Errors"
+                        ],
+                        "Costing": [
+                            "Cost Classifications",
+                            "Break-even Analysis"
+                        ]
+                    },
+                    "A_Level": {
+                        "Financial Statements": [
+                            "Preparation of Income Statement",
+                            "Balance Sheet",
+                            "Cash Flow Statements"
+                        ],
+                        "Advanced Costing": [
+                            "Marginal Costing",
+                            "Budgeting and Variance Analysis"
+                        ]
+                    }
+                },
+                "Biology-WBI01": {
+                    "AS_Level": {
+                        "Cell Biology": [
+                            "Cell Structure and Function",
+                            "Microscopy",
+                            "Cell Membrane Transport"
+                        ],
+                        "Genetics": [
+                            "DNA and RNA",
+                            "Mendelian Inheritance"
+                        ]
+                    },
+                    "A_Level": {
+                        "Physiology": [
+                            "Circulatory System",
+                            "Respiratory System",
+                            "Nervous System"
+                        ],
+                        "Ecology": [
+                            "Population Dynamics",
+                            "Ecosystems and Energy Flow"
+                        ]
+                    }
+                },
+                "Business_Studies-WBS01": {
+                    "AS_Level": {
+                        "Business Environment": [
+                            "Types of Business Organizations",
+                            "Stakeholders",
+                            "Business Objectives"
+                        ],
+                        "Marketing": [
+                            "Market Research",
+                            "Marketing Mix"
+                        ]
+                    },
+                    "A_Level": {
+                        "Business Strategy": [
+                            "Growth and Expansion",
+                            "Change Management"
+                        ],
+                        "Financial Management": [
+                            "Sources of Finance",
+                            "Financial Statements Analysis"
+                        ]
+                    }
+                },
+                "Chemistry-WCH01": {
+                    "AS_Level": {
+                        "Atomic Structure": [
+                            "Subatomic Particles",
+                            "Isotopes",
+                            "Electronic Configuration"
+                        ],
+                        "Bonding": [
+                            "Ionic and Covalent Bonding",
+                            "Metallic Bonding"
+                        ]
+                    },
+                    "A_Level": {
+                        "Organic Chemistry": [
+                            "Hydrocarbons",
+                            "Alcohols and Ethers",
+                            "Aromatic Compounds"
+                        ],
+                        "Physical Chemistry": [
+                            "Thermodynamics",
+                            "Equilibria",
+                            "Kinetics"
+                        ]
+                    }
+                },
+                "Economics-WEC01": {
+                    "AS_Level": {
+                        "Microeconomics": [
+                            "Demand and Supply",
+                            "Elasticity",
+                            "Market Structures"
+                        ],
+                        "Macroeconomics": [
+                            "National Income",
+                            "Inflation",
+                            "Unemployment"
+                        ]
+                    },
+                    "A_Level": {
+                        "International Economics": [
+                            "Trade Policies",
+                            "Exchange Rates",
+                            "Balance of Payments"
+                        ],
+                        "Development Economics": [
+                            "Poverty and Inequality",
+                            "Economic Growth"
+                        ]
+                    }
+                },
+                "Core_Mathematics-WMA01": {
+                    "AS_Level": {
+                        "Algebra": [
+                            "Quadratics",
+                            "Polynomials",
+                            "Sequences"
+                        ],
+                        "Calculus": [
+                            "Differentiation Basics",
+                            "Integration Basics"
+                        ]
+                    },
+                    "A_Level": {
+                        "Advanced Calculus": [
+                            "Techniques of Differentiation",
+                            "Definite Integrals"
+                        ],
+                        "Vectors": [
+                            "Vector Algebra",
+                            "3D Geometry"
+                        ]
+                    }
+                },
+                "Further_Pure_Mathematics-WFM01": {
+                    "AS_Level": {
+                        "Complex Numbers": [
+                            "Argand Diagram",
+                            "Polar Form"
+                        ],
+                        "Matrices": [
+                            "Matrix Operations",
+                            "Determinants"
+                        ]
+                    },
+                    "A_Level": {
+                        "Further Calculus": [
+                            "Differential Equations",
+                            "Advanced Integration"
+                        ],
+                        "Series": [
+                            "Power Series",
+                            "Maclaurin and Taylor Series"
+                        ]
+                    }
+                },
+                "Pure_Mathematics-XPM01": {
+                    "AS_Level": {
+                        "Algebra and Functions": [
+                            "Functions and Graphs",
+                            "Polynomials"
+                        ]
+                    },
+                    "A_Level": {
+                        "Advanced Topics": [
+                            "Group Theory",
+                            "Further Algebra"
+                        ]
+                    }
+                },
+                "Mechanics-WME01": {
+                    "AS_Level": {
+                        "Kinematics": [
+                            "Equations of Motion",
+                            "Projectile Motion"
+                        ],
+                        "Forces and Newton’s Laws": [
+                            "Equilibrium",
+                            "Friction"
+                        ]
+                    },
+                    "A_Level": {
+                        "Dynamics": [
+                            "Work, Energy and Power",
+                            "Circular Motion"
+                        ]
+                    }
+                },
+                "Statistics-WST01": {
+                    "AS_Level": {
+                        "Data Presentation": [
+                            "Graphs and Charts",
+                            "Measures of Central Tendency"
+                        ],
+                        "Probability": [
+                            "Basic Probability",
+                            "Conditional Probability"
+                        ]
+                    },
+                    "A_Level": {
+                        "Distributions": [
+                            "Binomial Distribution",
+                            "Normal Distribution"
+                        ],
+                        "Hypothesis Testing": [
+                            "Tests for Means",
+                            "Chi-Square Tests"
+                        ]
+                    }
+                },
+                "Decision_Mathematics-WDM01": {
+                    "AS_Level": {
+                        "Algorithms": [
+                            "Sorting and Searching",
+                            "Graph Theory Basics"
+                        ],
+                        "Linear Programming": [
+                            "Formulation",
+                            "Graphical Solution"
+                        ]
+                    },
+                    "A_Level": {
+                        "Advanced Graph Theory": [
+                            "Networks",
+                            "Critical Path Analysis"
+                        ]
+                    }
+                },
+                "Physics-WPH01": {
+                    "AS_Level": {
+                        "Mechanics": [
+                            "Kinematics",
+                            "Dynamics",
+                            "Forces"
+                        ],
+                        "Waves": [
+                            "Wave Properties",
+                            "Sound and Light"
+                        ]
+                    },
+                    "A_Level": {
+                        "Electricity and Magnetism": [
+                            "Electrostatics",
+                            "Current Electricity",
+                            "Magnetic Fields"
+                        ],
+                        "Modern Physics": [
+                            "Quantum Physics",
+                            "Nuclear Physics"
+                        ]
+                    }
+                }
+            }
+        },
+        "IB": {
+            "SL": {
+                "Biology": {
+                    "1 Unity and diversity": [
+                        "Water",
+                        "Nucleic acids",
+                        "Origins of cells *",
+                        "Cell structure",
+                        "Viruses *",
+                        "Diversity of organisms",
+                        "Classification and cladistics *",
+                        "Evolution and speciation",
+                        "Conservation of biodiversity"
+                    ],
+                    "2 Form and function": [
+                        "Carbohydrates and lipids",
+                        "Proteins",
+                        "Membranes and membrane transport",
+                        "Organelles and compartmentalization",
+                        "Cell specialization",
+                        "Gas exchange",
+                        "Transport",
+                        "Muscle and motility *",
+                        "Adaptation to environment",
+                        "Ecological niches"
+                    ],
+                    "3 Interaction and interdependence": [
+                        "Enzymes and metabolism",
+                        "Cell respiration",
+                        "Photosynthesis",
+                        "Chemical signalling *",
+                        "Neural signalling",
+                        "Integration of body systems",
+                        "Defence against disease",
+                        "Populations and communities",
+                        "Transfer of energy and matter"
+                    ],
+                    "4 Continuity and change": [
+                        "DNA replication",
+                        "Protein synthesis",
+                        "Mutations and gene editing",
+                        "Cell and nuclear division",
+                        "Gene expression *",
+                        "Water potential",
+                        "Reproduction",
+                        "Inheritance",
+                        "Homeostasis",
+                        "Natural selection",
+                        "Sustainability and change",
+                        "Climate change"
+                    ],
+                    "5 Experimental programme": [
+                        "Practical work",
+                        "Collaborative sciences project",
+                        "Scientific investigation"
+                    ]
+                },
+                "Chemistry": {
+                    "1 Stoichiometric relationships": [
+                        "The mole concept",
+                        "Chemical calculations"
+                    ],
+                    "2 Atomic structure": [
+                        "Subatomic particles",
+                        "Electron configuration"
+                    ],
+                    "3 Periodicity": [
+                        "Periodic table",
+                        "Periodic trends"
+                    ],
+                    "4 Chemical bonding and structure": [
+                        "Ionic bonding",
+                        "Covalent bonding",
+                        "Metallic bonding",
+                        "Intermolecular forces"
+                    ],
+                    "5 Energetics/thermochemistry": [
+                        "Enthalpy changes",
+                        "Hess's law"
+                    ],
+                    "6 Chemical kinetics": [
+                        "Rate of reaction",
+                        "Factors affecting rate"
+                    ],
+                    "7 Equilibrium": [
+                        "Equilibrium constants",
+                        "Le Chatelier's principle"
+                    ]
+                },
+                "Physics": {
+                    "1 Measurements and uncertainties": [
+                        "Physical quantities and units",
+                        "Measurement techniques",
+                        "Uncertainties and errors"
+                    ],
+                    "2 Mechanics": [
+                        "Motion",
+                        "Forces",
+                        "Work, energy and power"
+                    ],
+                    "3 Thermal physics": [
+                        "Thermal concepts",
+                        "Thermal properties of matter"
+                    ],
+                    "4 Waves": [
+                        "Wave characteristics",
+                        "Wave behavior"
+                    ],
+                    "5 Electricity and magnetism": [
+                        "Electric fields",
+                        "Electric circuits",
+                        "Magnetic fields"
+                    ]
+                },
+                "Mathematics": {
+                    "1 Number and algebra": [
+                        "Arithmetic sequences",
+                        "Geometric sequences",
+                        "Polynomials"
+                    ],
+                    "2 Functions and equations": [
+                        "Types of functions",
+                        "Solving equations"
+                    ],
+                    "3 Geometry and trigonometry": [
+                        "Coordinate geometry",
+                        "Trigonometric ratios"
+                    ]
+                },
+                "Economics": {
+                    "1 Introduction to economics": [
+                        "Basic economic concepts",
+                        "Demand and supply",
+                        "Market equilibrium"
+                    ],
+                    "2 Microeconomics": [
+                        "Elasticities",
+                        "Market failure",
+                        "Government intervention"
+                    ]
+                }
+            },
+            "HL": {
+                "Biology": {
+                    "1 Unity and diversity": [
+                        "Water",
+                        "Nucleic acids",
+                        "Origins of cells *",
+                        "Cell structure",
+                        "Viruses *",
+                        "Diversity of organisms",
+                        "Classification and cladistics *",
+                        "Evolution and speciation",
+                        "Conservation of biodiversity"
+                    ],
+                    "2 Form and function": [
+                        "Carbohydrates and lipids",
+                        "Proteins",
+                        "Membranes and membrane transport",
+                        "Organelles and compartmentalization",
+                        "Cell specialization",
+                        "Gas exchange",
+                        "Transport",
+                        "Muscle and motility *",
+                        "Adaptation to environment",
+                        "Ecological niches"
+                    ],
+                    "3 Interaction and interdependence": [
+                        "Enzymes and metabolism",
+                        "Cell respiration",
+                        "Photosynthesis",
+                        "Chemical signalling *",
+                        "Neural signalling",
+                        "Integration of body systems",
+                        "Defence against disease",
+                        "Populations and communities",
+                        "Transfer of energy and matter"
+                    ],
+                    "4 Continuity and change": [
+                        "DNA replication",
+                        "Protein synthesis",
+                        "Mutations and gene editing",
+                        "Cell and nuclear division",
+                        "Gene expression *",
+                        "Water potential",
+                        "Reproduction",
+                        "Inheritance",
+                        "Homeostasis",
+                        "Natural selection",
+                        "Sustainability and change",
+                        "Climate change"
+                    ],
+                    "5 Experimental programme": [
+                        "Practical work",
+                        "Collaborative sciences project",
+                        "Scientific investigation"
+                    ],
+                    "6 Additional higher level topics": [
+                        "Evolution and biodiversity",
+                        "Nucleic acids",
+                        "Metabolism, cell respiration and photosynthesis",
+                        "Plant biology",
+                        "Genetics and evolution"
+                    ]
+                },
+                "Chemistry": {
+                    "1 Stoichiometric relationships": [
+                        "The mole concept",
+                        "Chemical calculations"
+                    ],
+                    "2 Atomic structure": [
+                        "Subatomic particles",
+                        "Electron configuration"
+                    ],
+                    "3 Periodicity": [
+                        "Periodic table",
+                        "Periodic trends"
+                    ],
+                    "4 Chemical bonding and structure": [
+                        "Ionic bonding",
+                        "Covalent bonding",
+                        "Metallic bonding",
+                        "Intermolecular forces"
+                    ],
+                    "5 Energetics/thermochemistry": [
+                        "Enthalpy changes",
+                        "Hess's law"
+                    ],
+                    "6 Chemical kinetics": [
+                        "Rate of reaction",
+                        "Factors affecting rate"
+                    ],
+                    "7 Equilibrium": [
+                        "Equilibrium constants",
+                        "Le Chatelier's principle"
+                    ],
+                    "8 Acids and bases": [
+                        "pH and pOH",
+                        "Buffers",
+                        "Titrations"
+                    ],
+                    "9 Redox processes": [
+                        "Oxidation and reduction",
+                        "Electrochemical cells"
+                    ],
+                    "10 Organic chemistry": [
+                        "Hydrocarbons",
+                        "Alcohols",
+                        "Carboxylic acids and derivatives",
+                        "Polymers"
+                    ],
+                    "11 Measurement and data processing": [
+                        "Uncertainties",
+                        "Data analysis"
+                    ]
+                },
+                "Physics": {
+                    "1 Measurements and uncertainties": [
+                        "Physical quantities and units",
+                        "Measurement techniques",
+                        "Uncertainties and errors"
+                    ],
+                    "2 Mechanics": [
+                        "Motion",
+                        "Forces",
+                        "Work, energy and power",
+                        "Circular motion",
+                        "Gravitation"
+                    ],
+                    "3 Thermal physics": [
+                        "Thermal concepts",
+                        "Thermal properties of matter"
+                    ],
+                    "4 Waves": [
+                        "Wave characteristics",
+                        "Wave behavior"
+                    ],
+                    "5 Electricity and magnetism": [
+                        "Electric fields",
+                        "Electric circuits",
+                        "Magnetic fields"
+                    ],
+                    "6 Circular motion and gravitation": [
+                        "Uniform circular motion",
+                        "Gravitational fields"
+                    ],
+                    "7 Atomic, nuclear and particle physics": [
+                        "Radioactivity",
+                        "Nuclear reactions"
+                    ],
+                    "8 Energy production": [
+                        "Fossil fuels",
+                        "Nuclear power"
+                    ]
+                },
+                "Mathematics": {
+                    "1 Number and algebra": [
+                        "Arithmetic sequences",
+                        "Geometric sequences",
+                        "Polynomials"
+                    ],
+                    "2 Functions and equations": [
+                        "Types of functions",
+                        "Solving equations"
+                    ],
+                    "3 Geometry and trigonometry": [
+                        "Coordinate geometry",
+                        "Trigonometric ratios"
+                    ],
+                    "4 Calculus": [
+                        "Differentiation",
+                        "Integration"
+                    ]
+                },
+                "Economics": {
+                    "1 Introduction to economics": [
+                        "Basic economic concepts",
+                        "Demand and supply",
+                        "Market equilibrium"
+                    ],
+                    "2 Microeconomics": [
+                        "Elasticities",
+                        "Market failure",
+                        "Government intervention"
+                    ],
+                    "3 Macroeconomics": [
+                        "Aggregate demand and supply",
+                        "Fiscal policy",
+                        "Monetary policy"
+                    ],
+                    "4 International economics": [
+                        "Trade theory",
+                        "Exchange rates",
+                        "Balance of payments"
+                    ]
+                }
+            }
+        }
+    },
+    "Bangla-Medium": {
+ 
+  "SSC": {
+    "Science": {
+      "Bangla-101": {
+       
+          "Grammar": ["Parts of Speech", "Sentence Structure"],
+          "Literature": ["Poems", "Stories"],
+          "Composition": ["Paragraph Writing", "Letter Writing"]
+        
+      },
+     
+      "English-107": {
+       
+          "Comprehension": ["Passage Analysis", "Summary Writing"],
+          "Vocabulary": ["Synonyms", "Contextual Meaning"],
+         "Grammar": ["Tense", "Subject-Verb Agreement"],
+          "Writing": ["Essay", "Email", "Paragraph"]      
+      },
+      "Mathematics-109": {
+       
+          "Algebra": ["Linear Equations", "Factorization"],
+          "Geometry": ["Circle Theorems", "Construction"],
+          "Arithmetic": ["Percentage", "Ratio and Proportion"]
+        
+      },
+      "Information-and-Technology-154": {
+       
+          "Basics": ["Hardware", "Software"],
+          "Applications": ["Word Processing", "Internet Usage"]
+        
+      },
+
+      "Physics-136": {
+       
+          "Mechanics": ["Motion", "Newton’s Laws"],
+          "Electricity": ["Ohm's Law", "Parallel & Series Circuits"]
+        
+      },
+      "Chemistry-137": {
+       
+          "Structure of Matter": ["Atomic Model", "Molecules"],
+          "Chemical Reactions": ["Combustion", "Neutralization"]
+        
+      },
+      "Biology-138": {
+       
+          "Cell Biology": ["Cell Organelles", "Cell Division"],
+          "Human Physiology": ["Digestive System", "Respiratory System"]
+        
+      },
+      "Higher Mathematics-126": {
+       
+          "Coordinate Geometry": ["Straight Line", "Circle"],
+          "Trigonometry": ["Trigonometric Ratios", "Identities"]
+        
+      },
+      "Islam & Moral Education-111": {
+       
+          "Faith": ["Five Pillars of Islam", "Prophet Muhammad’s Life"],
+          "Moral Education": ["Honesty", "Respect for Others"]
+        
+      },
+      "Bangladesh & World Studies-150": {
+       
+          "History": ["Liberation War", "Language Movement"],
+          "Geography": ["Rivers", "Climate Zones"]
+        
+      },
+      "Agriculture Studies-134": {
+       
+          "Crop Production": ["Seed Selection", "Irrigation"],
+          "Animal Husbandry": ["Cattle Rearing", "Poultry"]
+        
+      },
+      "Home Science-151": {
+       
+          "Nutrition": ["Balanced Diet", "Meal Planning"],
+          "Family Care": ["Child Development", "Home Hygiene"]
+        }
+      
+    },
+
+    "Commerce": {
+     "Bangla-101": {
+       
+          "Grammar": ["Parts of Speech", "Sentence Structure"],
+          "Literature": ["Poems", "Stories"],
+          "Composition": ["Paragraph Writing", "Letter Writing"]
+        
+      },
+      "English-107": {
+    
+          "Comprehension": ["Passage Analysis", "Summary Writing"],
+          "Vocabulary": ["Synonyms", "Contextual Meaning"]
+        
+      },
+      "English-108": {
+    
+          "Grammar": ["Tense", "Subject-Verb Agreement"],
+          "Writing": ["Essay", "Email", "Paragraph"]
+        
+      },
+      "Mathematics-109": {
+    
+          "Algebra": ["Linear Equations", "Factorization"],
+          "Geometry": ["Circle Theorems", "Construction"],
+          "Arithmetic": ["Percentage", "Ratio and Proportion"]
+        
+      },
+      "Information-and-Technology-154": {
+    
+          "Basics": ["Hardware", "Software"],
+          "Applications": ["Word Processing", "Internet Usage"]
+        
+      },
+
+      "Finance & Banking-152": {
+    
+          "Banking": ["Functions of Bank", "Account Types"],
+          "Finance": ["Budgeting", "Loans & Interests"]
+        
+      },
+      "Accounting-146": {
+    
+          "Bookkeeping": ["Journal", "Ledger"],
+          "Statements": ["Trial Balance", "Income Statement"]
+        
+      },
+      "Business Entrepreneurship-143": {
+    
+          "Entrepreneurship": ["Startup Planning", "Innovation"],
+          "Marketing": ["Market Research", "Promotion"]
+        
+      },
+      "General Science-127": {
+    
+          "Physics": ["Force", "Energy"],
+          "Biology": ["Nutrition", "Health"],
+          "Chemistry": ["Acids", "Chemical Change"]
+        
+      },
+      "Islam & Moral Education-111": {
+    
+          "Faith": ["Five Pillars of Islam", "Prophet Muhammad’s Life"],
+          "Moral Education": ["Honesty", "Respect for Others"]
+        
+      },
+      "Agriculture Studies-134": {
+    
+          "Agribusiness": ["Farm Management", "Crop Marketing"]
+        
+      },
+      "Home Science-151": {
+    
+          "Textile": ["Fabric Types", "Clothing Care"],
+          "Home Budget": ["Expense Planning", "Savings"]
+        
+      },
+      "Music-149": {
+    
+          "Theory": ["Notation", "Scales"],
+          "Practical": ["Singing", "Instrument Practice"]
+        
+      }
+    },
+
+    "Arts": {
+    "Bangla-101": {
+       
+          "Grammar": ["Parts of Speech", "Sentence Structure"],
+          "Literature": ["Poems", "Stories"],
+          "Composition": ["Paragraph Writing", "Letter Writing"]
+        
+      },
+      "English-107": {
+    
+          "Comprehension": ["Passage Analysis", "Summary Writing"],
+          "Vocabulary": ["Synonyms", "Contextual Meaning"],
+         "Grammar": ["Tense", "Subject-Verb Agreement"],
+          "Writing": ["Essay", "Email", "Paragraph"]
+        
+      },
+      "Mathematics-109": {
+      
+          "Algebra": ["Linear Equations", "Factorization"],
+          "Geometry": ["Circle Theorems", "Construction"],
+          "Arithmetic": ["Percentage", "Ratio and Proportion"]
+        
+      },
+      "Information-and-Technology-154": {
+        
+          "Basics": ["Hardware", "Software"],
+          "Applications": ["Word Processing", "Internet Usage"]
+        
+      },
+
+      "Geography-110": {
+       
+          "Physical Geography": ["Mountains", "Rivers"],
+          "Environment": ["Pollution", "Sustainable Development"]
+        
+      },
+      "Civic & Citizenship-140": {
+      
+          "Government": ["Types", "Democracy"],
+          "Citizen Duties": ["Voting", "Rights & Responsibilities"]
+        
+      },
+      "Economics-141": {
+    
+          "Microeconomics": ["Demand & Supply", "Price Elasticity"],
+          "Macroeconomics": ["GDP", "Inflation"]
+        
+      },
+      "General Science-127": {
+   
+          "Biology": ["Plants", "Diseases"],
+          "Physics": ["Simple Machines", "Heat"],
+          "Chemistry": ["Water", "Air"]
+        
+      },
+      "Islam & Moral Education-111": {
+     
+          "Islamic Ethics": ["Kindness", "Honesty"],
+          "Teachings": ["Prophets", "Scriptures"]
+        
+      },
+      "History of Bangladesh-153": {
+      
+          "Modern History": ["1947–1971", "Constitution"],
+          "National Movements": ["Language Movement", "Liberation War"]
+        
+      },
+      "Agriculture Studies-134": {
+   
+          "Farming": ["Land Preparation", "Harvesting"]
+        
+      },
+      "Home Science-151": {
+     
+          "Health & Nutrition": ["Malnutrition", "Food Safety"]
+        
+      },
+      "Music-149": {
+       
+          "Genres": ["Folk", "Classical"],
+          "Performance": ["Solo", "Group"]
+        
+      }
+    }
+  },
+        "HSC": {
+    "Science": {
+     
+        "Bangla-101": {
+         
+            "ব্যাকরণ": ["বাক্য বিশ্লেষণ", "সমাস", "সন্ধি"],
+            "সাহিত্য": ["কবিতা", "গল্প", "নাটক"]
+          
+        },
+        "English-107": {
+         
+            "Grammar": ["Parts of Speech", "Tenses", "Sentence Structure"],
+            "Literature": ["Poetry Analysis", "Drama", "Short Stories"]
+          
+        },
+        "Information_and_Technology-275": {
+         
+            "Basics": ["Computer Hardware", "Operating Systems", "File Management"],
+            "Applications": ["Word Processing", "Spreadsheets", "Presentation Software"],
+            "Networking": ["Internet Basics", "Email", "Security"]
+          
+        },
+        "Physics-174": {
+         
+            "Mechanics": ["Kinematics", "Newton’s Laws", "Work, Energy and Power"],
+            "Waves": ["Sound Waves", "Light Waves", "Reflection and Refraction"],
+            "Electricity": ["Current, Voltage and Resistance", "Ohm’s Law", "Circuits"]
+          
+        },
+        "Chemistry-176": {
+         
+            "Physical Chemistry": ["Atomic Structure", "Periodic Table", "Chemical Bonding"],
+            "Organic Chemistry": ["Hydrocarbons", "Alcohols and Ethers", "Carboxylic Acids and Derivatives"],
+            "Inorganic Chemistry": ["Metals and Non-metals", "Acids, Bases and Salts", "Electrochemistry"]
+          
+        },
+        "Biology-178": {
+         
+            "Cell Biology": ["Cell Structure", "Cell Division", "Cellular Respiration"],
+            "Genetics": ["Mendelian Genetics", "DNA and RNA", "Genetic Disorders"],
+            "Human Physiology": ["Digestive System", "Respiratory System", "Circulatory System"]
+          
+        },
+        "Higher_Math-265": {
+         
+            "Calculus": ["Limits and Continuity", "Differentiation", "Integration"],
+            "Algebra": ["Matrices", "Complex Numbers", "Quadratic Equations"],
+            "Statistics": ["Probability", "Data Analysis", "Distributions"]
+          
+        }
+   
+      
+    },
+    "Commerce": {
+      
+        "Bangla-101": {
+         
+            "ব্যাকরণ": ["বাক্য বিশ্লেষণ", "সমাস", "সন্ধি"],
+            "সাহিত্য": ["কবিতা", "গল্প", "নাটক"]
+       
+        },
+        "English-107": {
+          
+            "Grammar": ["Parts of Speech", "Tenses", "Sentence Structure"],
+            "Literature": ["Poetry Analysis", "Drama", "Short Stories"]
+          
+        },
+        "Information_and_Technology-275": {
+          
+            "Basics": ["Computer Hardware", "Operating Systems", "File Management"],
+            "Applications": ["Word Processing", "Spreadsheets", "Presentation Software"],
+            "Networking": ["Internet Basics", "Email", "Security"]
+          
+        },
+        "Accounting-253": {
+          
+            "Basics": ["Journal Entries", "Ledger Accounts", "Trial Balance"],
+            "Financial Statements": ["Income Statement", "Balance Sheet", "Cash Flow Statement"]
+          
+        },
+        "Finance_and_Banking-292": {
+          
+            "Banking Systems": ["Types of Banks", "Banking Services", "Regulatory Framework"],
+            "Finance": ["Loans and Advances", "Investment", "Financial Markets"]
+          
+        },
+        "Business_Organization_and_Management-277": {
+          
+            "Business Basics": ["Business Types", "Business Environment", "Management Principles"],
+            "Organizational Behavior": ["Motivation", "Leadership", "Communication"]
+          
+        },
+        "Production_Management_and_Marketing-286": {
+          
+            "Production Management": ["Production Planning", "Inventory Control", "Quality Management"],
+            "Marketing": ["Marketing Mix", "Market Research", "Advertising"]
+          
+        },
+        "Economics-109": {
+          
+            "Microeconomics": ["Demand and Supply", "Elasticity", "Market Structures"],
+            "Macroeconomics": ["National Income", "Inflation", "Fiscal Policy"]
+          }
+        
+      },
+    "Arts": {
+     
+        "Bangla-101": {
+          
+            "ব্যাকরণ": ["বাক্য বিশ্লেষণ", "সমাস", "সন্ধি"],
+            "সাহিত্য": ["কবিতা", "গল্প", "নাটক"]
+          
+        },
+        "English-107": {
+          
+            "Grammar": ["Parts of Speech", "Tenses", "Sentence Structure"],
+            "Literature": ["Poetry Analysis", "Drama", "Short Stories"]
+          
+        },
+        "Information_and_Technology-275": {
+          
+            "Basics": ["Computer Hardware", "Operating Systems", "File Management"],
+            "Applications": ["Word Processing", "Spreadsheets", "Presentation Software"],
+            "Networking": ["Internet Basics", "Email", "Security"]
+          
+        },
+        "Civic_and_Good_Governance-269": {
+          
+            "Citizenship": ["Rights and Duties", "Government Systems", "Public Policies"],
+            "Governance": ["Local Government", "Electoral Systems", "Transparency"]
+          
+        },
+        "Economics-109": {
+          
+            "Basic Economics": ["Supply and Demand", "Market Types", "Economic Development"],
+            "Development Economics": ["Poverty", "Growth Theories", "Sustainability"]
+          
+        },
+        "Islamic_History-267": {
+          
+            "Early Islamic History": ["Life of Prophet Muhammad", "Caliphate Period"],
+            "Medieval Islamic History": ["Islamic Empires", "Cultural Contributions"]
+          
+        },
+        "History-304": {
+         
+            "World History": ["Ancient Civilizations", "Medieval Period", "Modern History"],
+            "Bangladesh History": ["Liberation War", "Post-Independence"]
+          
+        },
+        "Social_Work-271": {
+         
+            "Community Development": ["Social Welfare", "Counseling", "Volunteerism"]
+          
+        },
+        "Sociology-117": {
+         
+            "Basic Concepts": ["Culture", "Socialization", "Social Institutions"],
+            "Social Change": ["Modernization", "Urbanization", "Globalization"]
+          
+        },
+        "Logic-121": {
+        "Propositional Logic": [
+            "Syntax and semantics of propositional logic ",
+            "Inferences and proofs within propositional logic ",
+            "Truth tables and logical equivalence "
+          ],
+          "Mathematical Logic": [
+            "Number bases and computer coding ",
+            "Set theory and Boolean algebra ",
+            "Logic gates and digital circuits "
+          ]
+        },
+        "Home_Science-273": {
+         
+            "Nutrition": ["Balanced Diet", "Food Groups", "Cooking Methods"],
+            "Child Development": ["Stages of Growth", "Health and Hygiene"],
+            "Family Management": ["Budgeting", "Time Management"]
+          
+        }
+      }
+      
+    }
+     },
+    "University-Admission": {
+        "Public-University": {
+    "Units": [
+      "Ka",
+      "Kha",
+      "Ga",
+      "Gha"
+    ],
+    "Universities": [
+      "University of Dhaka",
+      "University of Rajshahi",
+      "University of Chittagong",
+      "Jahangirnagar University",
+      "Islamic University, Bangladesh",
+      "National University",
+      "Bangladesh Open University",
+      "Jagannath University",
+      "Comilla University",
+      "Jatiya Kabi Kazi Nazrul Islam University",
+      "Begum Rokeya University, Rangpur",
+      "University of Barishal",
+      "Rabindra University, Bangladesh",
+      "Islamic Arabic University",
+      "Bangladesh University of Professionals",
+      "Netrokona University",
+      "Naogaon University",
+      "Meherpur University",
+      "Kishoreganj University"
+    ]
+  },
+        "Engineering": {
+    "Subjects": [
+      "Physics",
+      "Chemistry",
+      "Mathematics",
+      "Biology",
+      "All Combined"
+    ],
+    "Universities": [
+      "Bangladesh University of Engineering & Technology (BUET)",
+      "Chittagong University of Engineering & Technology (CUET)",
+      "Rajshahi University of Engineering & Technology (RUET)",
+      "Khulna University of Engineering & Technology (KUET)",
+      "Dhaka University of Engineering & Technology (DUET)",
+      "Jessore University of Science & Technology",
+      "Pabna University of Science and Technology",
+      "Mawlana Bhashani Science & Technology University",
+      "Hajee Mohammad Danesh Science & Technology University",
+      "Patuakhali Science And Technology University",
+      "Noakhali Science & Technology University",
+      "Gopalganj Science & Technology University",
+      "Rangamati Science and Technology University",
+      "Chandpur Science and Technology University",
+      "Sunamganj Science and Technology University",
+      "Pirojpur Science & Technology University",
+      "Jamalpur Science and Technology University",
+      "Gazipur Digital University",
+      "Aviation and Aerospace University, Bangladesh"
+    ]
+  },
+      "Medical": {
+    "Subjects": [
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "All Combined"
+    ],
+    "Universities": [
+      "Dhaka Medical College",
+      "Sir Salimullah Medical College",
+      "Shaheed Suhrawardy Medical College",
+      "Mymensingh Medical College",
+      "Chittagong Medical College",
+      "Rajshahi Medical College",
+      "MAG Osmani Medical College",
+      "Sher-e-Bangla Medical College",
+      "Rangpur Medical College",
+      "Cumilla Medical College",
+      "Khulna Medical College",
+      "Shaheed Ziaur Rahman Medical College",
+      "Faridpur Medical College",
+      "Dinajpur Medical College",
+      "Pabna Medical College",
+      "Noakhali Medical College",
+      "Cox's Bazar Medical College",
+      "Jashore Medical College",
+      "Satkhira Medical College",
+      "Shahid Syed Nazrul Islam Medical College",
+      "Kushtia Medical College",
+      "Gopalganj Medical College",
+      "Shaheed Tajuddin Ahmad Medical College",
+      "Tangail Medical College",
+      "Jamalpur Medical College",
+      "Manikganj Medical College",
+      "Shaheed M. Monsur Ali Medical College",
+      "Patuakhali Medical College",
+      "Rangamati Medical College",
+      "Mugda Medical College",
+      "Habiganj Medical College",
+      "Netrokona Medical College",
+      "Nilphamari Medical College",
+      "Magura Medical College",
+      "Naogaon Medical College",
+      "Chandpur Medical College",
+      "Sunamganj Medical College"
+    ]
+  },
+        "IBA": {
+           
+                "English": {
+                "Grammar": [
+                    "Basic grammar rules",
+                    "Sentence correction",
+                    "Error detection"
+                ],
+                "Vocabulary": [
+                    "High-frequency words",
+                    "Understanding analogies"
+                ],
+                "Comprehension": [
+                    "Reading passages",
+                    "Answering related questions"
+                ],
+                "Composition": [
+                    "Essay writing",
+                    "Letter/application/report writing",
+                    "Sentence construction"
+                ]
+            },
+            "Mathematics": {
+                "Arithmetic": [
+                    "Basic operations",
+                    "Percentages",
+                    "Ratios",
+                    "Proportions",
+                    "Averages",
+                    "Profit and loss",
+                    "Time and work",
+                    "Time and distance"
+                ],
+                "Algebra": [
+                    "Equations",
+                    "Inequalities",
+                    "Functions"
+                ],
+                "Geometry": [
+                    "Basic shapes",
+                    "Area",
+                    "Volume",
+                    "Trigonometry"
+                ],
+                "Word Problems": [
+                    "Applying mathematical concepts to real-world scenarios"
+                ],
+                "Quantitative Reasoning": [
+                    "Data sufficiency",
+                    "Data interpretation"
+                ]
+            },
+            "Analytical Ability": {
+                "Logical Reasoning": [
+                    "Critical reasoning",
+                    "Deductive reasoning",
+                    "Inductive reasoning"
+                ],
+                "Problem Solving": [
+                    "Puzzle solving",
+                    "Spatial reasoning"
+                ],
+                "Data Interpretation": [
+                    "Analyzing data from charts and graphs"
+                ],
+                "Critical Thinking": [
+                    "Evaluating arguments",
+                    "Forming conclusions"
+                ]
+            }
+   
+            }
+    },
+    "GED": {
+      
+         "Social Science": [
+            "GED Social Studies Orientation",
+            "US Exploration & Colony Establishment",
+            "USA Civil War",
+            "Industrialization & Progressive Era",
+            "American Imperialism",
+            "Cold War & Civil Rights Movement",
+            "Introduction To Civics & Government",
+            "Types Of Government",
+            "US Constitution",
+            "Federalism",
+            "Three Branches Of Government",
+            "The Amendment Process",
+            "Electoral College",
+            "Basic Economic Concept",
+            "US Economy System",
+            "Business Cycle",
+            "Labour & Consumer Issues",
+            "Early Civilization",
+            "Middle Ages",
+            "Age Of Explorations",
+            "Age Of Revolution",
+            "Intro To Geography",
+            "Using Resources Wisely"
+        ],
+        "RLA Reading": [
+            "GED RLA Reading Orientation",
+            "Main Idea Part 1",
+            "Main Idea Part 2",
+            "Restatement & Summary",
+            "Application of Ideas",
+            "Cause & Effect",
+            "Compare & Contrast",
+            "Conclusion & Generalizations",
+            "Word Choice",
+            "Tone & Point of View",
+            "Text Structure",
+            "Sequence",
+            "Purpose of Text",
+            "Effectiveness of Argument",
+            "Validity of Arguments",
+            "Text related by topic",
+            "Text with opposing Arguments",
+            "Text with Graphic information",
+            "Solving Non Fiction",
+            "Plot Elements",
+            "Inferences",
+            "Theme Part 1",
+            "Theme Part 2",
+            "Style & Point of View",
+            "Setting",
+            "Figurative Language"
+        ],
+        "RLA Writing": [
+            "RLA Writing Orientation",
+            "Run Ons",
+            "Subordinating Ideas",
+            "Comma Use",
+            "Capitalization",
+            "Homonyms",
+            "Possessives & Contractions"
+        ],
+        "Science": [
+            "Cell Structure & Functions",
+            "Cell Processes & Energy",
+            "Human Body System Part 1",
+            "Human Body Systems Part 2",
+            "Health Issues",
+            "Reproduction & Heredity",
+            "Modern Genetics",
+            "Evolution & Natural Selection",
+            "Organization Of Ecosystem",
+            "Atoms & Molecules",
+            "Properties & States Of Matter",
+            "Chemical Reactions",
+            "The Nature Of Energy",
+            "Motion & Forces",
+            "Electricity & Magnetism",
+            "Structure Of Earth Part 1",
+            "Structure Of Earth Part 2",
+            "Earth Resource",
+            "Weather & Climate",
+            "Earth In Solar System",
+            "Expanding Universe",
+            "Comprehend Scientific Presentations",
+            "Scientific Method",
+            "Reason With Scientific Information",
+            "Statistics & Probability"
+        ],
+        "Mathematics": [
+            "GED Mathematics Orientation",
+            "Ordering Numbers",
+            "Decimal Fraction",
+            "Percentage",
+            "Graphs",
+            "Mean, median, mode",
+            "Line Plot",
+            "Probability",
+            "Combination",
+            "Polynomials",
+            "Scientific Notation",
+            "Order Of Operations",
+            "Algebraic Expressions",
+            "Algebraic Word Equation",
+            "Inequalities",
+            "Quadratic equation",
+            "Graphing A Line",
+            "Slope And Equation",
+            "System Of Linear Equation",
+            "Function Application",
+            "Polygons",
+            "Scale Drawing",
+            "Area Perimeter",
+            "Volume & Surface Area"
+        ]
+       
+    },
+ "Entrance-Exams": {
+    "IELTS": {
+    
+        "Listening": [],
+        "Reading": [],
+        "Writing": [],
+        "Speaking": []
+  
+    },
+
+      "Parts": {
+        "Speaking & Writing": [],
+        "Reading": [],
+        "Listening": []
+
+    },
+    "SAT": {
+      
+        "Reading": [],
+        "Writing and Language": [],
+        "Math – No Calculator": [],
+        "Math – Calculator": [],
+        "Essay (Optional)": []
+
+    },
+    "GRE": {
+  
+        "Verbal Reasoning": [],
+        "Quantitative Reasoning": [],
+        "Analytical Writing": [],
+        "Unscored/Research (Experimental)": []
+  
+    },
+    "GMAT": {
+     
+        "Analytical Writing Assessment": [],
+        "Integrated Reasoning": [],
+        "Quantitative": [],
+        "Verbal": []
+  
+    },
+    "TOEFL": {
+  
+        "Reading": [],
+        "Listening": [],
+        "Speaking": [],
+        "Writing": []
+  
+    }
+  },
+  "BCS": {
+    "General": {
+      "Preliminary": {
+        "Parts": {
+          "Bangla Language and Literature": [],
+          "English Language and Literature": [],
+          "Bangladesh Affairs": [],
+          "International Affairs": [],
+          "Geography, Environment and Disaster Management": [],
+          "General Knowledge": [],
+          "Computer and Information Technology": [],
+          "Analytical Ability": [],
+          "Mental Skills": [],
+          "Ethics, Values and Good Governance": []
+        }
+      },
+      "Written": {
+        "Parts": {
+          "General Bengali (Part I & II)": [],
+          "General English (Part I & II)": [],
+          "Bangladesh Affairs (Part I & II)": [],
+          "International Affairs": [],
+          "Mathematical Reasoning and Mental Ability": [],
+          "General Science and Technology": []
+        }
+      },
+      "Viva": {
+        "Parts": {}
+      }
+    },
+    "Technical": {
+      "Preliminary": {
+        "Parts": {
+          "Bangla Language and Literature": [],
+          "English Language and Literature": [],
+          "Bangladesh Affairs": [],
+          "International Affairs": [],
+          "Geography, Environment and Disaster Management": [],
+          "General Knowledge": [],
+          "Computer and Information Technology": [],
+          "Analytical Ability": [],
+          "Mental Skills": [],
+          "Ethics, Values and Good Governance": []
+        }
+      },
+      "Written": {
+        "Parts": {
+          "General Bengali": [],
+          "General English (Part I & II)": [],
+          "Bangladesh Affairs (Part I & II)": [],
+          "International Affairs": [],
+          "Mathematical Reasoning and Mental Ability": []
+        }
+      },
+      "Viva": {
+        "Parts": {}
+      }
+    },
+    "Both": {
+      "Preliminary": {
+        "Parts": {
+          "Bangla Language and Literature": [],
+          "English Language and Literature": [],
+          "Bangladesh Affairs": [],
+          "International Affairs": [],
+          "Geography, Environment and Disaster Management": [],
+          "General Knowledge": [],
+          "Computer and Information Technology": [],
+          "Analytical Ability": [],
+          "Mental Skills": [],
+          "Ethics, Values and Good Governance": []
+        }
+      },
+      "Written": {
+        "Parts": {
+          "General Bengali (Part I & II)": [],
+          "General English (Part I & II)": [],
+          "Bangladesh Affairs (Part I & II)": [],
+          "International Affairs": [],
+          "Mathematical Reasoning and Mental Ability": [],
+          "General Science and Technology": []
+        }
+      },
+      "Viva": {
+        "Parts": {}
+      }
+    }
+  }
+
+
+}

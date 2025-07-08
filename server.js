@@ -6,6 +6,8 @@ const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/db');
 const adminRoutes = require('./controllers/oneTimeAdminController');
+const subjectRoutes = require('./routes/subjectsRoutes');
+const educationTreeRoute = require('./routes/educationRoutes');
 // Load environment variables
 dotenv.config();
 
@@ -27,9 +29,9 @@ app.use('/api/teachers', require('./routes/teacherRoutes'));
 app.use('/api/posts', require('./routes/teacherPostRoutes'));
 app.use('/api/session-requests', require('./routes/sessionRequest'));
 app.use('/api/admin', adminRoutes);
-
+app.use('/api', subjectRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use(educationTreeRoute);
 // Create HTTP server
 const server = http.createServer(app);
 
