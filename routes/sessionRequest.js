@@ -3,19 +3,22 @@ const router = express.Router();
 const SessionRequest = require('../models/sessionRequest');
 const auth = require('../middleware/auth');
 
-// ✅ POST: Student requests a session with a teacher
+// POST: Student requests a session with a teacher
 router.post('/', auth('student'), async (req, res) => {
   try {
     const { teacherId, subject, message } = req.body;
+    console.log('Request body:', req.body);  // Debug log to see incoming data
 
-    if (!teacherId || !subject || !message) {
-      return res.status(400).json({ message: 'All fields are required' });
+    // Validate required fields (subject is optional now)
+    if (!teacherId || !message) {
+      return res.status(400).json({ message: 'teacherId and message are required' });
     }
 
+    // Create new session request
     const newRequest = await SessionRequest.create({
-      student: req.user.userId,
+      student: req.user.userId,  // from auth middleware
       teacher: teacherId,
-      subject,
+      subject: subject || '',
       message,
     });
 
@@ -29,7 +32,7 @@ router.post('/', auth('student'), async (req, res) => {
   }
 });
 
-// 🛠️ (Optional) GET: View all session requests for a teacher (for future use)
+// Optional: GET all session requests for a teacher (for future use)
 router.get('/teacher/:teacherId', auth('teacher'), async (req, res) => {
   try {
     const requests = await SessionRequest.find({ teacher: req.params.teacherId }).populate('student', 'name');
