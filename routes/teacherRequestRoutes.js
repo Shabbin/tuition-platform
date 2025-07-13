@@ -1,19 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const TeacherRequest = require('../models/TeacherRequest');
+const TeacherRequest = require('../models/teacherRequest');
+const ChatThread = require('../models/chatThread');
 
 // Create a new request (used by student)
 router.post('/', auth('student'), async (req, res) => {
   try {
     const { teacherId, studentId, studentName, postId, topic, subject, message } = req.body;
 
-    // Required fields
     if (!teacherId || !studentId || !studentName || !message) {
       return res.status(400).json({ message: 'teacherId, studentId, studentName, and message are required.' });
     }
 
-    // Ensure either postId (tuition), or topic, or subject (session) is provided - at least one
     if (!postId && !topic && !subject) {
       return res.status(400).json({ message: 'Provide at least one of postId, topic, or subject.' });
     }
@@ -51,7 +50,7 @@ router.get('/', auth('teacher'), async (req, res) => {
   }
 });
 
-// Update request status (approve/reject)
+// ✅ Update request status (approve/reject)
 router.post('/:id/:action', auth('teacher'), async (req, res) => {
   try {
     const { id, action } = req.params;
@@ -69,7 +68,33 @@ router.post('/:id/:action', auth('teacher'), async (req, res) => {
     request.status = action === 'approve' ? 'approved' : 'rejected';
     await request.save();
 
-    res.json({ message: `Request ${request.status} successfully`, request });
+    let thread = null;
+
+    if (request.status === 'approved') {
+      thread = await ChatThread.findOne({ requestId: request._id });
+
+      if (!thread) {
+        thread = new ChatThread({
+          requestId: request._id,
+          participants: [request.studentId, request.teacherId],
+          messages: [
+              {
+          senderId: request.studentId,
+          text: request.message || '[No message provided]',
+          timestamp: request.requestedAt || new Date(),
+        },
+          ],
+        });
+
+        await thread.save();
+      }
+    }
+
+    res.json({
+      message: `Request ${request.status} successfully`,
+      request,
+      threadId: thread?._id || null,
+    });
   } catch (error) {
     console.error('Error updating request:', error);
     res.status(500).json({ message: 'Server error while updating request' });
