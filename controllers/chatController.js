@@ -1,21 +1,20 @@
-// controllers/chatController.js
 const ChatThread = require('../models/chatThread');
 const TeacherRequest = require('../models/teacherRequest');
 
+// Get or create thread by requestId (not used in new logic, but left intact)
 exports.getOrCreateThreadByRequestId = async (req, res) => {
-  console.log("API HIT: /api/chat/thread/", req.params.requestId);
   try {
     const { requestId } = req.params;
 
-    let thread = await ChatThread.findOne({ requestId }).populate('participants', 'name email');
-console.log("Checking thread existence for requestId:", requestId);
+    const request = await TeacherRequest.findById(requestId);
+    if (!request) return res.status(404).json({ message: 'Tuition request not found' });
+
+    let thread = await ChatThread.findOne({
+      participants: { $all: [request.studentId, request.teacherId] },
+    }).populate('participants', 'name email');
+
     if (!thread) {
-      const request = await TeacherRequest.findById(requestId);
-      if (!request) return res.status(404).json({ message: 'Tuition request not found' });
-console.log("Creating thread with message:", request.message);
-      // Create thread with initial message from the tuition request's message
       thread = new ChatThread({
-        requestId,
         participants: [request.studentId, request.teacherId],
         messages: [
           {
@@ -24,12 +23,17 @@ console.log("Creating thread with message:", request.message);
             timestamp: request.createdAt,
           },
         ],
-        
-      }
-      
-    );
-      await thread.save();
+        sessions: [
+          {
+            subject: request.subject || 'Untitled',
+            origin: request.postId ? `Post: ${request.postId}` : 'Direct',
+            status: 'pending',
+            requestId,
+          },
+        ],
+      });
 
+      await thread.save();
       thread = await thread.populate('participants', 'name email');
     }
 
