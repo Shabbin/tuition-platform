@@ -1,6 +1,8 @@
+//controllers\teacherRequestController.js
 const TeacherRequest = require('../models/teacherRequest');
 const ChatThread = require('../models/chatThread');
 
+// Create a new request
 // Create a new request
 exports.createRequest = async (req, res) => {
   try {
@@ -14,7 +16,7 @@ exports.createRequest = async (req, res) => {
       return res.status(400).json({ message: 'Provide at least one of postId, topic, or subject.' });
     }
 
-    // 🚫 Prevent duplicate active request per student-teacher pair (ignores posts)
+    // 🚫 Prevent duplicate active request per student-teacher pair
     const existing = await TeacherRequest.findOne({
       studentId,
       teacherId,
@@ -24,6 +26,7 @@ exports.createRequest = async (req, res) => {
       return res.status(409).json({ message: 'You already have an active request with this teacher.' });
     }
 
+    // ✅ Create the request first
     const newRequest = new TeacherRequest({
       teacherId,
       studentId,
@@ -38,6 +41,35 @@ exports.createRequest = async (req, res) => {
 
     await newRequest.save();
 
+    // ✅ Immediately create pending chat thread if one doesn't exist
+    const existingThread = await ChatThread.findOne({
+      participants: { $all: [studentId, teacherId] }
+    });
+
+    if (!existingThread) {
+      const session = {
+        subject: subject || topic || 'Untitled Subject',
+        origin: postId ? `Post: ${postId}` : 'Direct',
+        status: 'pending',
+        startedAt: newRequest.requestedAt,
+        requestId: newRequest._id,
+      };
+
+      const thread = new ChatThread({
+        participants: [studentId, teacherId],
+        messages: [
+          {
+            senderId: studentId,
+            text: message,
+            timestamp: newRequest.requestedAt,
+          }
+        ],
+        sessions: [session]
+      });
+
+      await thread.save();
+    }
+
     res.status(201).json({ message: 'Session request created successfully', request: newRequest });
   } catch (error) {
     console.error('Error creating teacher request:', error);
@@ -45,17 +77,38 @@ exports.createRequest = async (req, res) => {
   }
 };
 
+
 // Get all requests for logged-in teacher
+// controllers/teacherRequestController.js
+
 exports.getRequestsForTeacher = async (req, res) => {
   try {
     const teacherId = req.user.userId || req.user._id;
+
     const requests = await TeacherRequest.find({ teacherId });
-    res.json(requests);
+
+    // Attach threadId to each request
+    const requestsWithThreadId = await Promise.all(
+      requests.map(async (reqItem) => {
+        const thread = await ChatThread.findOne({
+          participants: { $all: [reqItem.studentId, reqItem.teacherId] },
+          'sessions.requestId': reqItem._id,
+        });
+
+        return {
+          ...reqItem.toObject(),
+          threadId: thread ? thread._id : null,
+        };
+      })
+    );
+
+    res.json(requestsWithThreadId);
   } catch (error) {
     console.error('Error fetching requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Approve or reject a request
 exports.updateRequestStatus = async (req, res) => {
@@ -136,10 +189,37 @@ exports.updateRequestStatus = async (req, res) => {
 exports.getRequestsForStudent = async (req, res) => {
   try {
     const studentId = req.user.userId || req.user._id;
+
     const requests = await TeacherRequest.find({ studentId, status: 'approved' });
-    res.json(requests);
+
+    const requestsWithThreadId = await Promise.all(
+      requests.map(async (reqItem) => {
+        const thread = await ChatThread.findOne({
+          participants: { $all: [reqItem.studentId, reqItem.teacherId] },
+          'sessions.requestId': reqItem._id,
+        });
+
+        return {
+          ...reqItem.toObject(),
+          threadId: thread ? thread._id : null,
+        };
+      })
+    );
+
+    res.json(requestsWithThreadId);
   } catch (error) {
     console.error('Error fetching student requests:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getAllRequestsForStudent = async (req, res) => {
+  try {
+    const studentId = req.user.userId || req.user._id;
+    const requests = await TeacherRequest.find({ studentId });
+    res.json(requests);
+  } catch (error) {
+    console.error('Error fetching all student requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
