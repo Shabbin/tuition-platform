@@ -1,3 +1,4 @@
+//controllers\chatController.js
 const ChatThread = require('../models/chatThread');
 const TeacherRequest = require('../models/teacherRequest');
 
@@ -44,6 +45,7 @@ exports.getOrCreateThreadByRequestId = async (req, res) => {
   }
 };
 
+
 exports.getThreadById = async (req, res) => {
   try {
     const { threadId } = req.params;
@@ -88,5 +90,32 @@ exports.postMessage = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.getStudentThreads = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const threads = await ChatThread.find({ "participants.student": studentId })
+      .populate("participants.teacher", "name email")
+      .populate("participants.student", "name email")
+      .populate("messages.sender", "name role");
+
+    res.json(threads);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch student chat threads" });
+  }
+};
+exports.getThreadsByStudentId = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const threads = await ChatThread.find({
+      participants: studentId
+    }).populate('participants', 'name role'); // populate participant names and roles
+
+    res.status(200).json(threads);
+  } catch (error) {
+    console.error('Error fetching student threads:', error);
+    res.status(500).json({ message: 'Failed to fetch student threads' });
   }
 };
