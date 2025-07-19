@@ -26,7 +26,7 @@ exports.createRequest = async (req, res) => {
       return res.status(409).json({ message: 'You already have an active request with this teacher.' });
     }
 
-    // ✅ Create the request first
+    // ✅ Create the request
     const newRequest = new TeacherRequest({
       teacherId,
       studentId,
@@ -41,20 +41,28 @@ exports.createRequest = async (req, res) => {
 
     await newRequest.save();
 
-    // ✅ Immediately create pending chat thread if one doesn't exist
+    // 🛡️ Safety check: ensure requestId is valid
+    if (!newRequest._id) {
+      console.error('❌ Failed to get request ID after saving.');
+      return res.status(500).json({ message: 'Failed to create chat thread: missing request ID.' });
+    }
+
+    // ✅ Ensure no duplicate chat session for same requestId
     const existingThread = await ChatThread.findOne({
-      participants: { $all: [studentId, teacherId] }
+      participants: { $all: [studentId, teacherId] },
+      'sessions.requestId': newRequest._id,
     });
 
-    if (!existingThread) {
-      const session = {
-        subject: subject || topic || 'Untitled Subject',
-        origin: postId ? `Post: ${postId}` : 'Direct',
-        status: 'pending',
-        startedAt: newRequest.requestedAt,
-        requestId: newRequest._id,
-      };
+    const session = {
+      subject: subject || topic || 'Untitled Subject',
+      origin: postId ? `Post: ${postId}` : 'Direct',
+      status: 'pending',
+      startedAt: newRequest.requestedAt,
+      requestId: newRequest._id,
+    };
 
+    if (!existingThread) {
+      // 🆕 Create new thread with first session
       const thread = new ChatThread({
         participants: [studentId, teacherId],
         messages: [
@@ -64,10 +72,19 @@ exports.createRequest = async (req, res) => {
             timestamp: newRequest.requestedAt,
           }
         ],
-        sessions: [session]
+        sessions: [session],
       });
 
       await thread.save();
+    } else {
+      // ♻️ Add new session to existing thread
+      existingThread.sessions.push(session);
+      existingThread.messages.push({
+        senderId: studentId,
+        text: message,
+        timestamp: newRequest.requestedAt,
+      });
+      await existingThread.save();
     }
 
     res.status(201).json({ message: 'Session request created successfully', request: newRequest });
