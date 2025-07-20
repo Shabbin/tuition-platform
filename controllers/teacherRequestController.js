@@ -1,8 +1,7 @@
-//controllers\teacherRequestController.js
 const TeacherRequest = require('../models/teacherRequest');
 const ChatThread = require('../models/chatThread');
+const User = require('../models/user'); // ✅ make sure this path matches your User model location
 
-// Create a new request
 // Create a new request
 exports.createRequest = async (req, res) => {
   try {
@@ -16,7 +15,6 @@ exports.createRequest = async (req, res) => {
       return res.status(400).json({ message: 'Provide at least one of postId, topic, or subject.' });
     }
 
-    // 🚫 Prevent duplicate active request per student-teacher pair
     const existing = await TeacherRequest.findOne({
       studentId,
       teacherId,
@@ -26,7 +24,6 @@ exports.createRequest = async (req, res) => {
       return res.status(409).json({ message: 'You already have an active request with this teacher.' });
     }
 
-    // ✅ Create the request
     const newRequest = new TeacherRequest({
       teacherId,
       studentId,
@@ -41,13 +38,11 @@ exports.createRequest = async (req, res) => {
 
     await newRequest.save();
 
-    // 🛡️ Safety check: ensure requestId is valid
     if (!newRequest._id) {
       console.error('❌ Failed to get request ID after saving.');
       return res.status(500).json({ message: 'Failed to create chat thread: missing request ID.' });
     }
 
-    // ✅ Ensure no duplicate chat session for same requestId
     const existingThread = await ChatThread.findOne({
       participants: { $all: [studentId, teacherId] },
       'sessions.requestId': newRequest._id,
@@ -62,7 +57,6 @@ exports.createRequest = async (req, res) => {
     };
 
     if (!existingThread) {
-      // 🆕 Create new thread with first session
       const thread = new ChatThread({
         participants: [studentId, teacherId],
         messages: [
@@ -77,7 +71,6 @@ exports.createRequest = async (req, res) => {
 
       await thread.save();
     } else {
-      // ♻️ Add new session to existing thread
       existingThread.sessions.push(session);
       existingThread.messages.push({
         senderId: studentId,
@@ -94,17 +87,13 @@ exports.createRequest = async (req, res) => {
   }
 };
 
-
 // Get all requests for logged-in teacher
-// controllers/teacherRequestController.js
-
 exports.getRequestsForTeacher = async (req, res) => {
   try {
     const teacherId = req.user.userId || req.user._id;
 
     const requests = await TeacherRequest.find({ teacherId });
 
-    // Attach threadId to each request
     const requestsWithThreadId = await Promise.all(
       requests.map(async (reqItem) => {
         const thread = await ChatThread.findOne({
@@ -112,9 +101,14 @@ exports.getRequestsForTeacher = async (req, res) => {
           'sessions.requestId': reqItem._id,
         });
 
+        const student = await User.findById(reqItem.studentId).select('name image');
+        const teacher = await User.findById(reqItem.teacherId).select('name image');
+
         return {
           ...reqItem.toObject(),
           threadId: thread ? thread._id : null,
+          student,
+          teacher,
         };
       })
     );
@@ -125,7 +119,6 @@ exports.getRequestsForTeacher = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 // Approve or reject a request
 exports.updateRequestStatus = async (req, res) => {
@@ -153,7 +146,6 @@ exports.updateRequestStatus = async (req, res) => {
     let thread = null;
 
     if (request.status === 'approved') {
-      // Reuse existing thread if exists for this student-teacher pair
       thread = await ChatThread.findOne({
         participants: { $all: [request.studentId, request.teacherId] },
       });
@@ -167,7 +159,6 @@ exports.updateRequestStatus = async (req, res) => {
       };
 
       if (!thread) {
-        // Create thread
         thread = new ChatThread({
           participants: [request.studentId, request.teacherId],
           messages: [
@@ -181,11 +172,6 @@ exports.updateRequestStatus = async (req, res) => {
         });
       } else {
         thread.sessions.push(session);
-        thread.messages.push({
-          senderId: request.studentId,
-          text: request.message || '[No message provided]',
-          timestamp: request.requestedAt || new Date(),
-        });
       }
 
       await thread.save();
@@ -206,7 +192,6 @@ exports.updateRequestStatus = async (req, res) => {
 exports.getRequestsForStudent = async (req, res) => {
   try {
     const studentId = req.user.userId || req.user._id;
-
     const requests = await TeacherRequest.find({ studentId, status: 'approved' });
 
     const requestsWithThreadId = await Promise.all(
@@ -216,9 +201,14 @@ exports.getRequestsForStudent = async (req, res) => {
           'sessions.requestId': reqItem._id,
         });
 
+        const student = await User.findById(reqItem.studentId).select('name image');
+        const teacher = await User.findById(reqItem.teacherId).select('name image');
+
         return {
           ...reqItem.toObject(),
           threadId: thread ? thread._id : null,
+          student,
+          teacher,
         };
       })
     );
@@ -230,6 +220,7 @@ exports.getRequestsForStudent = async (req, res) => {
   }
 };
 
+// Get all requests (any status) for a student
 exports.getAllRequestsForStudent = async (req, res) => {
   try {
     const studentId = req.user.userId || req.user._id;
