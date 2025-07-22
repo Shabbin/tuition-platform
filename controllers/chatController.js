@@ -1,6 +1,6 @@
 const ChatThread = require('../models/chatThread');
 const TeacherRequest = require('../models/teacherRequest');
-
+const ChatMessage = require('../models/chatMessage');
 // Get or create thread by requestId
 exports.getOrCreateThreadByRequestId = async (req, res) => {
   try {
@@ -63,22 +63,23 @@ exports.getThreadById = async (req, res) => {
 };
 
 // GET messages by threadId
+
+
 exports.getMessagesByThreadId = async (req, res) => {
   try {
-    const { threadId } = req.params;
+    const messages = await ChatMessage.find({ threadId: req.params.threadId })
+      .populate('senderId', 'name profileImage role')
+      .sort({ timestamp: 1 }); // oldest first
 
-    const thread = await ChatThread.findById(threadId)
-      .populate('messages.senderId', 'name profileImage role');
-
-    if (!thread) return res.status(404).json({ message: 'Thread not found' });
-
-    res.json({ messages: thread.messages });
-  } catch (error) {
-    console.error('[getMessagesByThreadId] Error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.json(messages);
+  } catch (err) {
+    console.error('Error fetching messages:', err);
+    res.status(500).json({ message: 'Error fetching messages' });
   }
 };
 
+
+// POST message to thread
 // POST message to thread
 exports.postMessage = async (req, res) => {
   try {
@@ -90,16 +91,36 @@ exports.postMessage = async (req, res) => {
     const thread = await ChatThread.findById(threadId);
     if (!thread) return res.status(404).json({ message: 'Thread not found' });
 
-    const newMessage = { senderId, text, timestamp: new Date() };
-    thread.messages.push(newMessage);
-    await thread.save();
+    // 1. Create new embedded message
+    const newEmbeddedMessage = {
+      senderId,
+      text,
+      timestamp: new Date(),
+    };
 
-    res.status(201).json(newMessage);
+    // 2. Create new ChatMessage document
+    const newChatMessage = new ChatMessage({
+      threadId,
+      senderId,
+      text,
+      timestamp: newEmbeddedMessage.timestamp,
+    });
+
+    // Save both
+    thread.messages.push(newEmbeddedMessage);
+    await thread.save();
+    await newChatMessage.save();
+
+    // Optionally populate sender info before returning
+    await newChatMessage.populate('senderId', 'name profileImage role');
+
+    res.status(201).json(newChatMessage);
   } catch (error) {
     console.error('[postMessage] Error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Get all chat threads for a student by studentId
 exports.getStudentThreads = async (req, res) => {

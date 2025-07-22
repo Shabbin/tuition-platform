@@ -11,7 +11,7 @@ const educationTreeRoute = require('./routes/educationRoutes');
 const teacherRequestsRouter = require('./routes/teacherRequestRoutes');
 const ChatThread = require('./models/chatThread');
 const chatRoutes = require('./routes/chatRoutes');
-
+const ChatMessage = require('./models/chatMessage');
 dotenv.config();
 connectDB();
 
@@ -52,25 +52,27 @@ io.on('connection', (socket) => {
     console.log(`Socket ${socket.id} left room ${threadId}`);
   });
 
-  socket.on('send_message', async (data) => {
-    const { threadId, senderId, text } = data;
-    try {
-      const thread = await ChatThread.findById(threadId);
-      if (!thread) {
-        console.warn('Thread not found for id:', threadId);
-        return;
-      }
+socket.on('send_message', async (data) => {
+  const { threadId, senderId, text } = data;
+  try {
+    // Save message as standalone doc
+    const message = await ChatMessage.create({
+      threadId,
+      senderId,
+      text,
+    });
 
-      const newMessage = { senderId, text, timestamp: new Date() };
-      thread.messages.push(newMessage);
-      await thread.save();
+    // Populate sender data
+    await message.populate({ path: 'senderId', select: 'name profileImage role' });
 
-      console.log(`Emitting new_message to room ${threadId}`, newMessage);
-      io.in(threadId).emit('new_message', newMessage);
-    } catch (error) {
-      console.error('Error saving message:', error);
-    }
-  });
+    // Emit to thread room
+    io.in(threadId).emit('new_message', message);
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+});
+
+
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
