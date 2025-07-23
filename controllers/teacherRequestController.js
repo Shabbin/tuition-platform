@@ -1,29 +1,29 @@
 const TeacherRequest = require('../models/teacherRequest');
 const ChatThread = require('../models/chatThread');
 const User = require('../models/user'); // ✅ make sure this path matches your User model location
-
+const ChatMessage = require('../models/chatMessage');
 // Create a new request
 exports.createRequest = async (req, res) => {
   try {
     const { teacherId, studentId, studentName, postId, topic, subject, message } = req.body;
 
-    if (!teacherId || !studentId || !studentName || !message) {
-      return res.status(400).json({ message: 'teacherId, studentId, studentName, and message are required.' });
-    }
-
-    if (!postId && !topic && !subject) {
-      return res.status(400).json({ message: 'Provide at least one of postId, topic, or subject.' });
-    }
-
-    const existing = await TeacherRequest.findOne({
-      studentId,
+    // Prevent duplicate active requests by this student to this teacher
+    const existingRequest = await TeacherRequest.findOne({
       teacherId,
-      status: { $in: ['pending', 'approved'] }
+      studentId,
+      status: { $in: ['pending', 'approved'] }, // only active requests
+      // Uncomment below if you want to limit per post as well
+      // postId: postId || undefined,
     });
-    if (existing) {
-      return res.status(409).json({ message: 'You already have an active request with this teacher.' });
+
+    if (existingRequest) {
+      return res.status(400).json({
+        message: 'You already have an active request for this teacher.',
+        existingRequestId: existingRequest._id,
+      });
     }
 
+    // Proceed with creating the new request
     const newRequest = new TeacherRequest({
       teacherId,
       studentId,
@@ -38,16 +38,6 @@ exports.createRequest = async (req, res) => {
 
     await newRequest.save();
 
-    if (!newRequest._id) {
-      console.error('❌ Failed to get request ID after saving.');
-      return res.status(500).json({ message: 'Failed to create chat thread: missing request ID.' });
-    }
-
-    const existingThread = await ChatThread.findOne({
-      participants: { $all: [studentId, teacherId] },
-      'sessions.requestId': newRequest._id,
-    });
-
     const session = {
       subject: subject || topic || 'Untitled Subject',
       origin: postId ? `Post: ${postId}` : 'Direct',
@@ -56,31 +46,40 @@ exports.createRequest = async (req, res) => {
       requestId: newRequest._id,
     };
 
-    if (!existingThread) {
-      const thread = new ChatThread({
+    const initialMessage = {
+      senderId: studentId,
+      text: message,
+      timestamp: newRequest.requestedAt,
+    };
+
+    let thread = await ChatThread.findOne({
+      participants: { $all: [studentId, teacherId] },
+      'sessions.requestId': newRequest._id,
+    });
+
+    if (!thread) {
+      thread = new ChatThread({
         participants: [studentId, teacherId],
-        messages: [
-          {
-            senderId: studentId,
-            text: message,
-            timestamp: newRequest.requestedAt,
-          }
-        ],
+        messages: [initialMessage],      // embedded message
         sessions: [session],
       });
-
       await thread.save();
     } else {
-      existingThread.sessions.push(session);
-      existingThread.messages.push({
-        senderId: studentId,
-        text: message,
-        timestamp: newRequest.requestedAt,
-      });
-      await existingThread.save();
+      thread.sessions.push(session);
+      thread.messages.push(initialMessage);
+      await thread.save();
     }
 
-    res.status(201).json({ message: 'Session request created successfully', request: newRequest });
+    // Save the initial message as a separate ChatMessage document too
+    const chatMessage = new ChatMessage({
+      threadId: thread._id,
+      senderId: studentId,
+      text: message,
+      timestamp: newRequest.requestedAt,
+    });
+    await chatMessage.save();
+
+    res.status(201).json({ message: 'Session request created successfully', request: newRequest, threadId: thread._id });
   } catch (error) {
     console.error('Error creating teacher request:', error);
     res.status(500).json({ message: 'Server error while creating request.' });
