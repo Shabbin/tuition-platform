@@ -157,21 +157,15 @@ exports.updateRequestStatus = async (req, res) => {
         requestId: request._id,
       };
 
-      if (!thread) {
-        thread = new ChatThread({
-          participants: [request.studentId, request.teacherId],
-          messages: [
-            {
-              senderId: request.studentId,
-              text: request.message || '[No message provided]',
-              timestamp: request.requestedAt || new Date(),
-            },
-          ],
-          sessions: [session],
-        });
-      } else {
-        thread.sessions.push(session);
-      }
+ if (!thread) {
+  thread = new ChatThread({
+    participants: [request.studentId, request.teacherId],
+    messages: [], // 👈 No duplicate message
+    sessions: [session],
+  });
+} else {
+  thread.sessions.push(session);
+}
 
       await thread.save();
     }
