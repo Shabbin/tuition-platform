@@ -159,3 +159,22 @@ exports.getThreadsByStudentId = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch student threads' });
   }
 };
+
+exports.getThreadsByTeacherId = async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+
+    const threads = await ChatThread.find({
+      participants: teacherId
+    })
+      .populate('participants', 'name profileImage role')
+      .populate('messages.senderId', 'name profileImage role')
+      .populate('sessions')
+      .exec();
+
+    res.json(threads);
+  } catch (err) {
+    console.error('[getThreadsByTeacherId] Error:', err);
+    res.status(500).json({ message: 'Failed to fetch teacher chat threads' });
+  }
+};
