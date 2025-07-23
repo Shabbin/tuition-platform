@@ -80,7 +80,6 @@ exports.getMessagesByThreadId = async (req, res) => {
 
 
 // POST message to thread
-// POST message to thread
 exports.postMessage = async (req, res) => {
   try {
     const { threadId, senderId, text } = req.body;
@@ -134,7 +133,18 @@ exports.getStudentThreads = async (req, res) => {
       .populate('messages.senderId', 'name profileImage role') // populate message senders
       .exec();
 
-    res.json(threads);
+    // Add lastMessage property for each thread
+    const threadsWithLastMessage = threads.map(thread => {
+      const lastMsg = thread.messages.length > 0
+        ? thread.messages[thread.messages.length - 1].text
+        : '';
+      return {
+        ...thread.toObject(),
+        lastMessage: lastMsg,
+      };
+    });
+
+    res.json(threadsWithLastMessage);
   } catch (error) {
     console.error('[getStudentThreads] Error:', error);
     res.status(500).json({ error: "Failed to fetch student chat threads" });
@@ -153,7 +163,18 @@ exports.getThreadsByStudentId = async (req, res) => {
       .populate('messages.senderId', 'name profileImage role')
       .exec();
 
-    res.status(200).json(threads);
+    // Add lastMessage property for each thread
+    const threadsWithLastMessage = threads.map(thread => {
+      const lastMsg = thread.messages.length > 0
+        ? thread.messages[thread.messages.length - 1].text
+        : '';
+      return {
+        ...thread.toObject(),
+        lastMessage: lastMsg,
+      };
+    });
+
+    res.status(200).json(threadsWithLastMessage);
   } catch (error) {
     console.error('[getThreadsByStudentId] Error:', error);
     res.status(500).json({ message: 'Failed to fetch student threads' });
@@ -172,7 +193,18 @@ exports.getThreadsByTeacherId = async (req, res) => {
       .populate('sessions')
       .exec();
 
-    res.json(threads);
+    // Add lastMessage property for each thread
+    const threadsWithLastMessage = threads.map(thread => {
+      const lastMsg = thread.messages.length > 0
+        ? thread.messages[thread.messages.length - 1].text
+        : '';
+      return {
+        ...thread.toObject(),
+        lastMessage: lastMsg,
+      };
+    });
+
+    res.json(threadsWithLastMessage);
   } catch (err) {
     console.error('[getThreadsByTeacherId] Error:', err);
     res.status(500).json({ message: 'Failed to fetch teacher chat threads' });
