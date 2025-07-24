@@ -107,6 +107,13 @@ exports.postMessage = async (req, res) => {
 
     // Save both
     thread.messages.push(newEmbeddedMessage);
+thread.lastMessage = {
+  text,
+  senderId,
+  timestamp: new Date(),
+};
+thread.updatedAt = new Date(); // ensure updatedAt is touched
+await thread.save();
     await thread.save();
     await newChatMessage.save();
 
@@ -159,27 +166,18 @@ exports.getThreadsByStudentId = async (req, res) => {
     const threads = await ChatThread.find({
       participants: studentId
     })
+      .sort({ updatedAt: -1 }) // newest first
       .populate('participants', 'name profileImage role')
-      .populate('messages.senderId', 'name profileImage role')
+      .populate('lastMessage.senderId', 'name profileImage role') // ✅ populate lastMessage sender
       .exec();
 
-    // Add lastMessage property for each thread
-    const threadsWithLastMessage = threads.map(thread => {
-      const lastMsg = thread.messages.length > 0
-        ? thread.messages[thread.messages.length - 1].text
-        : '';
-      return {
-        ...thread.toObject(),
-        lastMessage: lastMsg,
-      };
-    });
-
-    res.status(200).json(threadsWithLastMessage);
+    res.status(200).json(threads); // ✅ directly return the threads
   } catch (error) {
     console.error('[getThreadsByStudentId] Error:', error);
     res.status(500).json({ message: 'Failed to fetch student threads' });
   }
 };
+
 
 exports.getThreadsByTeacherId = async (req, res) => {
   try {
@@ -188,25 +186,14 @@ exports.getThreadsByTeacherId = async (req, res) => {
     const threads = await ChatThread.find({
       participants: teacherId
     })
-      .populate('participants', 'name profileImage role')
-      .populate('messages.senderId', 'name profileImage role')
-      .populate('sessions')
+      .sort({ updatedAt: -1 }) // ✅ newest first
+      .populate('participants', 'name profileImage role') // ✅ show name & image in convo list
+      .populate('lastMessage.senderId', 'name profileImage role') // ✅ populate last sender only
       .exec();
 
-    // Add lastMessage property for each thread
-    const threadsWithLastMessage = threads.map(thread => {
-      const lastMsg = thread.messages.length > 0
-        ? thread.messages[thread.messages.length - 1].text
-        : '';
-      return {
-        ...thread.toObject(),
-        lastMessage: lastMsg,
-      };
-    });
-
-    res.json(threadsWithLastMessage);
-  } catch (err) {
-    console.error('[getThreadsByTeacherId] Error:', err);
-    res.status(500).json({ message: 'Failed to fetch teacher chat threads' });
+    res.status(200).json(threads); // ✅ no transformation needed
+  } catch (error) {
+    console.error('[getThreadsByTeacherId] Error:', error);
+    res.status(500).json({ message: 'Failed to fetch teacher threads' });
   }
 };

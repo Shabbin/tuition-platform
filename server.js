@@ -55,18 +55,47 @@ io.on('connection', (socket) => {
 socket.on('send_message', async (data) => {
   const { threadId, senderId, text } = data;
   try {
-    // Save message as standalone doc
+    // 1. Save message as standalone document
     const message = await ChatMessage.create({
       threadId,
       senderId,
       text,
+      timestamp: new Date(), // explicitly add timestamp
     });
 
-    // Populate sender data
+    // 2. Populate sender data for frontend convenience
     await message.populate({ path: 'senderId', select: 'name profileImage role' });
 
-    // Emit to thread room
+    // 3. Update the ChatThread's embedded messages and lastMessage, updatedAt
+    const thread = await ChatThread.findById(threadId);
+    if (thread) {
+      // Add to embedded messages array
+      thread.messages.push({
+        senderId,
+        text,
+        timestamp: message.timestamp,
+      });
+
+      // Update lastMessage and updatedAt
+      thread.lastMessage = {
+        text,
+        senderId,
+        timestamp: message.timestamp,
+      };
+      thread.updatedAt = new Date();
+
+      await thread.save();
+
+      // Populate lastMessage sender and participants for broadcasting
+      await thread.populate('lastMessage.senderId', 'name profileImage role');
+      await thread.populate('participants', 'name profileImage role');
+    }
+
+    // 4. Emit the new message to clients in the thread room
     io.in(threadId).emit('new_message', message);
+
+    // 5. Emit the updated thread info (with lastMessage) to update conversation headlines
+    io.in(threadId).emit('thread_updated', thread);
   } catch (error) {
     console.error('Error sending message:', error);
   }
