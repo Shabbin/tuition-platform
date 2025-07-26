@@ -9,6 +9,15 @@ const teacherRequestSchema = new mongoose.Schema({
   topic: { type: String },                                          // For topic help
   subject: { type: String },                                        // Optional, from session requests
   message: { type: String, required: true },
+    lastMessageTimestamp: {
+    type: Date,
+    default: null,
+  },
+  // optionally lastMessageText, if you want
+  lastMessageText: {
+    type: String,
+    default: '',
+  },
   rejectionMessage: { type: String },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   requestedAt: { type: Date, default: Date.now },                   // Optional from session requests

@@ -90,32 +90,33 @@ exports.postMessage = async (req, res) => {
     const thread = await ChatThread.findById(threadId);
     if (!thread) return res.status(404).json({ message: 'Thread not found' });
 
-    // 1. Create new embedded message
+    const now = new Date();
+
     const newEmbeddedMessage = {
       senderId,
       text,
-      timestamp: new Date(),
+      timestamp: now,
     };
 
-    // 2. Create new ChatMessage document
     const newChatMessage = new ChatMessage({
       threadId,
       senderId,
       text,
-      timestamp: newEmbeddedMessage.timestamp,
+      timestamp: now,
     });
 
-    // Save both
     thread.messages.push(newEmbeddedMessage);
-thread.lastMessage = {
-  text,
-  senderId,
-  timestamp: new Date(),
-};
-thread.updatedAt = new Date(); // ensure updatedAt is touched
-await thread.save();
+    thread.lastMessage = {
+      text,
+      senderId,
+      timestamp: now,
+    };
+    thread.updatedAt = now;
+
     await thread.save();
     await newChatMessage.save();
+
+    console.log('Saved thread lastMessage:', thread.lastMessage);
 
     // Optionally populate sender info before returning
     await newChatMessage.populate('senderId', 'name profileImage role');
@@ -126,6 +127,7 @@ await thread.save();
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 
 // Get all chat threads for a student by studentId
@@ -140,14 +142,16 @@ exports.getStudentThreads = async (req, res) => {
       .populate('messages.senderId', 'name profileImage role') // populate message senders
       .exec();
 
-    // Add lastMessage property for each thread
+    // Add lastMessage and lastMessageTimestamp property for each thread
     const threadsWithLastMessage = threads.map(thread => {
       const lastMsg = thread.messages.length > 0
-        ? thread.messages[thread.messages.length - 1].text
-        : '';
+        ? thread.messages[thread.messages.length - 1]
+        : null;
+
       return {
         ...thread.toObject(),
-        lastMessage: lastMsg,
+        lastMessage: lastMsg ? lastMsg.text : '',
+        lastMessageTimestamp: lastMsg ? lastMsg.timestamp : thread.updatedAt,
       };
     });
 
@@ -158,20 +162,26 @@ exports.getStudentThreads = async (req, res) => {
   }
 };
 
+
 // Alias for getStudentThreads, if needed
 exports.getThreadsByStudentId = async (req, res) => {
   try {
     const { studentId } = req.params;
 
     const threads = await ChatThread.find({
-      participants: studentId
+      participants: studentId,
     })
-      .sort({ updatedAt: -1 }) // newest first
-      .populate('participants', 'name profileImage role')
-      .populate('lastMessage.senderId', 'name profileImage role') // ✅ populate lastMessage sender
+      .sort({ 'lastMessage.timestamp': -1, updatedAt: -1 }) // sort newest active first
+      .populate('participants', 'name profileImage role') // populate participants info
+      .populate('lastMessage.senderId', 'name profileImage role') // populate last message sender info
       .exec();
 
-    res.status(200).json(threads); // ✅ directly return the threads
+    const threadsWithTimestamp = threads.map((thread) => ({
+      ...thread.toObject(),
+      lastMessageTimestamp: thread.lastMessage?.timestamp || thread.updatedAt,
+    }));
+
+    res.status(200).json(threadsWithTimestamp);
   } catch (error) {
     console.error('[getThreadsByStudentId] Error:', error);
     res.status(500).json({ message: 'Failed to fetch student threads' });
@@ -184,16 +194,57 @@ exports.getThreadsByTeacherId = async (req, res) => {
     const { teacherId } = req.params;
 
     const threads = await ChatThread.find({
-      participants: teacherId
+      participants: teacherId,
     })
-      .sort({ updatedAt: -1 }) // ✅ newest first
-      .populate('participants', 'name profileImage role') // ✅ show name & image in convo list
-      .populate('lastMessage.senderId', 'name profileImage role') // ✅ populate last sender only
+      .sort({ 'lastMessage.timestamp': -1, updatedAt: -1 }) // sort newest active first
+      .populate('participants', 'name profileImage role') // populate participants info
+      .populate('lastMessage.senderId', 'name profileImage role') // populate last message sender info
       .exec();
 
-    res.status(200).json(threads); // ✅ no transformation needed
+    const threadsWithTimestamp = threads.map((thread) => ({
+      ...thread.toObject(),
+      lastMessageTimestamp: thread.lastMessage?.timestamp || thread.updatedAt,
+    }));
+
+    res.status(200).json(threadsWithTimestamp);
   } catch (error) {
     console.error('[getThreadsByTeacherId] Error:', error);
     res.status(500).json({ message: 'Failed to fetch teacher threads' });
+  }
+};
+exports.getConversationsForUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const conversations = await ChatThread.find({
+      participants: userId,
+    })
+      .sort({ 'lastMessage.timestamp': -1 })  // sort by lastMessage timestamp descending
+      .populate('participants', 'name avatar') // populate only needed user fields
+      .lean()
+      .exec();
+
+    // Normalize data for frontend (excluding the current user from participants list)
+   const normalized = conversations.map(thread => {
+  const others = thread.participants.filter(p => p._id.toString() !== userId);
+  return {
+    threadId: thread._id,
+    requestId: thread.sessions?.length
+      ? thread.sessions[thread.sessions.length - 1].requestId
+      : null, // ✅ FIXED: get requestId from latest session
+    participants: others,
+    lastMessage: thread.lastMessage?.text || '',
+    lastMessageTimestamp: thread.lastMessage?.timestamp || thread.updatedAt,
+    status: thread.sessions?.length
+      ? thread.sessions[thread.sessions.length - 1].status
+      : null,
+  };
+});
+
+
+    res.json(normalized);
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
+    res.status(500).json({ message: 'Failed to fetch conversations', error: error.message });
   }
 };
