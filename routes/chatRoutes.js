@@ -7,8 +7,8 @@ router.get('/thread/:requestId', chatController.getOrCreateThreadByRequestId);
 router.get('/threadById/:threadId', chatController.getThreadById);
 router.get('/messages/:threadId', chatController.getMessagesByThreadId);
 router.get('/student/:studentId', chatController.getThreadsByStudentId);
-// router.get('/teacher/:teacherId/threads', chatController.getThreadsByTeacherId);
+router.get('/teacher/:teacherId/threads', chatController.getThreadsByTeacherId);
 router.post('/messages', chatController.postMessage);
-
+router.get('/conversations/:userId', chatController.getConversationsForUser);
 
 module.exports = router;

@@ -36,7 +36,11 @@ app.use('/api/chat', chatRoutes);
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: '*' },
+  cors: {
+    origin: 'http://localhost:3000',  // ✅ Only your frontend
+    methods: ['GET', 'POST'],         // ✅ Only allow necessary methods
+    credentials: true,                // ✅ If using cookies or sessions
+  },
 });
 
 io.on('connection', (socket) => {
