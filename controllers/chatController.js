@@ -220,7 +220,7 @@ exports.getConversationsForUser = async (req, res) => {
       participants: userId,
     })
       .sort({ 'lastMessage.timestamp': -1 })  // sort by lastMessage timestamp descending
-      .populate('participants', 'name avatar') // populate only needed user fields
+      .populate('participants', 'name  profileImage') // populate only needed user fields
       .lean()
       .exec();
 
