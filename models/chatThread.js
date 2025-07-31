@@ -19,11 +19,17 @@ const chatThreadSchema = new mongoose.Schema({
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   messages: [messageSchema],
   sessions: [sessionSchema],
-   lastMessage: {
+  lastMessage: {
     text: { type: String },
     senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     timestamp: { type: Date }
   },
+  lastSeen: {
+    type: Map,
+    of: Date, // maps userId => last seen timestamp
+    default: {},
+  },
 }, { timestamps: true });
+
 
 module.exports = mongoose.model('ChatThread', chatThreadSchema);

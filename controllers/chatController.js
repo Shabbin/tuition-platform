@@ -1,6 +1,7 @@
 const ChatThread = require('../models/chatThread');
 const TeacherRequest = require('../models/teacherRequest');
 const ChatMessage = require('../models/chatMessage');
+
 // Get or create thread by requestId
 exports.getOrCreateThreadByRequestId = async (req, res) => {
   try {
@@ -32,6 +33,11 @@ exports.getOrCreateThreadByRequestId = async (req, res) => {
             requestId,
           },
         ],
+        // Initialize lastSeen for both participants to now - prevents false unread counts
+        lastSeen: {
+          [request.studentId]: new Date(),
+          [request.teacherId]: new Date(),
+        },
       });
 
       await thread.save();
@@ -62,9 +68,7 @@ exports.getThreadById = async (req, res) => {
   }
 };
 
-// GET messages by threadId
-
-
+// GET messages by threadId (returns all messages, no filtering)
 exports.getMessagesByThreadId = async (req, res) => {
   try {
     const messages = await ChatMessage.find({ threadId: req.params.threadId })
@@ -77,7 +81,6 @@ exports.getMessagesByThreadId = async (req, res) => {
     res.status(500).json({ message: 'Error fetching messages' });
   }
 };
-
 
 // POST message to thread
 exports.postMessage = async (req, res) => {
@@ -128,8 +131,6 @@ exports.postMessage = async (req, res) => {
   }
 };
 
-
-
 // Get all chat threads for a student by studentId
 exports.getStudentThreads = async (req, res) => {
   try {
@@ -162,7 +163,6 @@ exports.getStudentThreads = async (req, res) => {
   }
 };
 
-
 // Alias for getStudentThreads, if needed
 exports.getThreadsByStudentId = async (req, res) => {
   try {
@@ -188,7 +188,6 @@ exports.getThreadsByStudentId = async (req, res) => {
   }
 };
 
-
 exports.getThreadsByTeacherId = async (req, res) => {
   try {
     const { teacherId } = req.params;
@@ -212,6 +211,9 @@ exports.getThreadsByTeacherId = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch teacher threads' });
   }
 };
+
+
+// Get conversations for user with unreadCount calculation
 exports.getConversationsForUser = async (req, res) => {
   const userId = req.params.userId;
 
@@ -220,31 +222,65 @@ exports.getConversationsForUser = async (req, res) => {
       participants: userId,
     })
       .sort({ 'lastMessage.timestamp': -1 })  // sort by lastMessage timestamp descending
-      .populate('participants', 'name  profileImage') // populate only needed user fields
+      .populate('participants', 'name profileImage') // populate only needed user fields
       .lean()
       .exec();
 
-    // Normalize data for frontend (excluding the current user from participants list)
-   const normalized = conversations.map(thread => {
-  const others = thread.participants.filter(p => p._id.toString() !== userId);
-  return {
-    threadId: thread._id,
-    requestId: thread.sessions?.length
-      ? thread.sessions[thread.sessions.length - 1].requestId
-      : null, // ✅ FIXED: get requestId from latest session
-    participants: others,
-    lastMessage: thread.lastMessage?.text || '',
-    lastMessageTimestamp: thread.lastMessage?.timestamp || thread.updatedAt,
-    status: thread.sessions?.length
-      ? thread.sessions[thread.sessions.length - 1].status
-      : null,
-  };
-});
+    const normalized = conversations.map(thread => {
+      const others = thread.participants.filter(p => p._id.toString() !== userId);
 
+      // Safely get lastSeen for user, fallback null
+      const lastSeen = thread.lastSeen ? thread.lastSeen[userId] : null;
+
+      // Calculate unreadCount: only messages after lastSeen and NOT sent by current user
+      const unreadCount = lastSeen
+        ? (thread.messages || []).filter(msg =>
+            msg.senderId.toString() !== userId &&
+            new Date(msg.timestamp) > new Date(lastSeen)
+          ).length
+        : 0;
+
+      return {
+        threadId: thread._id,
+        requestId: thread.sessions?.length
+          ? thread.sessions[thread.sessions.length - 1].requestId
+          : null,
+        participants: others,
+        lastMessage: thread.lastMessage?.text || '',
+        lastMessageTimestamp: thread.lastMessage?.timestamp || thread.updatedAt,
+        status: thread.sessions?.length
+          ? thread.sessions[thread.sessions.length - 1].status
+          : null,
+        unreadCount,  // <-- added unreadCount here
+      };
+    });
 
     res.json(normalized);
   } catch (error) {
     console.error('Error fetching conversations:', error);
     res.status(500).json({ message: 'Failed to fetch conversations', error: error.message });
+  }
+};
+
+// Optional: Mark thread as read by updating lastSeen[userId] to now
+exports.markThreadAsRead = async (req, res) => {
+  try {
+    const { threadId, userId } = req.body;
+    if (!threadId || !userId) {
+      return res.status(400).json({ message: 'threadId and userId required' });
+    }
+
+    const thread = await ChatThread.findById(threadId);
+    if (!thread) return res.status(404).json({ message: 'Thread not found' });
+
+    thread.lastSeen = thread.lastSeen || {};
+    thread.lastSeen[userId] = new Date();
+
+    await thread.save();
+
+    res.json({ success: true, message: 'Thread marked as read' });
+  } catch (error) {
+    console.error('[markThreadAsRead] Error:', error);
+    res.status(500).json({ message: 'Failed to mark thread as read' });
   }
 };
