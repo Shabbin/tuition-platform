@@ -43,8 +43,19 @@ const io = new Server(server, {
   },
 });
 
+const userSocketsMap = new Map();
+
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  const userId = socket.handshake.query.userId;
+  console.log('User connected:', socket.id, 'userId:', userId);
+
+  // Track sockets by user
+  if (userId) {
+    if (!userSocketsMap.has(userId)) {
+      userSocketsMap.set(userId, new Set());
+    }
+    userSocketsMap.get(userId).add(socket.id);
+  }
 
   socket.on('join_thread', (threadId) => {
     socket.join(threadId);
@@ -58,29 +69,28 @@ io.on('connection', (socket) => {
 
 socket.on('send_message', async (data) => {
   const { threadId, senderId, text } = data;
+  console.log(`[send_message] Received from senderId=${senderId} in threadId=${threadId}: ${text}`);
+
   try {
-    // 1. Save message as standalone document
+    // Save message
     const message = await ChatMessage.create({
       threadId,
       senderId,
       text,
-      timestamp: new Date(), // explicitly add timestamp
+      timestamp: new Date(),
     });
 
-    // 2. Populate sender data for frontend convenience
     await message.populate({ path: 'senderId', select: 'name profileImage role' });
 
-    // 3. Update the ChatThread's embedded messages and lastMessage, updatedAt
+    // Update thread
     const thread = await ChatThread.findById(threadId);
     if (thread) {
-      // Add to embedded messages array
       thread.messages.push({
         senderId,
         text,
         timestamp: message.timestamp,
       });
 
-      // Update lastMessage and updatedAt
       thread.lastMessage = {
         text,
         senderId,
@@ -89,26 +99,58 @@ socket.on('send_message', async (data) => {
       thread.updatedAt = new Date();
 
       await thread.save();
-
-      // Populate lastMessage sender and participants for broadcasting
-      await thread.populate('lastMessage.senderId', 'name profileImage role');
-      await thread.populate('participants', 'name profileImage role');
+      console.log(`[send_message] Updated thread ${threadId} with new message`);
     }
 
-    // 4. Emit the new message to clients in the thread room
+    // Refetch full thread with populated data
+    const fullThread = await ChatThread.findById(threadId)
+      .populate('participants', 'name profileImage role')
+      .populate('messages.senderId', 'name profileImage role')
+      .populate('lastMessage.senderId', 'name profileImage role')
+      .lean();
+
+    console.log(`[send_message] Refetched full thread for threadId=${threadId}`);
+
+    // Emit new message event with message payload (to clients currently in this thread room)
     io.in(threadId).emit('new_message', message);
 
-    // 5. Emit the updated thread info (with lastMessage) to update conversation headlines
-    io.in(threadId).emit('thread_updated', thread);
+    // Emit full updated thread for the thread (useful for UI updates in active thread)
+    io.in(threadId).emit('thread_updated', fullThread);
+
+    // Emit to participant sockets for conversation list update and notification alerts
+    fullThread.participants.forEach((participant) => {
+      const participantId = participant._id.toString();
+      if (userSocketsMap.has(participantId)) {
+        userSocketsMap.get(participantId).forEach((sockId) => {
+          console.log(`[send_message] Emitting conversation_list_updated to socket ${sockId} for participant ${participantId}`);
+          io.to(sockId).emit('conversation_list_updated', fullThread);
+
+          console.log(`[send_message] Emitting new_message_alert to socket ${sockId} for participant ${participantId}`);
+          io.to(sockId).emit('new_message_alert', {
+            threadId,
+            from: {
+              _id: message.senderId._id,
+              name: message.senderId.name,
+            },
+            text: message.text,
+          });
+        });
+      }
+    });
   } catch (error) {
     console.error('Error sending message:', error);
   }
 });
 
 
-
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+    if (userId && userSocketsMap.has(userId)) {
+      userSocketsMap.get(userId).delete(socket.id);
+      if (userSocketsMap.get(userId).size === 0) {
+        userSocketsMap.delete(userId);
+      }
+    }
   });
 });
 
