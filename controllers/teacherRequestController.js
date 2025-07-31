@@ -77,7 +77,18 @@ exports.createRequest = async (req, res) => {
       text: message,
       timestamp: newRequest.requestedAt,
     });
-    await chatMessage.save();
+  // after this line:
+await chatMessage.save();
+
+// add this:
+thread.lastMessage = {
+  text: chatMessage.text,
+  senderId: chatMessage.senderId,
+  timestamp: chatMessage.timestamp,
+};
+
+thread.updatedAt = new Date();
+await thread.save();
 
     res.status(201).json({ message: 'Session request created successfully', request: newRequest, threadId: thread._id });
   } catch (error) {
@@ -135,14 +146,26 @@ exports.updateRequestStatus = async (req, res) => {
       return res.status(404).json({ message: 'Request not found or unauthorized' });
     }
 
-    request.status = action === 'approve' ? 'approved' : 'rejected';
-    if (action === 'reject' && rejectionMessage) {
-      request.rejectionMessage = rejectionMessage;
-    }
+ request.status = action === 'approve' ? 'approved' : 'rejected';
+if (action === 'reject' && rejectionMessage) {
+  request.rejectionMessage = rejectionMessage;
+}
 
-    await request.save();
+await request.save();
 
-    let thread = null;
+if (request.status === 'rejected') {
+  const thread = await ChatThread.findOne({
+    participants: { $all: [request.studentId, request.teacherId] },
+    'sessions.requestId': request._id,
+  });
+
+  if (thread) {
+    await ChatMessage.deleteMany({ threadId: thread._id });
+    await ChatThread.deleteOne({ _id: thread._id });
+  }
+}
+
+let thread = null;
 
     if (request.status === 'approved') {
       thread = await ChatThread.findOne({
