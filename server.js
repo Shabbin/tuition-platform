@@ -66,6 +66,24 @@ io.on('connection', (socket) => {
     socket.leave(threadId);
     console.log(`Socket ${socket.id} left room ${threadId}`);
   });
+ socket.on('mark_thread_read', async ({ threadId, userId }) => {
+    try {
+      const thread = await ChatThread.findById(threadId);
+      if (!thread) return;
+
+      const session = thread.sessions.find(
+        (s) => s.userId.toString() === userId
+      );
+      if (session) {
+        session.lastSeen = new Date();
+        await thread.save();
+        console.log(`[mark_thread_read] User ${userId} marked thread ${threadId} as read`);
+      }
+    } catch (err) {
+      console.error('Error in mark_thread_read:', err);
+            socket.emit('mark_thread_read', { threadId, userId });
+    }
+  });
 
 socket.on('send_message', async (data) => {
   const { threadId, senderId, text } = data;
