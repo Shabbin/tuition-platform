@@ -29,6 +29,11 @@ const chatThreadSchema = new mongoose.Schema({
     of: Date, // maps userId => last seen timestamp
     default: {},
   },
+    lastOpened: {
+    type: Map,
+    of: Date,
+    default: {},
+  },
 }, { timestamps: true });
 
 
