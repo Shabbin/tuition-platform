@@ -11,12 +11,11 @@ exports.createRequest = async (req, res) => {
     const existingRequest = await TeacherRequest.findOne({
       teacherId,
       studentId,
-      status: { $in: ['pending', 'approved'] }, // only active requests
-      // Uncomment below if you want to limit per post as well
-      // postId: postId || undefined,
+      status: { $in: ['pending', 'approved'] },
     });
 
     if (existingRequest) {
+      console.log('⚠️ Duplicate active request found:', existingRequest._id);
       return res.status(400).json({
         message: 'You already have an active request for this teacher.',
         existingRequestId: existingRequest._id,
@@ -37,6 +36,7 @@ exports.createRequest = async (req, res) => {
     });
 
     await newRequest.save();
+    console.log('✅ New TeacherRequest saved:', newRequest._id);
 
     const session = {
       subject: subject || topic || 'Untitled Subject',
@@ -60,42 +60,80 @@ exports.createRequest = async (req, res) => {
     if (!thread) {
       thread = new ChatThread({
         participants: [studentId, teacherId],
-        messages: [initialMessage],      // embedded message
+        messages: [initialMessage], // embedded message
         sessions: [session],
       });
       await thread.save();
+      console.log('✅ New ChatThread created:', thread._id);
     } else {
       thread.sessions.push(session);
       thread.messages.push(initialMessage);
       await thread.save();
+      console.log('✅ Existing ChatThread updated:', thread._id);
     }
 
-    // Save the initial message as a separate ChatMessage document too
     const chatMessage = new ChatMessage({
       threadId: thread._id,
       senderId: studentId,
       text: message,
       timestamp: newRequest.requestedAt,
     });
-  // after this line:
-await chatMessage.save();
 
-// add this:
-thread.lastMessage = {
-  text: chatMessage.text,
-  senderId: chatMessage.senderId,
-  timestamp: chatMessage.timestamp,
-};
+    await chatMessage.save();
+    console.log('✅ New ChatMessage saved:', chatMessage._id);
 
-thread.updatedAt = new Date();
-await thread.save();
+    thread.lastMessage = {
+      text: chatMessage.text,
+      senderId: chatMessage.senderId,
+      timestamp: chatMessage.timestamp,
+    };
+    thread.updatedAt = new Date();
+    await thread.save();
+    console.log('✅ ChatThread lastMessage updated:', thread._id);
+
+    // SOCKET.IO EMIT — notify all connected teachers about the new request
+    if (global.io) {
+      // Fetch full user details for participants (name, profileImage, role)
+      const populatedParticipants = await User.find({
+        _id: { $in: [studentId, teacherId] }
+      }).select('name profileImage role');
+
+      const student = populatedParticipants.find(u => u._id.toString() === studentId.toString());
+      const teacher = populatedParticipants.find(u => u._id.toString() === teacherId.toString());
+
+      const payload = {
+        request: newRequest,
+        threadId: thread._id.toString(),
+        studentId: studentId.toString(),
+        studentName: student?.name || 'Student',
+        teacherId: teacherId.toString(),
+        teacherName: teacher?.name || 'Teacher',
+        participants: populatedParticipants.map(u => ({
+          _id: u._id.toString(),
+          name: u.name,
+          role: u.role,
+          profileImage: u.profileImage,
+        })),
+        lastMessageText: thread.lastMessage?.text || '',
+        lastMessageTimestamp: thread.lastMessage?.timestamp || '',
+      };
+
+      console.log('🌐 Emitting new_tuition_request with payload:', payload);
+      global.io.emit('new_tuition_request', payload);
+      console.log('✅ Emitted new_tuition_request with full participant data');
+    } else {
+      console.warn('⚠️ global.io is undefined — cannot emit new_tuition_request');
+    }
 
     res.status(201).json({ message: 'Session request created successfully', request: newRequest, threadId: thread._id });
   } catch (error) {
-    console.error('Error creating teacher request:', error);
+    console.error('❌ Error creating teacher request:', error);
     res.status(500).json({ message: 'Server error while creating request.' });
   }
 };
+
+
+
 
 // Get all requests for logged-in teacher
 exports.getRequestsForTeacher = async (req, res) => {
