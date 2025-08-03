@@ -126,9 +126,26 @@ socket.on('send_message', async (data) => {
       .lean();
 
     console.log(`[send_message] Refetched full thread for threadId=${threadId}`);
+await message.populate({ path: 'senderId', select: 'name profileImage role' });
 
+// ✅ Create a consistent structure for your frontend
+const normalizedMessage = {
+  _id: message._id,
+  threadId: message.threadId,
+  text: message.text,
+  timestamp: message.timestamp,
+  sender: {
+    _id: message.senderId._id,
+    name: message.senderId.name,
+    profileImage: message.senderId.profileImage,
+    role: message.senderId.role,
+  },
+};
+
+// ✅ Send this normalized message to everyone in the thread
+io.in(threadId).emit('new_message', normalizedMessage);
     // Emit new message event with message payload (to clients currently in this thread room)
-    io.in(threadId).emit('new_message', message);
+  
 
     // Emit full updated thread for the thread (useful for UI updates in active thread)
     io.in(threadId).emit('thread_updated', fullThread);

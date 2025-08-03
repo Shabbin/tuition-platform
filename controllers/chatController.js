@@ -83,6 +83,7 @@ exports.getMessagesByThreadId = async (req, res) => {
 };
 
 // POST message to thread
+// POST message to thread
 exports.postMessage = async (req, res) => {
   try {
     const { threadId, senderId, text } = req.body;
@@ -119,10 +120,11 @@ exports.postMessage = async (req, res) => {
     await thread.save();
     await newChatMessage.save();
 
-    console.log('Saved thread lastMessage:', thread.lastMessage);
-
-    // Optionally populate sender info before returning
+    // Populate senderId to get full sender info
     await newChatMessage.populate('senderId', 'name profileImage role');
+
+    // Log to debug senderId after populate
+    console.log('New chat message after populate:', newChatMessage);
 
     res.status(201).json(newChatMessage);
   } catch (error) {
@@ -130,6 +132,7 @@ exports.postMessage = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Get all chat threads for a student by studentId
 exports.getStudentThreads = async (req, res) => {
@@ -228,36 +231,31 @@ exports.getConversationsForUser = async (req, res) => {
       .exec();
 
     const normalized = conversations.map(thread => {
-      const others = thread.participants.filter(p => p._id.toString() !== userId);
+  const others = thread.participants.filter(p => p._id.toString() !== userId);
 
-      const lastSeenRaw = thread.lastSeen ? thread.lastSeen[userId] || thread.lastSeen.get?.(userId) : null;
-      const lastSeen = lastSeenRaw ? new Date(lastSeenRaw) : null;
+  const otherUser = others[0]; // assuming 1-on-1 chat
 
-      console.log(`Thread ${thread._id} - lastSeen for user ${userId}:`, lastSeen);
+  const lastSeenRaw = thread.lastSeen ? thread.lastSeen[userId] || thread.lastSeen.get?.(userId) : null;
+  const lastSeen = lastSeenRaw ? new Date(lastSeenRaw) : null;
 
-      const unreadCount = lastSeen
-        ? (thread.messages || []).filter(msg => {
-            const isFromOther = msg.senderId.toString() !== userId;
-            const isAfterLastSeen = new Date(msg.timestamp) > lastSeen;
-            if (isFromOther && isAfterLastSeen) {
-              console.log(`Unread message found: msgId=${msg._id}, timestamp=${msg.timestamp}`);
-            }
-            return isFromOther && isAfterLastSeen;
-          }).length
-        : 0;
+  const unreadCount = lastSeen
+    ? (thread.messages || []).filter(msg => {
+        return msg.senderId.toString() !== userId && new Date(msg.timestamp) > lastSeen;
+      }).length
+    : 0;
 
-      console.log(`Thread ${thread._id} - unreadCount:`, unreadCount);
-
-      return {
-        threadId: thread._id,
-        requestId: thread.sessions?.length ? thread.sessions[thread.sessions.length - 1].requestId : null,
-        participants: others,
-        lastMessage: thread.lastMessage?.text || '',
-        lastMessageTimestamp: thread.lastMessage?.timestamp || thread.updatedAt,
-        status: thread.sessions?.length ? thread.sessions[thread.sessions.length - 1].status : null,
-        unreadCount,
-      };
-    });
+  return {
+    threadId: thread._id,
+    requestId: thread.sessions?.length ? thread.sessions[thread.sessions.length - 1].requestId : null,
+    participants: others,
+    displayName: otherUser?.name || 'No Name', // 👈 add this line
+    displayImage: otherUser?.profileImage || null, // optional
+    lastMessage: thread.lastMessage?.text || '',
+    lastMessageTimestamp: thread.lastMessage?.timestamp || thread.updatedAt,
+    status: thread.sessions?.length ? thread.sessions[thread.sessions.length - 1].status : null,
+    unreadCount,
+  };
+});
 
     res.json(normalized);
   } catch (error) {
