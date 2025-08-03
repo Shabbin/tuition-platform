@@ -91,8 +91,8 @@ exports.createRequest = async (req, res) => {
     await thread.save();
     console.log('✅ ChatThread lastMessage updated:', thread._id);
 
-    // SOCKET.IO EMIT — notify all connected teachers about the new request
-    if (global.io) {
+    // SOCKET.IO EMIT — notify only the intended teacher about the new request
+    if (global.emitToUser) {
       // Fetch full user details for participants (name, profileImage, role)
       const populatedParticipants = await User.find({
         _id: { $in: [studentId, teacherId] }
@@ -119,10 +119,10 @@ exports.createRequest = async (req, res) => {
       };
 
       console.log('🌐 Emitting new_tuition_request with payload:', payload);
-      global.io.emit('new_tuition_request', payload);
-      console.log('✅ Emitted new_tuition_request with full participant data');
+      global.emitToUser(teacherId.toString(), 'new_tuition_request', payload);
+      console.log('✅ Emitted new_tuition_request only to intended teacher:', teacherId);
     } else {
-      console.warn('⚠️ global.io is undefined — cannot emit new_tuition_request');
+      console.warn('⚠️ global.emitToUser is undefined — cannot emit new_tuition_request');
     }
 
     res.status(201).json({ message: 'Session request created successfully', request: newRequest, threadId: thread._id });
@@ -131,6 +131,7 @@ exports.createRequest = async (req, res) => {
     res.status(500).json({ message: 'Server error while creating request.' });
   }
 };
+
 
 
 
