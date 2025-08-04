@@ -12,6 +12,9 @@ const teacherRequestsRouter = require('./routes/teacherRequestRoutes');
 const ChatThread = require('./models/chatThread');
 const chatRoutes = require('./routes/chatRoutes');
 const ChatMessage = require('./models/chatMessage');
+const { createAdapter } = require('@socket.io/redis-adapter');
+const { createClient } = require('redis');
+
 dotenv.config();
 connectDB();
 
@@ -42,28 +45,106 @@ const io = new Server(server, {
     credentials: true,               
   },
 });
-global.io = io;
+
+// Setup Redis clients for Socket.IO adapter
+const pubClient = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
+const subClient = pubClient.duplicate();
+
+(async () => {
+  await pubClient.connect();
+  await subClient.connect();
+
+  io.adapter(createAdapter(pubClient, subClient));
+  console.log('Socket.IO Redis adapter connected');
+})();
 
 const userSocketsMap = new Map();
+
+// Helper to compare arrays ignoring order
+function arraysEqual(a, b) {
+  if (a.length !== b.length) return false;
+  const s1 = new Set(a);
+  const s2 = new Set(b);
+  if (s1.size !== s2.size) return false;
+  for (const v of s1) if (!s2.has(v)) return false;
+  return true;
+}
+
+let lastOnlineUsersSet = new Set();
+let onlineUsersBroadcastTimeout = null;
+
+// Helper to get conversation partners for a given userId
+async function getConversationUserIds(userId) {
+  try {
+    const threads = await ChatThread.find({ participants: userId }).lean();
+    const partnersSet = new Set();
+
+    threads.forEach(thread => {
+      thread.participants.forEach(p => {
+        const pStr = p.toString();
+        if (pStr !== userId) {
+          partnersSet.add(pStr);
+        }
+      });
+    });
+
+    return Array.from(partnersSet);
+  } catch (err) {
+    console.error('Error fetching conversation partners:', err);
+    return [];
+  }
+}
+
+// Updated broadcast function to send filtered online users per client
+async function broadcastOnlineUsersDebounced() {
+  if (onlineUsersBroadcastTimeout) return;
+
+  onlineUsersBroadcastTimeout = setTimeout(async () => {
+    const currentOnlineUsers = Array.from(userSocketsMap.keys());
+
+    if (!arraysEqual(currentOnlineUsers, Array.from(lastOnlineUsersSet))) {
+      lastOnlineUsersSet = new Set(currentOnlineUsers);
+
+      for (const userId of currentOnlineUsers) {
+        const conversationUserIds = await getConversationUserIds(userId);
+        const filteredOnline = conversationUserIds.filter(id => lastOnlineUsersSet.has(id));
+
+        if (userSocketsMap.has(userId)) {
+          userSocketsMap.get(userId).forEach(socketId => {
+            io.to(socketId).emit('online_users', filteredOnline);
+          });
+        }
+      }
+
+      console.log('[broadcast] Sent filtered online_users to each client');
+    }
+    onlineUsersBroadcastTimeout = null;
+  }, 1000);
+}
 
 io.on('connection', (socket) => {
   const userId = socket.handshake.query.userId;
   console.log('User connected:', socket.id, 'userId:', userId);
 
-  // Track sockets by user
   if (userId) {
     if (!userSocketsMap.has(userId)) {
       userSocketsMap.set(userId, new Set());
     }
     userSocketsMap.get(userId).add(socket.id);
 
-    // Also join a personal room with their userId (optional, but useful)
-    socket.join(userId);
+    // Join user room only once
+    if (!socket.rooms.has(userId)) {
+      socket.join(userId);
+    }
+
+    broadcastOnlineUsersDebounced();
   }
 
   socket.on('join_thread', (threadId) => {
-    socket.join(threadId);
-    console.log(`Socket ${socket.id} joined room ${threadId}`);
+    if (!socket.rooms.has(threadId)) {
+      socket.join(threadId);
+      console.log(`Socket ${socket.id} joined room ${threadId}`);
+    }
   });
 
   socket.on('leave_thread', (threadId) => {
@@ -171,11 +252,11 @@ io.on('connection', (socket) => {
       if (userSocketsMap.get(userId).size === 0) {
         userSocketsMap.delete(userId);
       }
+      broadcastOnlineUsersDebounced();
     }
   });
 });
 
-// Helper function to emit to a specific user by userId
 function emitToUser(userId, event, data) {
   if (userSocketsMap.has(userId)) {
     userSocketsMap.get(userId).forEach(socketId => {
@@ -185,6 +266,8 @@ function emitToUser(userId, event, data) {
 }
 
 global.emitToUser = emitToUser;
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 module.exports = { app, server, io };
