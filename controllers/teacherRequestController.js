@@ -206,31 +206,43 @@ if (request.status === 'rejected') {
 
 let thread = null;
 
-    if (request.status === 'approved') {
-      thread = await ChatThread.findOne({
-        participants: { $all: [request.studentId, request.teacherId] },
-      });
-
-      const session = {
-        subject: request.subject || 'Untitled Subject',
-        origin: request.postId ? `Post: ${request.postId}` : 'Direct',
-        status: 'approved',
-        startedAt: new Date(),
-        requestId: request._id,
-      };
-
- if (!thread) {
-  thread = new ChatThread({
-    participants: [request.studentId, request.teacherId],
-    messages: [], // 👈 No duplicate message
-    sessions: [session],
+  if (request.status === 'approved') {
+  thread = await ChatThread.findOne({
+    participants: { $all: [request.studentId, request.teacherId] },
   });
-} else {
-  thread.sessions.push(session);
-}
 
-      await thread.save();
-    }
+  const session = {
+    subject: request.subject || 'Untitled Subject',
+    origin: request.postId ? `Post: ${request.postId}` : 'Direct',
+    status: 'approved',
+    startedAt: new Date(),
+    requestId: request._id,
+  };
+
+  if (!thread) {
+    thread = new ChatThread({
+      participants: [request.studentId, request.teacherId],
+      messages: [], // 👈 No duplicate message
+      sessions: [session],
+    });
+  } else {
+    thread.sessions.push(session);
+  }
+
+  await thread.save();
+
+  // ✅ Emit to student that request is approved
+  if (global.emitToUser && thread) {
+    global.emitToUser(request.studentId.toString(), 'request_approved', {
+      requestId: request._id.toString(),
+      threadId: thread._id.toString(),
+      approvedBy: 'teacher',
+      timestamp: Date.now(),
+    });
+
+    console.log(`✅ Emitted request_approved to studentId: ${request.studentId}`);
+  }
+}
 
     res.json({
       message: `Request ${request.status} successfully`,
