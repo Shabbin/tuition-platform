@@ -4,11 +4,15 @@ const { Server } = require('socket.io');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+const cookie = require('cookie');
+const jwt = require('jsonwebtoken');
 const connectDB = require('./config/db');
 const adminRoutes = require('./controllers/oneTimeAdminController');
 const subjectRoutes = require('./routes/subjectsRoutes');
 const educationTreeRoute = require('./routes/educationRoutes');
 const teacherRequestsRouter = require('./routes/teacherRequestRoutes');
+const authRoutes = require('./routes/authRoutes');
 const ChatThread = require('./models/chatThread');
 const chatRoutes = require('./routes/chatRoutes');
 const ChatMessage = require('./models/chatMessage');
@@ -20,11 +24,15 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/auth', authRoutes);
 app.use('/api/students', require('./routes/studentRoutes'));
 app.use('/api/teachers', require('./routes/teacherRoutes'));
 app.use('/api/posts', require('./routes/teacherPostRoutes'));
@@ -40,27 +48,43 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',  
-    methods: ['GET', 'POST'],        
-    credentials: true,               
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true,
   },
 });
 
-// Setup Redis clients for Socket.IO adapter
 const pubClient = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
 const subClient = pubClient.duplicate();
 
 (async () => {
   await pubClient.connect();
   await subClient.connect();
-
   io.adapter(createAdapter(pubClient, subClient));
   console.log('Socket.IO Redis adapter connected');
 })();
 
+// 🔹 Socket.IO middleware for JWT from cookies
+io.use((socket, next) => {
+  try {
+    const rawCookie = socket.handshake.headers.cookie;
+    if (!rawCookie) return next(new Error("No cookies found"));
+
+    const parsedCookies = cookie.parse(rawCookie);
+    const token = parsedCookies.token; // Change if your cookie name is different
+    if (!token) return next(new Error("No token cookie"));
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.request.userId = decoded.id; // set userId for later use
+    next();
+  } catch (err) {
+    console.error("Socket auth failed:", err.message);
+    next(new Error("Authentication error"));
+  }
+});
+
 const userSocketsMap = new Map();
 
-// Helper to compare arrays ignoring order
 function arraysEqual(a, b) {
   if (a.length !== b.length) return false;
   const s1 = new Set(a);
@@ -73,7 +97,6 @@ function arraysEqual(a, b) {
 let lastOnlineUsersSet = new Set();
 let onlineUsersBroadcastTimeout = null;
 
-// Helper to get conversation partners for a given userId
 async function getConversationUserIds(userId) {
   try {
     const threads = await ChatThread.find({ participants: userId }).lean();
@@ -95,7 +118,6 @@ async function getConversationUserIds(userId) {
   }
 }
 
-// Updated broadcast function to send filtered online users per client
 async function broadcastOnlineUsersDebounced() {
   if (onlineUsersBroadcastTimeout) return;
 
@@ -123,7 +145,8 @@ async function broadcastOnlineUsersDebounced() {
 }
 
 io.on('connection', (socket) => {
-  const userId = socket.handshake.query.userId;
+  const userId = socket.request.userId; // ✅ now set via middleware
+
   console.log('User connected:', socket.id, 'userId:', userId);
 
   if (userId) {
@@ -132,7 +155,6 @@ io.on('connection', (socket) => {
     }
     userSocketsMap.get(userId).add(socket.id);
 
-    // Join user room only once
     if (!socket.rooms.has(userId)) {
       socket.join(userId);
     }
@@ -168,7 +190,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('send_message', async (data) => {
-    const { threadId, senderId, text } = data;
+    const { threadId, text } = data;
+  const senderId = socket.request.userId;
     console.log(`[send_message] Received from senderId=${senderId} in threadId=${threadId}: ${text}`);
 
     try {

@@ -3,13 +3,11 @@ const jwt = require('jsonwebtoken');
 
 const auth = (...allowedRoles) => {
   return (req, res, next) => {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.token; // 🔐 Get token from cookie
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: 'Access token missing or malformed' });
+    if (!token) {
+      return res.status(401).json({ message: 'Access token missing in cookies' });
     }
-
-    const token = authHeader.split(' ')[1];
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -18,7 +16,7 @@ const auth = (...allowedRoles) => {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
 
-      req.user = decoded;
+      req.user = decoded; // Attach decoded user to request
       next();
     } catch (error) {
       console.error('JWT verification failed:', error.message);

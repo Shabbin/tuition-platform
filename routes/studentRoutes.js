@@ -12,33 +12,50 @@ const { getEligibleTeachers } = require('../controllers/studentController');
 // ✅ GET: Full student dashboard
 router.get('/dashboard', auth('student'), async (req, res) => {
   try {
-    const student = await User.findById(req.user.userId).select('-password');
+    const student = await User.findById(req.user.id)
+      .select('name email profileImage')
+      .lean();
 
-    // Get top 5 eligible teachers (dummy rating sort for now)
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
     const topRatedTeachers = await User.find({ role: 'teacher', isEligible: true })
-      .sort({ createdAt: -1 }) // You can change this to `.sort({ rating: -1 })` once you add ratings
+      .sort({ createdAt: -1 }) // or rating once available
       .limit(5)
-      .select('name subject profileImage isEligible');
+      .select('name profileImage')
+      .lean();
 
-    // TODO: Fetch student-specific data from other models
-    const myRequests = []; // await TuitionRequest.find({ studentId: req.user.userId });
-    const mySchedule = []; // await Session.find({ studentId: req.user.userId });
-    const myBookings = []; // await Booking.find({ studentId: req.user.userId });
+    const myRequests = [];
+    const mySchedule = [];
+    const myBookings = [];
+    const news = [];
+
+    const user = {
+      id: req.user.id,
+      role: req.user.role,
+      iat: req.user.iat,
+      exp: req.user.exp,
+    };
 
     return res.status(200).json({
       message: 'Welcome to the student dashboard',
       student,
+      user,
       topRatedTeachers,
       myRequests,
       mySchedule,
       myBookings,
-      news: [] // Placeholder
+      news,
     });
   } catch (error) {
     console.error('Error in student dashboard:', error.message);
     return res.status(500).json({ message: 'Failed to load student dashboard' });
   }
 });
+
+
+
 
 // ✅ GET: View eligible teachers
 router.get('/teachers', auth('student'), getEligibleTeachers);

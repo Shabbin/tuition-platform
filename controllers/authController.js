@@ -1,12 +1,13 @@
+// controllers/authController.js
+
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
-// Generate JWT
 const generateToken = (user) => {
   return jwt.sign(
     {
-      userId: user._id,
+      id: user._id,
       email: user.email,
       role: user.role,
     },
@@ -15,9 +16,6 @@ const generateToken = (user) => {
   );
 };
 
-// ==========================
-// REGISTER
-// ==========================
 const register = async (req, res) => {
   try {
     const { name, email, password, role, age } = req.body;
@@ -26,7 +24,6 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Role-specific validation
     if (role === 'teacher') {
       if (!age) return res.status(400).json({ message: 'Age is required for teachers' });
       if (isNaN(age) || Number(age) < 20) {
@@ -57,9 +54,15 @@ const register = async (req, res) => {
     await user.save();
 
     const token = generateToken(user);
+
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: false,        // must be false on localhost (no HTTPS)
+  sameSite: 'lax',      // lax is best for dev, strict blocks cross-site cookies
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
     res.status(201).json({
       message: 'User registered successfully',
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -77,9 +80,6 @@ const register = async (req, res) => {
   }
 };
 
-// ==========================
-// LOGIN
-// ==========================
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -99,9 +99,15 @@ const login = async (req, res) => {
     }
 
     const token = generateToken(user);
+
+  res.cookie('token', token, {
+  httpOnly: true,
+  secure: false,         // ✅ must be false for localhost
+  sameSite: 'Lax',       // ✅ this allows it to work across localhost ports
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
     res.status(200).json({
       message: 'Login successful',
-      token,
       user: {
         id: user._id,
         name: user.name,

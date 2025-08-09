@@ -2,6 +2,7 @@ const TeacherRequest = require('../models/teacherRequest');
 const ChatThread = require('../models/chatThread');
 const User = require('../models/user'); // ✅ make sure this path matches your User model location
 const ChatMessage = require('../models/chatMessage');
+
 // Create a new request
 exports.createRequest = async (req, res) => {
   try {
@@ -132,14 +133,10 @@ exports.createRequest = async (req, res) => {
   }
 };
 
-
-
-
-
 // Get all requests for logged-in teacher
 exports.getRequestsForTeacher = async (req, res) => {
   try {
-    const teacherId = req.user.userId || req.user._id;
+    const teacherId = req.user.id || req.user.userId || req.user._id;
 
     const requests = await TeacherRequest.find({ teacherId });
 
@@ -171,10 +168,12 @@ exports.getRequestsForTeacher = async (req, res) => {
 
 // Approve or reject a request
 exports.updateRequestStatus = async (req, res) => {
+  console.log('updateRequestStatus params:', req.params);
+  console.log('Authenticated user:', req.user);
   try {
     const { id, action } = req.params;
     const { rejectionMessage } = req.body || {};
-    const teacherId = req.user.userId || req.user._id;
+    const teacherId = req.user.id || req.user.userId || req.user._id;
 
     if (!['approve', 'reject'].includes(action)) {
       return res.status(400).json({ message: 'Invalid action' });
@@ -185,64 +184,64 @@ exports.updateRequestStatus = async (req, res) => {
       return res.status(404).json({ message: 'Request not found or unauthorized' });
     }
 
- request.status = action === 'approve' ? 'approved' : 'rejected';
-if (action === 'reject' && rejectionMessage) {
-  request.rejectionMessage = rejectionMessage;
-}
+    request.status = action === 'approve' ? 'approved' : 'rejected';
+    if (action === 'reject' && rejectionMessage) {
+      request.rejectionMessage = rejectionMessage;
+    }
 
-await request.save();
+    await request.save();
 
-if (request.status === 'rejected') {
-  const thread = await ChatThread.findOne({
-    participants: { $all: [request.studentId, request.teacherId] },
-    'sessions.requestId': request._id,
-  });
+    if (request.status === 'rejected') {
+      const thread = await ChatThread.findOne({
+        participants: { $all: [request.studentId, request.teacherId] },
+        'sessions.requestId': request._id,
+      });
 
-  if (thread) {
-    await ChatMessage.deleteMany({ threadId: thread._id });
-    await ChatThread.deleteOne({ _id: thread._id });
-  }
-}
+      if (thread) {
+        await ChatMessage.deleteMany({ threadId: thread._id });
+        await ChatThread.deleteOne({ _id: thread._id });
+      }
+    }
 
-let thread = null;
+    let thread = null;
 
-  if (request.status === 'approved') {
-  thread = await ChatThread.findOne({
-    participants: { $all: [request.studentId, request.teacherId] },
-  });
+    if (request.status === 'approved') {
+      thread = await ChatThread.findOne({
+        participants: { $all: [request.studentId, request.teacherId] },
+      });
 
-  const session = {
-    subject: request.subject || 'Untitled Subject',
-    origin: request.postId ? `Post: ${request.postId}` : 'Direct',
-    status: 'approved',
-    startedAt: new Date(),
-    requestId: request._id,
-  };
+      const session = {
+        subject: request.subject || 'Untitled Subject',
+        origin: request.postId ? `Post: ${request.postId}` : 'Direct',
+        status: 'approved',
+        startedAt: new Date(),
+        requestId: request._id,
+      };
 
-  if (!thread) {
-    thread = new ChatThread({
-      participants: [request.studentId, request.teacherId],
-      messages: [], // 👈 No duplicate message
-      sessions: [session],
-    });
-  } else {
-    thread.sessions.push(session);
-  }
+      if (!thread) {
+        thread = new ChatThread({
+          participants: [request.studentId, request.teacherId],
+          messages: [], // 👈 No duplicate message
+          sessions: [session],
+        });
+      } else {
+        thread.sessions.push(session);
+      }
 
-  await thread.save();
+      await thread.save();
 
-  // ✅ Emit to student that request is approved
-  if (global.emitToUser && thread) {
-    global.emitToUser(request.studentId.toString(), 'request_approved', {
-      requestId: request._id.toString(),
-      threadId: thread._id.toString(),
-      approvedBy: 'teacher',
-      timestamp: Date.now(),
-    });
+      // ✅ Emit to student that request is approved
+      if (global.emitToUser && thread) {
+        global.emitToUser(request.studentId.toString(), 'request_approved', {
+          requestId: request._id.toString(),
+          threadId: thread._id.toString(),
+          approvedBy: 'teacher',
+          timestamp: Date.now(),
+        });
 
-    console.log(`✅ Emitted request_approved to studentId: ${request.studentId}`);
-  }
-}
+        console.log(`✅ Emitted request_approved to studentId: ${request.studentId}`);
+      }
+    }
 
     res.json({
       message: `Request ${request.status} successfully`,
@@ -258,7 +257,7 @@ let thread = null;
 // Get approved requests for logged-in student
 exports.getRequestsForStudent = async (req, res) => {
   try {
-    const studentId = req.user.userId || req.user._id;
+    const studentId = req.user.id || req.user.userId || req.user._id;
     const requests = await TeacherRequest.find({ studentId, status: 'approved' });
 
     const requestsWithThreadId = await Promise.all(
@@ -290,7 +289,7 @@ exports.getRequestsForStudent = async (req, res) => {
 // Get all requests (any status) for a student
 exports.getAllRequestsForStudent = async (req, res) => {
   try {
-    const studentId = req.user.userId || req.user._id;
+    const studentId = req.user.id || req.user.userId || req.user._id;
     const requests = await TeacherRequest.find({ studentId });
     res.json(requests);
   } catch (error) {

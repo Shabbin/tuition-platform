@@ -18,7 +18,7 @@ const Session = require('../models/sessionRequest'); // Optional: only if you us
 // ✅ GET: Teacher dashboard (now includes posts and upcoming sessions)
 router.get('/dashboard', auth('teacher'), async (req, res) => {
   try {
-    const teacher = await User.findById(req.user.userId).select('name email role isEligible profileImage hasPaid');
+    const teacher = await User.findById(req.user.id).select('name email role isEligible profileImage hasPaid');
 
     if (!teacher) {
       return res.status(404).json({ message: 'Teacher not found' });
