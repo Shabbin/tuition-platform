@@ -3,9 +3,7 @@ const User = require('../models/user');
 const { flattenSubjects } = require('../utils/normalize');
 const { isMeaningfulText } = require('../utils/isMeaningfulText');
 const { validateEducationPath } = require('../utils/validateEducationPath');
-
 const { checkDuplicateSubjectCombination } = require('../utils/checkDuplicateSubjectCombination');
-
 
 // =========================
 // CREATE POST
@@ -29,7 +27,7 @@ const createPost = async (req, res) => {
     } = req.body;
 
     subjects = Array.isArray(subjects) ? subjects : [subjects];
-    console.log("is an array?",subjects);
+    console.log("is an array?", subjects);
     tags = Array.isArray(tags) ? tags : [tags];
 
     const normalizedSubjects = flattenSubjects(subjects).map(s => s.trim()).sort();
@@ -48,13 +46,13 @@ const createPost = async (req, res) => {
       return res.status(400).json({ message: eduValidation.message });
     }
 
-   const requiresBoard = educationSystem === 'English-Medium' || educationSystem === 'University-Admission';
+    const requiresBoard = educationSystem === 'English-Medium' || educationSystem === 'University-Admission';
 
-if (requiresBoard && (!board || board.trim() === '')) {
-  return res.status(400).json({ message: `${educationSystem === 'English-Medium' ? 'Board' : 'Track'} is required for ${educationSystem}.` });
-}
+    if (requiresBoard && (!board || board.trim() === '')) {
+      return res.status(400).json({ message: `${educationSystem === 'English-Medium' ? 'Board' : 'Track'} is required for ${educationSystem}.` });
+    }
 
-    const teacherId = req.user.userId;
+    const teacherId = req.user.id;  // <-- changed here
     const teacher = await User.findById(teacherId);
     if (!teacher || teacher.role !== 'teacher' || !teacher.isEligible) {
       return res.status(403).json({ message: 'Not authorized to post' });
@@ -110,7 +108,7 @@ if (requiresBoard && (!board || board.trim() === '')) {
 const updatePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    const teacherId = req.user.userId;
+    const teacherId = req.user.id; // <-- changed here
 
     const post = await TeacherPost.findById(postId);
     if (!post) return res.status(404).json({ message: 'Post not found' });
@@ -199,8 +197,6 @@ const updatePost = async (req, res) => {
     res.status(500).json({ message: 'Error updating post' });
   }
 };
-
-
 
 // =========================
 // GET ALL POSTS
@@ -324,7 +320,7 @@ const deleteTeacherPost = async (req, res) => {
 // =========================
 const getMyPosts = async (req, res) => {
   try {
-    const posts = await TeacherPost.find({ teacher: req.user.userId }).sort({ createdAt: -1 });
+    const posts = await TeacherPost.find({ teacher: req.user.id }).sort({ createdAt: -1 }); // <-- changed here
     res.json(posts);
   } catch (err) {
     console.error('Error fetching my posts:', err.message);
