@@ -10,6 +10,7 @@ const teacherPostSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  
   title: { type: String, required: true, trim: true },
 
   description: { type: String, required: true, trim: true },
@@ -100,7 +101,10 @@ level: {
     type: String,
     default: '',
   },
-
+ viewsCount: {
+    type: Number,
+    default: 0,
+  },
   tags: [String],
 
 
@@ -109,5 +113,7 @@ level: {
 {
   timestamps: true,
 });
+
+
 
 module.exports = mongoose.models.TeacherPost || mongoose.model('TeacherPost', teacherPostSchema);

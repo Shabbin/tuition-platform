@@ -3,8 +3,12 @@ const User = require('../models/user');
 const { flattenSubjects } = require('../utils/normalize');
 const { isMeaningfulText } = require('../utils/isMeaningfulText');
 const { validateEducationPath } = require('../utils/validateEducationPath');
+const PostViewEvent = require('../models/postView');
 const { checkDuplicateSubjectCombination } = require('../utils/checkDuplicateSubjectCombination');
+const { getIO } = require('../socketUtils/socket');
+const { v4: uuidv4 } = require('uuid');
 
+const mongoose = require('mongoose');
 // =========================
 // CREATE POST
 // =========================
@@ -328,6 +332,172 @@ const getMyPosts = async (req, res) => {
   }
 };
 
+//=========================
+// INCREMENT POST VIEW
+//=========================
+async function incrementPostView(req, res) {
+  try {
+    const postId = req.params.postId;
+    const userId = req.user?.id || null;
+    const visitorId = req.cookies?.visitorId || null;
+
+    console.log('View increment request received for post:', postId);
+    console.log('userId:', userId);
+    console.log('visitorId:', visitorId);
+
+    if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+      return res.status(400).json({ error: 'Invalid post ID' });
+    }
+
+    const cooldownMinutes = 60;
+    const cooldownDate = new Date(Date.now() - cooldownMinutes * 60 * 1000);
+
+    // Find recent view by either userId or visitorId
+    const recentView = await PostViewEvent.findOne({
+      postId,
+      createdAt: { $gte: cooldownDate },
+      $or: [
+        { userId: userId || null },
+        { visitorId: visitorId || null }
+      ],
+    });
+
+    if (recentView) {
+      const post = await TeacherPost.findById(postId).select('viewsCount');
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+      return res.json({
+        viewsCount: post.viewsCount,
+        viewEventTimestamp: recentView.createdAt,
+        message: 'View already counted recently',
+      });
+    }
+
+    // Increment viewsCount atomically
+    const updatedPost = await TeacherPost.findByIdAndUpdate(
+      postId,
+      { $inc: { viewsCount: 1 } },
+      { new: true, select: 'teacher title viewsCount' }
+    );
+
+    if (!updatedPost) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Create new PostViewEvent with either userId or visitorId
+    const newViewEvent = await PostViewEvent.create({
+      postId: updatedPost._id,
+      userId,
+      visitorId,
+    });
+
+    // Emit socket event to teacher if exists
+    if (updatedPost.teacher) {
+      const io = getIO();
+      io.to(updatedPost.teacher.toString()).emit('post_view_event', {
+        postId: updatedPost._id.toString(),
+        postTitle: updatedPost.title,
+        timestamp: newViewEvent.createdAt,
+        viewsCount: updatedPost.viewsCount,
+      });
+    }
+
+    res.json({
+      viewsCount: updatedPost.viewsCount,
+      viewEventTimestamp: newViewEvent.createdAt,
+    });
+  } catch (error) {
+    console.error('Error incrementing post views:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+
+
+
+
+
+//..............................................
+//GET RECENT VIEWS (WILL COME TO THIS PART LATER)
+//..............................................
+async function getUniqueViewCounts(postIds) {
+  // Convert all postIds to ObjectId instances with "new"
+  const objectIdPostIds = postIds.map(id => new mongoose.Types.ObjectId(id));
+
+  const uniqueViewCounts = await PostViewEvent.aggregate([
+    {
+      $match: {
+        postId: { $in: objectIdPostIds },
+      },
+    },
+    {
+      $group: {
+        _id: "$postId",
+        uniqueUsers: { $addToSet: "$userId" },  // gather unique userIds per post
+      },
+    },
+    {
+      $project: {
+        postId: "$_id",
+        uniqueViewCount: {
+          $size: {
+            $filter: {
+              input: "$uniqueUsers",
+              as: "userId",
+              cond: { $ne: ["$$userId", null] }  // exclude null userId (anonymous views)
+            },
+          },
+        },
+      },
+    },
+  ]);
+
+  // Map postId to its unique view count
+  const result = {};
+  uniqueViewCounts.forEach(item => {
+    result[item.postId.toString()] = item.uniqueViewCount;
+  });
+
+  return result;
+}
+async function getRecentViewEvents(req, res) {
+  try {
+    const { teacherId } = req.params;
+
+    // Find all posts by this teacher
+    const teacherPosts = await TeacherPost.find({ teacher: teacherId }).select('_id title');
+
+    const postIds = teacherPosts.map(p => p._id);
+
+    // Get unique view counts using your aggregation function
+    const uniqueViewCounts = await getUniqueViewCounts(postIds);
+
+    // Find recent view events for those posts, newest first, limit 20
+    const recentEvents = await PostViewEvent.find({ postId: { $in: postIds } })
+      .sort({ createdAt: -1 })  // use createdAt for timestamp if you don't have a separate field
+      .limit(20)
+      .populate('postId', 'title')
+      .lean();
+
+    // Overwrite viewsCount in posts with unique counts for up-to-date view count
+    const postsWithUpdatedViews = teacherPosts.map(post => ({
+      ...post.toObject(),
+      viewsCount: uniqueViewCounts[post._id.toString()] || 0,
+    }));
+
+    res.json({ 
+      events: recentEvents,
+      posts: postsWithUpdatedViews,
+    });
+
+  } catch (err) {
+    console.error('Error fetching recent view events:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+
 module.exports = {
   createPost,
   updatePost,
@@ -336,5 +506,7 @@ module.exports = {
   getPostsByTeacher,
   getTeacherPostBySubject,
   deleteTeacherPost,
-  getMyPosts
+  getMyPosts,
+  incrementPostView,
+  getRecentViewEvents
 };
