@@ -1,4 +1,4 @@
-// socket.js
+// socket.js(socketUtils\socket.js)
 const { Server } = require('socket.io');
 const cookie = require('cookie');
 const jwt = require('jsonwebtoken');
@@ -77,8 +77,11 @@ function emitToUser(userId, event, data) {
     userSocketsMap.get(userId).forEach(socketId => {
       io.to(socketId).emit(event, data);
     });
+  } else {
+    console.warn(`No active sockets for userId ${userId}. Event '${event}' not sent.`);
   }
 }
+
 
 function init(server) {
   io = new Server(server, {
