@@ -263,22 +263,21 @@ exports.updateRequestStatus = async (req, res) => {
   const teacher = await User.findById(teacherId).select('name profileImage');
     // Create notification for student (approved or rejected)
     const notificationForStudent = new Notification({
-    userId: request.studentId,
-    senderId: teacher?._id || teacherId,
-    senderName: teacher?.name || 'Teacher',
-    profileImage: teacher?.profileImage || '/default-avatar.png',
-    type: request.status === 'approved' ? 'request_approved' : 'request_rejected',
-    title: request.status === 'approved' ? 'Tuition Request Approved' : 'Tuition Request Rejected',
-    message: request.status === 'approved' 
-      ? 'Your tuition request has been approved by the teacher.' 
-      : `Your tuition request was rejected. ${request.rejectionMessage || ''}`,
-    data: {
-      requestId: request._id,
-      threadId: thread?._id,
-    },
-    read: false,
-  });
-
+  userId: request.studentId,
+  senderId: teacher?._id || teacherId,
+  senderName: teacher?.name || 'Teacher',
+  profileImage: teacher?.profileImage || '/default-avatar.png',
+  type: request.status === 'approved' ? 'request_approved' : 'request_rejected',
+  title: request.status === 'approved' ? 'Tuition Request Approved' : 'Tuition Request Rejected',
+  message: request.status === 'approved' 
+    ? 'has approved your tuition request.'
+    : `has rejected your tuition request. ${request.rejectionMessage || ''}`,
+  data: {
+    requestId: request._id,
+    threadId: thread?._id,
+  },
+  read: false,
+});
   await notificationForStudent.save();
   console.log(`✅ Notification created for student: ${request.studentId}`);
 
