@@ -75,7 +75,7 @@ const createPost = async (req, res) => {
       return res.status(400).json({ message: 'Please provide meaningful description content.' });
     }
 
-    const videoUrl = req.file ? `/uploads/videos/${req.file.filename}` : '';
+    const videoFile = req.file ? `/uploads/videos/${req.file.filename}` : '';
 
     const postData = {
       teacher: teacherId,
@@ -85,7 +85,7 @@ const createPost = async (req, res) => {
       location,
       language,
       hourlyRate,
-      videoFile: videoUrl,
+      videoFile,
       youtubeLink,
       tags: normalizedTags,
       educationSystem,

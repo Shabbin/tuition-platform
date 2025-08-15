@@ -14,6 +14,7 @@ const authRoutes = require('./routes/authRoutes');
 const teacherPostRoutes = require('./routes/teacherPostRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const videoRoutes = require('./routes/videoRoutes');
 dotenv.config();
 connectDB();
 
@@ -39,6 +40,7 @@ app.use(educationTreeRoute);
 app.use('/api/teacher-requests', teacherRequestsRouter);
 app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/videos', videoRoutes);
 const server = http.createServer(app);
 
 // Import and initialize Socket.IO singleton

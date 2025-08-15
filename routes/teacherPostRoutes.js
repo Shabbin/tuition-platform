@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'uploads/videos' });
 
 const auth = require('../middleware/auth');
 const {
@@ -18,7 +18,7 @@ const {
 } = require('../controllers/teacherPostController');
 
 // Create new post (authenticated & authorized teacher)
-router.post('/', auth('teacher'), upload.single('file'), createPost);
+router.post('/', auth('teacher'), upload.single('videoFile'), createPost);
 
 // Get all public posts (no auth)
 router.get('/', getAllPosts);

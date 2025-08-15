@@ -19,22 +19,29 @@ const allowedVideoTypes = /mp4|mov|avi/;
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  const extname = allowedImageTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedImageTypes.test(file.mimetype);
+  console.log('Uploading file:', file.fieldname, file.originalname, file.mimetype, file.size); // Debug
 
   if (file.fieldname === 'videoFile') {
-    const videoExt = allowedVideoTypes.test(path.extname(file.originalname).toLowerCase());
-    const videoMime = allowedVideoTypes.test(file.mimetype);
-    return videoExt && videoMime ? cb(null, true) : cb(new Error('Only video files are allowed!'));
+    const extname = allowedVideoTypes.test(path.extname(file.originalname).toLowerCase());
+    if (extname) {
+      return cb(null, true);
+    }
+    return cb(new Error('Only video files are allowed!'));
   }
 
-  return extname && mimetype ? cb(null, true) : cb(new Error('Only image files are allowed!'));
+  // For image files
+  const extname = allowedImageTypes.test(path.extname(file.originalname).toLowerCase());
+  if (extname) {
+    return cb(null, true);
+  }
+
+  return cb(new Error('Only image files are allowed!'));
 };
 
 // Set upload
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max, safer for videos
   fileFilter,
 });
 
