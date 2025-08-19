@@ -2805,27 +2805,6 @@
       "Kha",
       "Ga",
       "Gha"
-    ],
-    "Universities": [
-      "University of Dhaka",
-      "University of Rajshahi",
-      "University of Chittagong",
-      "Jahangirnagar University",
-      "Islamic University, Bangladesh",
-      "National University",
-      "Bangladesh Open University",
-      "Jagannath University",
-      "Comilla University",
-      "Jatiya Kabi Kazi Nazrul Islam University",
-      "Begum Rokeya University, Rangpur",
-      "University of Barishal",
-      "Rabindra University, Bangladesh",
-      "Islamic Arabic University",
-      "Bangladesh University of Professionals",
-      "Netrokona University",
-      "Naogaon University",
-      "Meherpur University",
-      "Kishoreganj University"
     ]
   },
         "Engineering": {
@@ -2835,28 +2814,8 @@
       "Mathematics",
       "Biology",
       "All Combined"
-    ],
-    "Universities": [
-      "Bangladesh University of Engineering & Technology (BUET)",
-      "Chittagong University of Engineering & Technology (CUET)",
-      "Rajshahi University of Engineering & Technology (RUET)",
-      "Khulna University of Engineering & Technology (KUET)",
-      "Dhaka University of Engineering & Technology (DUET)",
-      "Jessore University of Science & Technology",
-      "Pabna University of Science and Technology",
-      "Mawlana Bhashani Science & Technology University",
-      "Hajee Mohammad Danesh Science & Technology University",
-      "Patuakhali Science And Technology University",
-      "Noakhali Science & Technology University",
-      "Gopalganj Science & Technology University",
-      "Rangamati Science and Technology University",
-      "Chandpur Science and Technology University",
-      "Sunamganj Science and Technology University",
-      "Pirojpur Science & Technology University",
-      "Jamalpur Science and Technology University",
-      "Gazipur Digital University",
-      "Aviation and Aerospace University, Bangladesh"
     ]
+    
   },
       "Medical": {
     "Subjects": [
@@ -2864,46 +2823,8 @@
       "Chemistry",
       "Biology",
       "All Combined"
-    ],
-    "Universities": [
-      "Dhaka Medical College",
-      "Sir Salimullah Medical College",
-      "Shaheed Suhrawardy Medical College",
-      "Mymensingh Medical College",
-      "Chittagong Medical College",
-      "Rajshahi Medical College",
-      "MAG Osmani Medical College",
-      "Sher-e-Bangla Medical College",
-      "Rangpur Medical College",
-      "Cumilla Medical College",
-      "Khulna Medical College",
-      "Shaheed Ziaur Rahman Medical College",
-      "Faridpur Medical College",
-      "Dinajpur Medical College",
-      "Pabna Medical College",
-      "Noakhali Medical College",
-      "Cox's Bazar Medical College",
-      "Jashore Medical College",
-      "Satkhira Medical College",
-      "Shahid Syed Nazrul Islam Medical College",
-      "Kushtia Medical College",
-      "Gopalganj Medical College",
-      "Shaheed Tajuddin Ahmad Medical College",
-      "Tangail Medical College",
-      "Jamalpur Medical College",
-      "Manikganj Medical College",
-      "Shaheed M. Monsur Ali Medical College",
-      "Patuakhali Medical College",
-      "Rangamati Medical College",
-      "Mugda Medical College",
-      "Habiganj Medical College",
-      "Netrokona Medical College",
-      "Nilphamari Medical College",
-      "Magura Medical College",
-      "Naogaon Medical College",
-      "Chandpur Medical College",
-      "Sunamganj Medical College"
     ]
+    
   },
         "IBA": {
            
@@ -3148,64 +3069,7 @@
     }
   },
   "BCS": {
-    "General": {
-      "Preliminary": {
-        "Parts": {
-          "Bangla Language and Literature": [],
-          "English Language and Literature": [],
-          "Bangladesh Affairs": [],
-          "International Affairs": [],
-          "Geography, Environment and Disaster Management": [],
-          "General Knowledge": [],
-          "Computer and Information Technology": [],
-          "Analytical Ability": [],
-          "Mental Skills": [],
-          "Ethics, Values and Good Governance": []
-        }
-      },
-      "Written": {
-        "Parts": {
-          "General Bengali (Part I & II)": [],
-          "General English (Part I & II)": [],
-          "Bangladesh Affairs (Part I & II)": [],
-          "International Affairs": [],
-          "Mathematical Reasoning and Mental Ability": [],
-          "General Science and Technology": []
-        }
-      },
-      "Viva": {
-        "Parts": {}
-      }
-    },
-    "Technical": {
-      "Preliminary": {
-        "Parts": {
-          "Bangla Language and Literature": [],
-          "English Language and Literature": [],
-          "Bangladesh Affairs": [],
-          "International Affairs": [],
-          "Geography, Environment and Disaster Management": [],
-          "General Knowledge": [],
-          "Computer and Information Technology": [],
-          "Analytical Ability": [],
-          "Mental Skills": [],
-          "Ethics, Values and Good Governance": []
-        }
-      },
-      "Written": {
-        "Parts": {
-          "General Bengali": [],
-          "General English (Part I & II)": [],
-          "Bangladesh Affairs (Part I & II)": [],
-          "International Affairs": [],
-          "Mathematical Reasoning and Mental Ability": []
-        }
-      },
-      "Viva": {
-        "Parts": {}
-      }
-    },
-    "Both": {
+ 
       "Preliminary": {
         "Parts": {
           "Bangla Language and Literature": [],
@@ -3234,7 +3098,7 @@
         "Parts": {}
       }
     }
+  
   }
 
 
-}

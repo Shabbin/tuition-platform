@@ -6,7 +6,7 @@ const { validateEducationPath } = require('../utils/validateEducationPath');
 const PostViewEvent = require('../models/postView');
 const { checkDuplicateSubjectCombination } = require('../utils/checkDuplicateSubjectCombination');
 const { getIO } = require('../socketUtils/socket');
-const { v4: uuidv4 } = require('uuid');
+// const { v4: uuidv4 } = require('uuid');
 
 const mongoose = require('mongoose');
 // =========================

@@ -16,4 +16,8 @@ router.get('/teacher', auth('teacher'), teacherRequestController.getRequestsForT
 // Approve or reject a request (teacher)
 router.post('/:id/:action', auth('teacher'), teacherRequestController.updateRequestStatus);
 
+//Get all Approved Request
+router.get("/approved", auth('teacher'), teacherRequestController.getApprovedStudentsForPost);
+router.post('/from-post/:postId', auth('student'), teacherRequestController.createRequestFromPost);
 module.exports = router;
+

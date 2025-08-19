@@ -43,23 +43,28 @@ board: {
 },
 group: {
   type: String,
-  enum: ['Science', 'Commerce', 'Arts', 'General', 'Technical', 'Both', ""], // Add BCS groups
+  // you can keep the wider enum if you have legacy docs,
+  // but since BCS group is gone in the UI, it's safe to reduce it to BM groups + "".
+  enum: ['Science', 'Commerce', 'Arts', ''], 
   required: false,
   default: undefined,
   validate: {
     validator: function (value) {
+      // Bangla-Medium still requires a valid group
       if (this.educationSystem === 'Bangla-Medium') {
         return ['Science', 'Commerce', 'Arts'].includes(value);
       }
+      // ✅ BCS: group is NOT used anymore (allow undefined or empty string)
       if (this.educationSystem === 'BCS') {
-        return ['General', 'Technical', 'Both'].includes(value);
+        return value === undefined || value === '';
       }
-      // For others, allow empty/undefined
+      // Others: also allow empty/undefined
       return value === undefined || value === '';
     },
     message: props => `Invalid group "${props.value}" for education system "${props.instance.educationSystem}"`
   }
 },
+
 level: {
   type: String,
   required: function () {
