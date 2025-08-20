@@ -1,6 +1,6 @@
 const TeacherRequest = require('../models/teacherRequest');
 const ChatThread = require('../models/chatThread');
-const User = require('../models/User'); // ✅ make sure this path matches your User model location
+const User = require('../models/user'); // ✅ make sure this path matches your User model location
 const ChatMessage = require('../models/chatMessage');
 const Notification = require('../models/Notification');
 const TeacherPost = require('../models/teacherPost'); // ✅ added
