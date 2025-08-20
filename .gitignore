@@ -1,0 +1,5 @@
+.env
+server.js.env
+
+# Runtime uploads
+uploads/
