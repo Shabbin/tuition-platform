@@ -16,6 +16,14 @@ const chatRoutes = require('./routes/chatRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
+const tuitionGuardRoutes = require('./routes/tuitionGuardRoutes');
+// ✅ ADD: payment routes import
+const paymentRoutes = require('./routes/paymentRoutes');
+
+// ✅ ADD: credits badge + settlement routes imports
+const studentPublicRoutes = require('./routes/studentPublicRoutes');
+const settlementRoutes = require('./routes/settlementRoutes');
+
 dotenv.config();
 connectDB();
 
@@ -43,6 +51,14 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/videos', videoRoutes);
 app.use('/api/schedules', scheduleRoutes);
+
+// ✅ ADD: mount credits badge + settlement routes
+app.use('/api', studentPublicRoutes);           // GET /api/students/:id/credits
+app.use('/api/settlement', settlementRoutes);   // POST /api/settlement/questions/settle
+
+// ✅ ADD: mount payment routes (kept path simple and separate from /api/*)
+app.use('/pay', paymentRoutes);
+app.use('/api/tuition', tuitionGuardRoutes); // ✅ add
 const server = http.createServer(app);
 
 // Import and initialize Socket.IO singleton
@@ -52,10 +68,7 @@ const io = init(server);
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-
- // declare here
-
-
+// declare here
 
 // Export io if needed elsewhere
 module.exports = { app, server, io, getIO };

@@ -422,8 +422,11 @@ async function incrementPostView(req, res) {
 //GET RECENT VIEWS (WILL COME TO THIS PART LATER)
 //..............................................
 async function getUniqueViewCounts(postIds) {
-  // Convert all postIds to ObjectId instances with "new"
+  console.log("👉 getUniqueViewCounts called with postIds:", postIds);
+
+  // Convert all postIds to ObjectId instances
   const objectIdPostIds = postIds.map(id => new mongoose.Types.ObjectId(id));
+  console.log("✅ Converted to ObjectId array:", objectIdPostIds);
 
   const uniqueViewCounts = await PostViewEvent.aggregate([
     {
@@ -434,7 +437,7 @@ async function getUniqueViewCounts(postIds) {
     {
       $group: {
         _id: "$postId",
-        uniqueUsers: { $addToSet: "$userId" },  // gather unique userIds per post
+        uniqueUsers: { $addToSet: "$userId" }, // gather unique userIds per post
       },
     },
     {
@@ -445,7 +448,7 @@ async function getUniqueViewCounts(postIds) {
             $filter: {
               input: "$uniqueUsers",
               as: "userId",
-              cond: { $ne: ["$$userId", null] }  // exclude null userId (anonymous views)
+              cond: { $ne: ["$$userId", null] }, // exclude null userId (anonymous views)
             },
           },
         },
@@ -453,49 +456,61 @@ async function getUniqueViewCounts(postIds) {
     },
   ]);
 
+  console.log("📊 Aggregation result:", uniqueViewCounts);
+
   // Map postId to its unique view count
   const result = {};
   uniqueViewCounts.forEach(item => {
     result[item.postId.toString()] = item.uniqueViewCount;
   });
 
+  console.log("🗂️ Final unique view count mapping:", result);
+
   return result;
 }
+
 async function getRecentViewEvents(req, res) {
   try {
     const { teacherId } = req.params;
+    console.log("📩 Request received for teacherId:", teacherId);
 
     // Find all posts by this teacher
     const teacherPosts = await TeacherPost.find({ teacher: teacherId }).select('_id title');
+    console.log("📝 Teacher posts found:", teacherPosts.map(p => p._id.toString()));
 
     const postIds = teacherPosts.map(p => p._id);
 
-    // Get unique view counts using your aggregation function
+    // Get unique view counts
     const uniqueViewCounts = await getUniqueViewCounts(postIds);
 
-    // Find recent view events for those posts, newest first, limit 20
+    // Find recent view events for those posts, newest first
     const recentEvents = await PostViewEvent.find({ postId: { $in: postIds } })
-      .sort({ createdAt: -1 })  // use createdAt for timestamp if you don't have a separate field
+      .sort({ createdAt: -1 })
       .limit(20)
       .populate('postId', 'title')
       .lean();
 
-    // Overwrite viewsCount in posts with unique counts for up-to-date view count
+    console.log("📅 Recent events fetched (limit 20):", recentEvents);
+
+    // Overwrite viewsCount with unique counts
     const postsWithUpdatedViews = teacherPosts.map(post => ({
       ...post.toObject(),
       viewsCount: uniqueViewCounts[post._id.toString()] || 0,
     }));
 
-    res.json({ 
+    console.log("📈 Posts with updated viewsCount:", postsWithUpdatedViews);
+
+    res.json({
       events: recentEvents,
       posts: postsWithUpdatedViews,
     });
 
   } catch (err) {
-    console.error('Error fetching recent view events:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("❌ Error fetching recent view events:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
 
 
 module.exports = {

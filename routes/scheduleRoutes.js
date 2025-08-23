@@ -6,6 +6,7 @@ const {
   getSchedulesForTeacher,
   getSchedulesForStudent,
   cancelSchedule,
+  getEligibleStudents, // ✅ NEW: returns approved students split by paid/unpaid
 } = require('../controllers/scheduleController');
 
 const auth = require('../middleware/auth'); // <-- same as teacherPostRoutes
@@ -21,5 +22,9 @@ router.get('/student', auth('student'), getSchedulesForStudent);
 
 // Teacher cancels a schedule
 router.put('/:id/cancel', auth('teacher'), cancelSchedule);
+
+// ✅ NEW: Teacher fetches eligible students for a post
+// GET /api/schedules/eligible-students?postId=...&type=demo|regular
+router.get('/eligible-students', auth('teacher'), getEligibleStudents);
 
 module.exports = router;

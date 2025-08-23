@@ -1,3 +1,4 @@
+// models/userModel.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -34,6 +35,13 @@ const userSchema = new mongoose.Schema({
     default: '',
   },
 
+  // ➕ student credits (teachers will just have 0 and ignore)
+  topicCredits: {
+    type: Number,
+    default: 0,
+    min: [0, 'Credits cannot be negative'],
+  },
+
   // ➕ Extra fields for teachers
   age: {
     type: Number,
@@ -48,7 +56,7 @@ const userSchema = new mongoose.Schema({
   },
   bio: {
     type: String,
-    maxlength: [1000, 'Bio cannot exceed 1000 characters'],
+    maxlength: [10000, 'Bio cannot exceed 10000 characters'],
     default: '',
   },
   hourlyRate: {

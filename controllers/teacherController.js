@@ -49,10 +49,16 @@ const getTeacherProfileWithPosts = async (req, res) => {
 // ==============================
 const updateProfilePicture = async (req, res) => {
   try {
-    const teacher = await User.findById(req.user.userId);
+    const userId = req.user?.id || req.userId || req.user?._id; // ✅ robust read
+    if (!userId) return res.status(401).json({ message: 'Not authenticated' });
 
+    const teacher = await User.findById(userId);
     if (!teacher || teacher.role !== 'teacher') {
       return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
     }
 
     const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
@@ -75,11 +81,16 @@ const updateProfilePicture = async (req, res) => {
 // ==============================
 const updateCoverImage = async (req, res) => {
   try {
-    const teacherId = req.user.userId;
+    const userId = req.user?.id || req.userId || req.user?._id; // ✅ robust read
+    if (!userId) return res.status(401).json({ message: 'Not authenticated' });
 
-    const teacher = await User.findById(teacherId);
+    const teacher = await User.findById(userId);
     if (!teacher || teacher.role !== 'teacher') {
       return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
     }
 
     const coverImageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
@@ -97,29 +108,51 @@ const updateCoverImage = async (req, res) => {
 // ==============================
 // UPDATE PROFILE INFO
 // ==============================
+// controllers/teacherController.js
+
+const MAX_BIO = 10000;
+
 const updateProfileInfo = async (req, res) => {
   try {
-    const teacher = await User.findById(req.user.userId);
+    const userId = req.user?.id || req.userId || req.user?._id;
+    if (!userId) return res.status(401).json({ message: 'Not authenticated' });
+
+    const teacher = await User.findById(userId);
     if (!teacher || teacher.role !== 'teacher') {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
     const { name, bio, hourlyRate, skills, location, availability } = req.body;
 
-    if (name) teacher.name = name;
-    if (bio) teacher.bio = bio;
-    if (hourlyRate) teacher.hourlyRate = hourlyRate;
-    if (skills) teacher.skills = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim());
-    if (location) teacher.location = location;
-    if (availability) teacher.availability = availability;
+    if (name !== undefined) teacher.name = name.trim();
+
+    if (bio !== undefined) {
+      const trimmed = String(bio).trim();
+      if (trimmed.length > MAX_BIO) {
+        return res
+          .status(400)
+          .json({ message: `Bio cannot exceed ${MAX_BIO} characters (got ${trimmed.length}).` });
+      }
+      teacher.bio = trimmed;
+    }
+
+    if (hourlyRate !== undefined) teacher.hourlyRate = Number(hourlyRate);
+    if (skills !== undefined) {
+      teacher.skills = Array.isArray(skills)
+        ? skills
+        : String(skills).split(',').map(s => s.trim()).filter(Boolean);
+    }
+    if (location !== undefined) teacher.location = String(location).trim();
+    if (availability !== undefined) teacher.availability = availability;
 
     await teacher.save();
-    res.json({ message: 'Profile updated successfully', user: teacher });
+    return res.json({ message: 'Profile updated successfully', user: teacher });
   } catch (err) {
     console.error('Update profile info error:', err);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 module.exports = {
   approveTeacherEligibility,

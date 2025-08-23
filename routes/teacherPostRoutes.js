@@ -14,7 +14,7 @@ const {
   deleteTeacherPost,
   getMyPosts,
   incrementPostView,
-  getRecentViewEvents ,
+  getRecentViewEvents,
 } = require('../controllers/teacherPostController');
 
 // Create new post (authenticated & authorized teacher)
@@ -32,17 +32,17 @@ router.get('/teacher/:teacherId/subject/:subjectName', getTeacherPostBySubject);
 // Get all posts by a specific teacher
 router.get('/teacher/:teacherId', getPostsByTeacher);
 
+// ✅ Recently viewed must come BEFORE /:postId
+router.get('/recent-views/:teacherId', getRecentViewEvents);
+
 // Get post by ID (should be after more specific routes)
 router.get('/:postId', getPostById);
-
 
 // POST /api/posts/:postId/view - increment view count
 router.post('/:postId/view', incrementPostView);
 
 // Update post by ID (authenticated & authorized teacher)
 router.put('/:postId', auth('teacher'), updatePost);
-
-router.get('/recent-views/:teacherId', getRecentViewEvents);
 
 // Delete post by ID (authenticated & authorized teacher)
 router.delete('/:id', auth('teacher'), deleteTeacherPost);
