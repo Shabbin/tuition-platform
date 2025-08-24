@@ -17,8 +17,9 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const tuitionGuardRoutes = require('./routes/tuitionGuardRoutes');
-// ✅ ADD: payment routes import
 const paymentRoutes = require('./routes/paymentRoutes');
+
+
 
 // ✅ ADD: credits badge + settlement routes imports
 const studentPublicRoutes = require('./routes/studentPublicRoutes');
@@ -64,6 +65,15 @@ const server = http.createServer(app);
 // Import and initialize Socket.IO singleton
 const { init, getIO } = require('./socketUtils/socket');
 const io = init(server);
+
+
+// ALSO expose API-style endpoints for your frontend: /api/payments/*
+app.use('/api/payments', paymentRoutes);
+
+
+// keep callbacks (success/fail/cancel/ipn) working at /pay/*
+app.use('/pay', paymentRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
