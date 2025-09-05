@@ -55,12 +55,14 @@ const register = async (req, res) => {
 
     const token = generateToken(user);
 
-res.cookie('token', token, {
-  httpOnly: true,
-  secure: false,        // must be false on localhost (no HTTPS)
-  sameSite: 'lax',      // lax is best for dev, strict blocks cross-site cookies
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-});
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,        // must be false on localhost (no HTTPS)
+      sameSite: 'lax',      // lax is best for dev, strict blocks cross-site cookies
+      path: '/',            // 👈 ensure cookie is sent to ALL routes (e.g., /api/enrollment-invites)
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -100,12 +102,14 @@ const login = async (req, res) => {
 
     const token = generateToken(user);
 
-  res.cookie('token', token, {
-  httpOnly: true,
-  secure: false,         // ✅ must be false for localhost
-  sameSite: 'Lax',       // ✅ this allows it to work across localhost ports
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-});
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,         // ✅ must be false for localhost
+      sameSite: 'lax',       // ✅ lower-case; allows across localhost ports
+      path: '/',             // 👈 critical so requests to /api/* include cookie
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     res.status(200).json({
       message: 'Login successful',
       user: {

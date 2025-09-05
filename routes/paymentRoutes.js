@@ -11,6 +11,9 @@ router.post('/initiate', ctrl.initiate);
 // Tuition (FIRST half/full → 30%, RECURRING → 15%)
 router.post('/tuition/initiate', auth('student'), ctrl.initiateTuition);
 
+// ✅ Invite upfront payment (EnrollmentInvite)
+router.post('/invite/initiate', auth('student'), ctrl.initiateInvite);
+
 // Gateway callbacks (public)
 router.post('/success', ctrl.success);
 router.post('/fail',    ctrl.fail);

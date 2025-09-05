@@ -7,6 +7,10 @@ const Payment = require('../models/payment');
 const Notification = require('../models/Notification');
 const { TOPIC_PACK_PRICE, TOPIC_PACK_CREDITS } = require('../config/billing');
 
+// 👇 NEW: models used by invite payment flow
+const EnrollmentInvite = require('../models/EnrollmentInvite');
+const Routine = require('../models/routine');
+
 const is_live = String(process.env.SSLCZ_LIVE).toLowerCase() === 'true';
 const store_id = process.env.SSLCZ_STORE_ID;
 const store_passwd = process.env.SSLCZ_STORE_PASSWD;
@@ -34,6 +38,13 @@ function tuitionRate(phase, monthIndex) {
 }
 function safeParseMeta(s) {
   try { return s ? JSON.parse(s) : null; } catch { return null; }
+}
+
+// 👇 NEW: for EnrollmentInvite status calc
+function computeInvitePaymentStatus(inv) {
+  if (Number(inv.paidTk || 0) >= Number(inv.upfrontDueTk || 0)) return 'paid';
+  if (Number(inv.paidTk || 0) > 0) return 'partial';
+  return 'unpaid';
 }
 
 // Resolve an approved TeacherRequest by id OR (student+teacher+post) OR (student+teacher)
@@ -199,6 +210,87 @@ exports.initiateTuition = async (req, res) => {
   }
 };
 
+// ============================ Invite Upfront Payment =========================
+// Student pays remaining upfront for an EnrollmentInvite (no TeacherRequest required)
+exports.initiateInvite = async (req, res) => {
+  try {
+    const studentId = req.user?.id;
+    const { inviteId, returnUrl } = req.body || {};
+    if (!studentId) return res.status(401).json({ error: 'Unauthorized' });
+    if (!inviteId) return res.status(400).json({ error: 'inviteId is required' });
+
+    const inv = await EnrollmentInvite.findOne({ _id: inviteId, studentId }).lean();
+    if (!inv) return res.status(404).json({ error: 'Invite not found' });
+    if (inv.status !== 'pending') return res.status(400).json({ error: 'Invite is not pending' });
+    if (inv.expiresAt && new Date(inv.expiresAt) < new Date()) {
+      return res.status(400).json({ error: 'Invite expired' });
+    }
+
+    const upfrontDue = Number(inv.upfrontDueTk || 0);
+    const alreadyPaid = Number(inv.paidTk || 0);
+    const remaining = Math.max(0, upfrontDue - alreadyPaid);
+    if (!(remaining > 0)) return res.status(400).json({ error: 'Nothing due' });
+
+    const tran_id = `INV-${String(inviteId)}-${Date.now()}`;
+    const amountStr = Number(remaining).toFixed(2);
+
+    const data = {
+      total_amount: amountStr,
+      currency: 'BDT',
+      tran_id,
+      success_url: `${baseUrl()}/pay/success`,
+      fail_url:    `${baseUrl()}/pay/fail`,
+      cancel_url:  `${baseUrl()}/pay/cancel`,
+      ipn_url:     `${baseUrl()}/pay/ipn`,
+      product_name: `Course Invite Upfront`,
+      product_category: 'education',
+      product_profile: 'non-physical-goods',
+      emi_option: 0,
+      shipping_method: 'NO',
+      num_of_item: 1,
+      cus_name: 'Student',
+      cus_email: 'student@example.com',
+      cus_add1: 'Dhaka',
+      cus_city: 'Dhaka',
+      cus_postcode: '1212',
+      cus_country: 'Bangladesh',
+      cus_phone: '01700000000',
+      value_a: returnUrl || req.headers.referer || '',
+      value_b: JSON.stringify({
+        type: 'INVITE',
+        inviteId,
+        studentId: inv.studentId,
+        teacherId: inv.teacherId,
+        routineId: inv.routineId,
+        postId: inv.postId || null,
+        amount: Number(remaining)
+      })
+    };
+
+    const sslcz = new SSLCommerz(store_id, store_passwd, is_live);
+    const apiRes = await sslcz.init(data);
+    if (!apiRes?.GatewayPageURL) {
+      return res.status(500).json({ error: 'GatewayPageURL missing', apiRes });
+    }
+
+    attempts.set(tran_id, {
+      type: 'INVITE',
+      inviteId,
+      studentId: inv.studentId,
+      teacherId: inv.teacherId,
+      routineId: inv.routineId,
+      postId: inv.postId || null,
+      amount: Number(remaining),
+      returnUrl: data.value_a
+    });
+
+    return res.json({ url: apiRes.GatewayPageURL, tran_id });
+  } catch (err) {
+    console.error('initiateInvite:', err);
+    res.status(500).json({ error: 'Failed to initiate invite payment', message: err.message });
+  }
+};
+
 // ============================ Gateway Callbacks =============================
 exports.success = async (req, res) => {
   try {
@@ -242,6 +334,123 @@ exports.success = async (req, res) => {
       return res.status(200).send(`
         <h2>✅ Topic Pack Purchased</h2>
         <pre>${JSON.stringify({ studentId: meta.studentId, creditsAdded: TOPIC_PACK_CREDITS, amount: meta.amount }, null, 2)}</pre>
+      `);
+    }
+
+    // -------- Invite upfront (EnrollmentInvite) --------
+    if (meta?.type === 'INVITE') {
+      const inv = await EnrollmentInvite.findById(meta.inviteId);
+      if (!inv) {
+        return res.status(400).send('<h2>Invite not found</h2>');
+      }
+      if (String(inv.studentId) !== String(meta.studentId)) {
+        return res.status(400).send('<h2>Invite ownership mismatch</h2>');
+      }
+
+      const paidNow = Number(v.amount); // BDT
+      inv.paidTk = Math.max(0, Number(inv.paidTk || 0)) + Math.round(paidNow);
+      inv.paymentStatus = computeInvitePaymentStatus(inv);
+
+      let enrolled = false;
+      if (inv.paymentStatus === 'paid') {
+        const routine = await Routine.findById(inv.routineId);
+        if (routine) {
+          const present = (routine.studentIds || []).map(String).includes(String(inv.studentId));
+          if (!present) {
+            routine.studentIds.push(inv.studentId);
+            await routine.save();
+            enrolled = true;
+          }
+        }
+        inv.status = 'completed';
+        inv.decidedAt = new Date();
+
+        // notify both
+        const [student, teacher] = await Promise.all([
+          User.findById(inv.studentId).select('name profileImage'),
+          User.findById(inv.teacherId).select('name profileImage'),
+        ]);
+
+        const ns = new Notification({
+          userId: inv.studentId,
+          senderId: inv.teacherId,
+          senderName: teacher?.name || 'Teacher',
+          profileImage: teacher?.profileImage || '/default-avatar.png',
+          type: 'course_enrollment',
+          title: 'Enrollment confirmed',
+          message: `Payment received (৳${Math.round(inv.paidTk)}). You have been enrolled.`,
+          data: { routineId: String(inv.routineId), inviteId: String(inv._id) },
+          read: false,
+        });
+        const nt = new Notification({
+          userId: inv.teacherId,
+          senderId: inv.studentId,
+          senderName: student?.name || 'Student',
+          profileImage: student?.profileImage || '/default-avatar.png',
+          type: 'course_enrollment',
+          title: 'Student enrolled',
+          message: `${student?.name || 'Student'} completed the upfront and is enrolled.`,
+          data: { routineId: String(inv.routineId), inviteId: String(inv._id) },
+          read: false,
+        });
+        await Promise.all([ns.save(), nt.save()]);
+
+        if (global.emitToUser) {
+          global.emitToUser(String(inv.studentId), 'new_notification', {
+            _id: String(ns._id), senderId: ns.senderId, senderName: ns.senderName,
+            profileImage: ns.profileImage, type: ns.type, title: ns.title,
+            message: ns.message, data: ns.data, read: ns.read, createdAt: ns.createdAt
+          });
+          global.emitToUser(String(inv.teacherId), 'new_notification', {
+            _id: String(nt._id), senderId: nt.senderId, senderName: nt.senderName,
+            profileImage: nt.profileImage, type: nt.type, title: nt.title,
+            message: nt.message, data: nt.data, read: nt.read, createdAt: nt.createdAt
+          });
+          for (const uid of [String(inv.studentId), String(inv.teacherId)]) {
+            global.emitToUser(uid, 'routine_refresh', {
+              reason: 'invite_paid',
+              routineId: String(inv.routineId),
+            });
+          }
+        }
+      }
+
+      await inv.save();
+
+      // record payment (use TUITION type to fit existing enum)
+      const rate = 0.15; // platform share on upfront; change if needed
+      const yourShare = +(paidNow * rate).toFixed(2);
+      const teacherNet = +(paidNow - yourShare).toFixed(2);
+      await Payment.create({
+        type: 'TUITION',
+        studentId: inv.studentId,
+        teacherId: inv.teacherId,
+        amount: paidNow,
+        commissionRate: rate,
+        yourShare,
+        teacherShare: teacherNet,
+        phase: 'FIRST',
+        monthIndex: 1,
+        tran_id,
+        bank_tran_id: v.bank_tran_id,
+        status: 'PAID',
+      });
+
+      attempts.delete(tran_id);
+
+      if (value_a) {
+        const back = appendQuery(value_a, {
+          paid: 1, type: 'INVITE', invite: String(inv._id), amt: paidNow, enrolled: enrolled ? 1 : 0
+        });
+        return res.redirect(302, back);
+      }
+
+      return res.status(200).send(`
+        <h2>✅ Invite Upfront Paid</h2>
+        <pre>${JSON.stringify({
+          inviteId: inv._id, studentId: inv.studentId, teacherId: inv.teacherId,
+          paidNow, paymentStatus: inv.paymentStatus, enrolled
+        }, null, 2)}</pre>
       `);
     }
 
@@ -467,7 +676,6 @@ exports.getTeacherSummary = async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 };
-
 
 
 
