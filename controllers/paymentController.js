@@ -8,7 +8,7 @@ const Notification = require('../models/Notification');
 const { TOPIC_PACK_PRICE, TOPIC_PACK_CREDITS } = require('../config/billing');
 
 // 👇 NEW: models used by invite payment flow
-const EnrollmentInvite = require('../models/EnrollmentInvite');
+const EnrollmentInvite = require('../models/enrollmentInvite');
 const Routine = require('../models/routine');
 
 const is_live = String(process.env.SSLCZ_LIVE).toLowerCase() === 'true';
