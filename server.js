@@ -30,7 +30,7 @@ const changeRequestRoutes = require('./routes/changeRequestRoutes');
 const enrollmentInviteRoutes = require('./routes/enrollmentInviteRoutes');
 const privateCourse = require('./routes/privateCourseRoutes')
 // workers
-const { startRoutineWorker } = require('../tuition-backend/services/workers/routineWorker');
+const { startRoutineWorker } = require(path.join(__dirname, 'services', 'workers', 'routineWorker'));
 
 dotenv.config();
 connectDB();
