@@ -1,5 +1,5 @@
 // server/controllers/changeRequestController.js
-const ChangeRequest = require('../models/RoutineChangeRequest');
+const ChangeRequest = require('../models/routineChangeRequest');
 const Schedule = require('../models/schedule');
 const Routine = require('../models/routine');
 const User = require('../models/user');
