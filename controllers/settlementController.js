@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
-const SolvePayout = require('../models/SolvePayOut');
+const SolvePayout = require('../models/solvePayOut');
 const { PER_SOLVE_GROSS, PLATFORM_FEE_RATE } = require('../config/billing');
 const { computeTuitionStatus } = require('../utils/tuitionStatus');
 
