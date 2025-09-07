@@ -1,40 +1,55 @@
-//models\chatThread.js
+// models/chatThread.js
 const mongoose = require('mongoose');
 
-const messageSchema = new mongoose.Schema({
-  senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  text: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now },
-});
+const sessionSchema = new mongoose.Schema(
+  {
+    subject: String,
 
-const sessionSchema = new mongoose.Schema({
-  subject: String,
-  origin: String, // e.g., Post or Direct
-  status: { type: String, enum: ['pending', 'approved', 'rejected', 'completed'], default: 'pending' },
-  startedAt: Date,
-  requestId: { type: mongoose.Schema.Types.ObjectId, ref: 'TeacherRequest' },
-});
+    // Accept both legacy (capitalized) and new (lowercase) values
+    origin: {
+      type: String,
+      enum: ['Post', 'Direct', 'post', 'direct'],
+      default: 'Direct',
+    },
 
-const chatThreadSchema = new mongoose.Schema({
-  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  messages: [messageSchema],
-  sessions: [sessionSchema],
-  lastMessage: {
-    text: { type: String },
-    senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    timestamp: { type: Date }
+    // Link to a post when origin is/was started from a post (optional)
+    originPostId: { type: mongoose.Schema.Types.ObjectId, ref: 'TeacherPost', default: null },
+
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected', 'completed'],
+      default: 'pending',
+    },
+    startedAt: Date,
+    requestId: { type: mongoose.Schema.Types.ObjectId, ref: 'TeacherRequest' },
   },
-  lastSeen: {
-    type: Map,
-    of: Date, // maps userId => last seen timestamp
-    default: {},
-  },
-    lastOpened: {
-    type: Map,
-    of: Date,
-    default: {},
-  },
-}, { timestamps: true });
+  { _id: false }
+);
 
+const chatThreadSchema = new mongoose.Schema(
+  {
+    participants: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true, required: true },
+    ],
+    sessions: [sessionSchema],
 
-module.exports = mongoose.model('ChatThread', chatThreadSchema);
+    lastMessage: {
+      text: String,
+      senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      timestamp: Date,
+    },
+
+    // maps string(userId) -> Date
+    lastSeen: { type: Map, of: Date, default: {} },
+    lastOpened: { type: Map, of: Date, default: {} },
+  },
+  { timestamps: true, versionKey: false }
+);
+
+chatThreadSchema.index({ updatedAt: -1 });
+chatThreadSchema.index({ 'lastMessage.timestamp': -1 });
+// Helpful for request lookups
+chatThreadSchema.index({ 'sessions.requestId': 1 });
+
+module.exports =
+  mongoose.models.ChatThread || mongoose.model('ChatThread', chatThreadSchema);
