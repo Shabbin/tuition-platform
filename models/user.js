@@ -26,14 +26,17 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'teacher'],
     default: 'student'
   },
-  profileImage: {
-    type: String,
-    default: null,
-  },
-  coverImage: {
-    type: String,
-    default: '',
-  },
+
+  // 🔹 Media fields
+  profileImage: { type: String, default: null },       // direct URL
+  profileImagePublicId: { type: String, default: '' }, // Cloudinary ID
+
+  coverImage: { type: String, default: '' },           // direct URL
+  coverImagePublicId: { type: String, default: '' },   // Cloudinary ID
+
+  introVideoUrl: { type: String, default: '' },        // direct URL (if public)
+  introVideoPublicId: { type: String, default: '' },   // Cloudinary ID
+  introVideoAccess: { type: String, enum: ['public', 'authenticated'], default: 'authenticated' },
 
   // ➕ student credits (teachers will just have 0 and ignore)
   topicCredits: {

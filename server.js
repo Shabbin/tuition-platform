@@ -1,7 +1,10 @@
 // server.js
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+console.log('[ENV] region:', process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION);
+console.log('[ENV] bucket:', process.env.AWS_S3_BUCKET);
+
 const express = require('express');
 const http = require('http');
-const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -10,7 +13,6 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 
 const connectDB = require('./config/db');
-
 // Routes
 const adminRoutes = require('./controllers/oneTimeAdminController');
 const subjectRoutes = require('./routes/subjectsRoutes');
@@ -34,7 +36,7 @@ const privateCourse = require('./routes/privateCourseRoutes');
 // workers
 const { startRoutineWorker } = require(path.join(__dirname, 'services', 'workers', 'routineWorker'));
 
-dotenv.config();
+
 
 async function start() {
   // --- DB first (so we fail fast if URI is wrong) ---

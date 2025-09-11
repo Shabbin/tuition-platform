@@ -29,49 +29,50 @@ const teacherPostSchema = new mongoose.Schema({
     required: true,
   },
 
-board: {
-  type: String,
-  enum: [
-    'CIE', 'Edexcel', 'IB', 'Others', 
-    'IELTS', 'PTE', 'SAT', 'GRE', 'GMAT', 'TOEFL', // add Entrance-Exams here
-    'Public-University', 'Engineering', 'Medical', 'IBA',"Preliminary","Written","Viva" 
-  ],
-  required: function() {
-    // board required only if educationSystem !== 'Bangla-Medium'
-    return this.educationSystem !== 'Bangla-Medium' && this.educationSystem !== 'GED';
-  }
-},
-group: {
-  type: String,
-  // you can keep the wider enum if you have legacy docs,
-  // but since BCS group is gone in the UI, it's safe to reduce it to BM groups + "".
-  enum: ['Science', 'Commerce', 'Arts', ''], 
-  required: false,
-  default: undefined,
-  validate: {
-    validator: function (value) {
-      // Bangla-Medium still requires a valid group
-      if (this.educationSystem === 'Bangla-Medium') {
-        return ['Science', 'Commerce', 'Arts'].includes(value);
-      }
-      // ✅ BCS: group is NOT used anymore (allow undefined or empty string)
-      if (this.educationSystem === 'BCS') {
-        return value === undefined || value === '';
-      }
-      // Others: also allow empty/undefined
-      return value === undefined || value === '';
-    },
-    message: props => `Invalid group "${props.value}" for education system "${props.instance.educationSystem}"`
-  }
-},
-
-level: {
-  type: String,
-  required: function () {
-    return this.educationSystem === 'English-Medium' || this.educationSystem === 'Bangla-Medium';
+  board: {
+    type: String,
+    enum: [
+      'CIE', 'Edexcel', 'IB', 'Others', 
+      'IELTS', 'PTE', 'SAT', 'GRE', 'GMAT', 'TOEFL', // add Entrance-Exams here
+      'Public-University', 'Engineering', 'Medical', 'IBA', 'Preliminary', 'Written', 'Viva' 
+    ],
+    required: function() {
+      // board required only if educationSystem !== 'Bangla-Medium'
+      return this.educationSystem !== 'Bangla-Medium' && this.educationSystem !== 'GED';
+    }
   },
-  default: undefined,
-},
+
+  group: {
+    type: String,
+    // you can keep the wider enum if you have legacy docs,
+    // but since BCS group is gone in the UI, it's safe to reduce it to BM groups + "".
+    enum: ['Science', 'Commerce', 'Arts', ''], 
+    required: false,
+    default: undefined,
+    validate: {
+      validator: function (value) {
+        // Bangla-Medium still requires a valid group
+        if (this.educationSystem === 'Bangla-Medium') {
+          return ['Science', 'Commerce', 'Arts'].includes(value);
+        }
+        // ✅ BCS: group is NOT used anymore (allow undefined or empty string)
+        if (this.educationSystem === 'BCS') {
+          return value === undefined || value === '';
+        }
+        // Others: also allow empty/undefined
+        return value === undefined || value === '';
+      },
+      message: props => `Invalid group "${props.value}" for education system "${props.instance.educationSystem}"`
+    }
+  },
+
+  level: {
+    type: String,
+    required: function () {
+      return this.educationSystem === 'English-Medium' || this.educationSystem === 'Bangla-Medium';
+    },
+    default: undefined,
+  },
 
   subLevel: {
     type: String,
@@ -97,7 +98,14 @@ level: {
     required: true,
   },
 
+  // Public (or legacy) URL reference (may be empty when using authenticated videos)
   videoFile: {
+    type: String,
+    default: '',
+  },
+
+  // ⬇️ NEW: keep Cloudinary public_id so server can generate signed URLs when needed
+  videoPublicId: {
     type: String,
     default: '',
   },
@@ -106,19 +114,16 @@ level: {
     type: String,
     default: '',
   },
- viewsCount: {
+
+  viewsCount: {
     type: Number,
     default: 0,
   },
+
   tags: [String],
 
-
-},
-
-{
+}, {
   timestamps: true,
 });
-
-
 
 module.exports = mongoose.models.TeacherPost || mongoose.model('TeacherPost', teacherPostSchema);

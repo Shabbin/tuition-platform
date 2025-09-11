@@ -1,9 +1,11 @@
+// routes/teacherPostRoutes.js
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/videos' });
 
 const auth = require('../middleware/auth');
+// ✅ use your centralized memoryStorage multer (handles buffers for Cloudinary)
+const upload = require('../middleware/upload');
+
 const {
   createPost,
   getAllPosts,
@@ -18,6 +20,7 @@ const {
 } = require('../controllers/teacherPostController');
 
 // Create new post (authenticated & authorized teacher)
+// ✅ IMPORTANT: attach upload.single('videoFile')
 router.post('/', auth('teacher'), upload.single('videoFile'), createPost);
 
 // Get all public posts (no auth)
@@ -42,7 +45,8 @@ router.get('/:postId', getPostById);
 router.post('/:postId/view', incrementPostView);
 
 // Update post by ID (authenticated & authorized teacher)
-router.put('/:postId', auth('teacher'), updatePost);
+// ✅ IMPORTANT: also attach upload.single('videoFile') here
+router.put('/:postId', auth('teacher'), upload.single('videoFile'), updatePost);
 
 // Delete post by ID (authenticated & authorized teacher)
 router.delete('/:id', auth('teacher'), deleteTeacherPost);

@@ -1,3 +1,4 @@
+// server/controllers/teacherPostController.js
 const TeacherPost = require('../models/teacherPost');
 const User = require('../models/user');
 const { flattenSubjects } = require('../utils/normalize');
@@ -6,9 +7,63 @@ const { validateEducationPath } = require('../utils/validateEducationPath');
 const PostViewEvent = require('../models/postView');
 const { checkDuplicateSubjectCombination } = require('../utils/checkDuplicateSubjectCombination');
 const { getIO } = require('../socketUtils/socket');
-// const { v4: uuidv4 } = require('uuid');
-
+const { absoluteLocalVideoUrl } = require('../utils/localVideo');
 const mongoose = require('mongoose');
+const crypto = require('crypto');
+
+// ⬇️ Cloudinary utils
+const {
+  cloudinary,                  // used to build signed video URLs
+  uploadBuffer,
+  buildVideoUrl,
+  CLOUDINARY_BASE_FOLDER,
+  CLOUDINARY_VIDEOS_ACCESS,
+} = require('../utils/cloudinary');
+
+/**
+ * Attach a playable `videoUrl` to a post object.
+ * Order:
+ * 1) If videos are AUTHENTICATED and we have `videoPublicId` → signed Cloudinary URL
+ * 2) If `videoFile` is already absolute (http/https) → passthrough
+ * 3) If `videoFile` is legacy local "/uploads/videos/..." → convert to absolute via absoluteLocalVideoUrl
+ * 4) else empty
+ */
+function withSignedVideo(postDoc) {
+  if (!postDoc) return postDoc;
+  const obj = typeof postDoc.toObject === 'function' ? postDoc.toObject() : postDoc;
+
+  const accessMode = (CLOUDINARY_VIDEOS_ACCESS || 'authenticated').toLowerCase();
+
+  // 1) Cloudinary authenticated (signed)
+  if (accessMode === 'authenticated' && obj.videoPublicId) {
+    obj.videoUrl = cloudinary.url(obj.videoPublicId, {
+      resource_type: 'video',
+      type: 'authenticated',
+      sign_url: true,
+      secure: true,
+      format: 'mp4',
+      transformation: [{ quality: 'auto' }],
+    });
+    return obj;
+  }
+
+  // 2) Already absolute URL (Cloudinary public or any full http(s) URL)
+  if (typeof obj.videoFile === 'string' && /^https?:\/\//i.test(obj.videoFile)) {
+    obj.videoUrl = obj.videoFile;
+    return obj;
+  }
+
+  // 3) Legacy local path
+  if (typeof obj.videoFile === 'string' && obj.videoFile.includes('/uploads/videos')) {
+    obj.videoUrl = absoluteLocalVideoUrl(obj.videoFile);
+    return obj;
+  }
+
+  // 4) Fallback
+  obj.videoUrl = '';
+  return obj;
+}
+
 // =========================
 // CREATE POST
 // =========================
@@ -31,7 +86,6 @@ const createPost = async (req, res) => {
     } = req.body;
 
     subjects = Array.isArray(subjects) ? subjects : [subjects];
-    console.log("is an array?", subjects);
     tags = Array.isArray(tags) ? tags : [tags];
 
     const normalizedSubjects = flattenSubjects(subjects).map(s => s.trim()).sort();
@@ -45,18 +99,18 @@ const createPost = async (req, res) => {
       subjects: normalizedSubjects,
       subLevel,
     });
-
     if (!eduValidation.valid) {
       return res.status(400).json({ message: eduValidation.message });
     }
 
     const requiresBoard = educationSystem === 'English-Medium' || educationSystem === 'University-Admission';
-
     if (requiresBoard && (!board || board.trim() === '')) {
-      return res.status(400).json({ message: `${educationSystem === 'English-Medium' ? 'Board' : 'Track'} is required for ${educationSystem}.` });
+      return res.status(400).json({
+        message: `${educationSystem === 'English-Medium' ? 'Board' : 'Track'} is required for ${educationSystem}.`,
+      });
     }
 
-    const teacherId = req.user.id;  // <-- changed here
+    const teacherId = req.user.id;
     const teacher = await User.findById(teacherId);
     if (!teacher || teacher.role !== 'teacher' || !teacher.isEligible) {
       return res.status(403).json({ message: 'Not authorized to post' });
@@ -75,7 +129,34 @@ const createPost = async (req, res) => {
       return res.status(400).json({ message: 'Please provide meaningful description content.' });
     }
 
-    const videoFile = req.file ? `/uploads/videos/${req.file.filename}` : '';
+    // ⬇️ Upload video to Cloudinary (if provided)
+    let videoFile = '';     // for public delivery or legacy compatibility
+    let videoPublicId = ''; // for authenticated delivery & signing
+    if (req.file) {
+      const folder = `${CLOUDINARY_BASE_FOLDER}/posts/videos`;
+      const public_id = `${teacherId}-${crypto.randomBytes(8).toString('hex')}`;
+
+      const accessMode = (CLOUDINARY_VIDEOS_ACCESS || 'authenticated').toLowerCase();
+
+      const uploaded = await uploadBuffer(req.file.buffer, {
+        folder,
+        public_id,
+        resource_type: 'video',
+        overwrite: true,
+        access_mode: accessMode, // 'public' or 'authenticated'
+        transformation: [{ quality: 'auto' }],
+      });
+
+      videoPublicId = uploaded.public_id;
+
+      if (accessMode === 'public') {
+        // Direct, cacheable public URL
+        videoFile = buildVideoUrl(uploaded.public_id, { format: 'mp4', access: 'public' });
+      } else {
+        // Keep a reference; actual playable URL will be signed per request
+        videoFile = uploaded.secure_url; // (upload URL, not directly usable without signing)
+      }
+    }
 
     const postData = {
       teacher: teacherId,
@@ -86,6 +167,7 @@ const createPost = async (req, res) => {
       language,
       hourlyRate,
       videoFile,
+      videoPublicId,
       youtubeLink,
       tags: normalizedTags,
       educationSystem,
@@ -98,7 +180,7 @@ const createPost = async (req, res) => {
     const post = new TeacherPost(postData);
     await post.save();
 
-    res.status(201).json({ message: 'Post created successfully', post });
+    res.status(201).json({ message: 'Post created successfully', post: withSignedVideo(post) });
 
   } catch (err) {
     console.error('Create post error:', err);
@@ -112,7 +194,7 @@ const createPost = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    const teacherId = req.user.id; // <-- changed here
+    const teacherId = req.user.id;
 
     const post = await TeacherPost.findById(postId);
     if (!post) return res.status(404).json({ message: 'Post not found' });
@@ -151,7 +233,6 @@ const updatePost = async (req, res) => {
       subjects: normalizedSubjects,
       subLevel,
     });
-
     if (!eduValidation.valid) {
       return res.status(400).json({ message: eduValidation.message });
     }
@@ -161,12 +242,8 @@ const updatePost = async (req, res) => {
     }
 
     const { exists, matchedSubjects } = await checkDuplicateSubjectCombination(
-      TeacherPost,
-      teacherId,
-      normalizedSubjects,
-      postId
+      TeacherPost, teacherId, normalizedSubjects, postId
     );
-
     if (exists) {
       return res.status(400).json({
         message: `You have already created another post with the same subject combination: ${matchedSubjects.join(', ')}`,
@@ -189,8 +266,27 @@ const updatePost = async (req, res) => {
       group,
     };
 
+    // ⬇️ If a new video is uploaded, push to Cloudinary and update both fields
     if (req.file) {
-      updates.videoFile = `/uploads/videos/${req.file.filename}`;
+      const folder = `${CLOUDINARY_BASE_FOLDER}/posts/videos`;
+      const public_id = `${teacherId}-${crypto.randomBytes(8).toString('hex')}`;
+
+      const accessMode = (CLOUDINARY_VIDEOS_ACCESS || 'authenticated').toLowerCase();
+
+      const uploaded = await uploadBuffer(req.file.buffer, {
+        folder,
+        public_id,
+        resource_type: 'video',
+        overwrite: true,
+        access_mode: accessMode,
+        transformation: [{ quality: 'auto' }],
+      });
+
+      updates.videoPublicId = uploaded.public_id;
+      updates.videoFile =
+        accessMode === 'public'
+          ? buildVideoUrl(uploaded.public_id, { format: 'mp4', access: 'public' })
+          : uploaded.secure_url;
     }
 
     await TeacherPost.findByIdAndUpdate(postId, updates, { new: true });
@@ -226,7 +322,9 @@ const getAllPosts = async (req, res) => {
     const posts = await TeacherPost.find(filter)
       .populate('teacher', 'name email isEligible profileImage location language');
 
-    const eligiblePosts = posts.filter(post => post.teacher?.isEligible);
+    const eligiblePosts = posts
+      .filter(post => post.teacher?.isEligible)
+      .map(p => withSignedVideo(p));
 
     res.status(200).json(eligiblePosts);
   } catch (err) {
@@ -242,12 +340,14 @@ const getPostById = async (req, res) => {
   try {
     const { postId } = req.params;
 
-    const post = await TeacherPost.findById(postId)
+    let post = await TeacherPost.findById(postId)
       .populate('teacher', 'name email isEligible profileImage');
 
     if (!post || !post.teacher?.isEligible) {
       return res.status(404).json({ message: 'Post not found or teacher not eligible' });
     }
+
+    post = withSignedVideo(post);
 
     res.status(200).json(post);
   } catch (err) {
@@ -324,7 +424,7 @@ const deleteTeacherPost = async (req, res) => {
 // =========================
 const getMyPosts = async (req, res) => {
   try {
-    const posts = await TeacherPost.find({ teacher: req.user.id }).sort({ createdAt: -1 }); // <-- changed here
+    const posts = await TeacherPost.find({ teacher: req.user.id }).sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {
     console.error('Error fetching my posts:', err.message);
@@ -341,10 +441,6 @@ async function incrementPostView(req, res) {
     const userId = req.user?.id || null;
     const visitorId = req.cookies?.visitorId || null;
 
-    console.log('View increment request received for post:', postId);
-    console.log('userId:', userId);
-    console.log('visitorId:', visitorId);
-
     if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
       return res.status(400).json({ error: 'Invalid post ID' });
     }
@@ -352,21 +448,15 @@ async function incrementPostView(req, res) {
     const cooldownMinutes = 60;
     const cooldownDate = new Date(Date.now() - cooldownMinutes * 60 * 1000);
 
-    // Find recent view by either userId or visitorId
     const recentView = await PostViewEvent.findOne({
       postId,
       createdAt: { $gte: cooldownDate },
-      $or: [
-        { userId: userId || null },
-        { visitorId: visitorId || null }
-      ],
+      $or: [{ userId: userId || null }, { visitorId: visitorId || null }],
     });
 
     if (recentView) {
       const post = await TeacherPost.findById(postId).select('viewsCount');
-      if (!post) {
-        return res.status(404).json({ error: 'Post not found' });
-      }
+      if (!post) return res.status(404).json({ error: 'Post not found' });
       return res.json({
         viewsCount: post.viewsCount,
         viewEventTimestamp: recentView.createdAt,
@@ -374,25 +464,20 @@ async function incrementPostView(req, res) {
       });
     }
 
-    // Increment viewsCount atomically
     const updatedPost = await TeacherPost.findByIdAndUpdate(
       postId,
       { $inc: { viewsCount: 1 } },
       { new: true, select: 'teacher title viewsCount' }
     );
 
-    if (!updatedPost) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
+    if (!updatedPost) return res.status(404).json({ error: 'Post not found' });
 
-    // Create new PostViewEvent with either userId or visitorId
     const newViewEvent = await PostViewEvent.create({
       postId: updatedPost._id,
       userId,
       visitorId,
     });
 
-    // Emit socket event to teacher if exists
     if (updatedPost.teacher) {
       const io = getIO();
       io.to(updatedPost.teacher.toString()).emit('post_view_event', {
@@ -413,31 +498,18 @@ async function incrementPostView(req, res) {
   }
 }
 
-
-
-
-
-
 //..............................................
 //GET RECENT VIEWS (WILL COME TO THIS PART LATER)
 //..............................................
 async function getUniqueViewCounts(postIds) {
-  console.log("👉 getUniqueViewCounts called with postIds:", postIds);
-
-  // Convert all postIds to ObjectId instances
   const objectIdPostIds = postIds.map(id => new mongoose.Types.ObjectId(id));
-  console.log("✅ Converted to ObjectId array:", objectIdPostIds);
 
   const uniqueViewCounts = await PostViewEvent.aggregate([
-    {
-      $match: {
-        postId: { $in: objectIdPostIds },
-      },
-    },
+    { $match: { postId: { $in: objectIdPostIds } } },
     {
       $group: {
         _id: "$postId",
-        uniqueUsers: { $addToSet: "$userId" }, // gather unique userIds per post
+        uniqueUsers: { $addToSet: "$userId" },
       },
     },
     {
@@ -448,7 +520,7 @@ async function getUniqueViewCounts(postIds) {
             $filter: {
               input: "$uniqueUsers",
               as: "userId",
-              cond: { $ne: ["$$userId", null] }, // exclude null userId (anonymous views)
+              cond: { $ne: ["$$userId", null] },
             },
           },
         },
@@ -456,15 +528,10 @@ async function getUniqueViewCounts(postIds) {
     },
   ]);
 
-  console.log("📊 Aggregation result:", uniqueViewCounts);
-
-  // Map postId to its unique view count
   const result = {};
   uniqueViewCounts.forEach(item => {
     result[item.postId.toString()] = item.uniqueViewCount;
   });
-
-  console.log("🗂️ Final unique view count mapping:", result);
 
   return result;
 }
@@ -472,33 +539,22 @@ async function getUniqueViewCounts(postIds) {
 async function getRecentViewEvents(req, res) {
   try {
     const { teacherId } = req.params;
-    console.log("📩 Request received for teacherId:", teacherId);
 
-    // Find all posts by this teacher
     const teacherPosts = await TeacherPost.find({ teacher: teacherId }).select('_id title');
-    console.log("📝 Teacher posts found:", teacherPosts.map(p => p._id.toString()));
-
     const postIds = teacherPosts.map(p => p._id);
 
-    // Get unique view counts
     const uniqueViewCounts = await getUniqueViewCounts(postIds);
 
-    // Find recent view events for those posts, newest first
     const recentEvents = await PostViewEvent.find({ postId: { $in: postIds } })
       .sort({ createdAt: -1 })
       .limit(20)
       .populate('postId', 'title')
       .lean();
 
-    console.log("📅 Recent events fetched (limit 20):", recentEvents);
-
-    // Overwrite viewsCount with unique counts
     const postsWithUpdatedViews = teacherPosts.map(post => ({
       ...post.toObject(),
       viewsCount: uniqueViewCounts[post._id.toString()] || 0,
     }));
-
-    console.log("📈 Posts with updated viewsCount:", postsWithUpdatedViews);
 
     res.json({
       events: recentEvents,
@@ -510,8 +566,6 @@ async function getRecentViewEvents(req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
-
-
 
 module.exports = {
   createPost,

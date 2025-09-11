@@ -1,46 +1,32 @@
-const fs = require('fs');
-const path = require('path');
+// controllers/videoController.js
+const { s3, S3_BUCKET } = require('../utils/cloudinary');
+const { GetObjectCommand } = require('@aws-sdk/client-s3');
 
-exports.streamVideo = (req, res) => {
-  const videoPath = path.join(__dirname, '..', 'uploads/videos', req.params.filename);
+async function streamVideo(req, res) {
+  try {
+    const filename = req.params.filename; // keep your existing route param
+    // If you upload videos under 'videos/<filename>' on S3, build the key similarly:
+    const key = `videos/${filename}`;
 
-  if (!fs.existsSync(videoPath)) {
-    return res.status(404).send('Video not found');
+    const range = req.headers.range; // e.g., "bytes=0-"
+    const params = { Bucket: S3_BUCKET, Key: key, Range: range };
+
+    const command = new GetObjectCommand(params);
+    const s3Response = await s3.send(command);
+
+    // Set headers for partial content if Range was requested
+    const statusCode = range ? 206 : 200;
+    if (s3Response.ContentRange) res.setHeader('Content-Range', s3Response.ContentRange);
+    if (s3Response.AcceptRanges) res.setHeader('Accept-Ranges', s3Response.AcceptRanges);
+    if (s3Response.ContentLength) res.setHeader('Content-Length', s3Response.ContentLength);
+    if (s3Response.ContentType) res.setHeader('Content-Type', s3Response.ContentType);
+
+    res.status(statusCode);
+    s3Response.Body.pipe(res);
+  } catch (err) {
+    console.error('Video stream error:', err);
+    res.status(404).json({ message: 'Video not found' });
   }
+}
 
-  const stat = fs.statSync(videoPath);
-  const fileSize = stat.size;
-  const range = req.headers.range;
-
-  if (range) {
-    // Parse range header
-    const parts = range.replace(/bytes=/, '').split('-');
-    const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-
-    if (start >= fileSize || end >= fileSize) {
-      res.status(416).send('Requested range not satisfiable\n' + start + ' >= ' + fileSize);
-      return;
-    }
-
-    const chunksize = end - start + 1;
-    const file = fs.createReadStream(videoPath, { start, end });
-    const head = {
-      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': chunksize,
-      'Content-Type': 'video/mp4', // adjust if supporting other types
-    };
-
-    res.writeHead(206, head);
-    file.pipe(res);
-  } else {
-    // No range header – send entire video
-    const head = {
-      'Content-Length': fileSize,
-      'Content-Type': 'video/mp4',
-    };
-    res.writeHead(200, head);
-    fs.createReadStream(videoPath).pipe(res);
-  }
-};
+module.exports = { streamVideo };
