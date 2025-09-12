@@ -7,13 +7,13 @@ const { validateEducationPath } = require('../utils/validateEducationPath');
 const PostViewEvent = require('../models/postView');
 const { checkDuplicateSubjectCombination } = require('../utils/checkDuplicateSubjectCombination');
 const { getIO } = require('../socketUtils/socket');
-const { absoluteLocalVideoUrl } = require('../utils/localVideo');
+
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 
 // ⬇️ Cloudinary utils
 const {
-  cloudinary,                  // used to build signed video URLs
+  cloudinary,                  // ✅ now used to build signed video URLs
   uploadBuffer,
   buildVideoUrl,
   CLOUDINARY_BASE_FOLDER,
@@ -22,11 +22,9 @@ const {
 
 /**
  * Attach a playable `videoUrl` to a post object.
- * Order:
- * 1) If videos are AUTHENTICATED and we have `videoPublicId` → signed Cloudinary URL
- * 2) If `videoFile` is already absolute (http/https) → passthrough
- * 3) If `videoFile` is legacy local "/uploads/videos/..." → convert to absolute via absoluteLocalVideoUrl
- * 4) else empty
+ * - If videos are `authenticated` and we have `videoPublicId`, generate a signed URL.
+ * - If `videoFile` is already a full URL (public/legacy), pass it through.
+ * - Else `videoUrl` is empty.
  */
 function withSignedVideo(postDoc) {
   if (!postDoc) return postDoc;
@@ -34,8 +32,8 @@ function withSignedVideo(postDoc) {
 
   const accessMode = (CLOUDINARY_VIDEOS_ACCESS || 'authenticated').toLowerCase();
 
-  // 1) Cloudinary authenticated (signed)
   if (accessMode === 'authenticated' && obj.videoPublicId) {
+    // 🔐 Signed delivery for authenticated assets
     obj.videoUrl = cloudinary.url(obj.videoPublicId, {
       resource_type: 'video',
       type: 'authenticated',
@@ -43,24 +41,15 @@ function withSignedVideo(postDoc) {
       secure: true,
       format: 'mp4',
       transformation: [{ quality: 'auto' }],
+      // version is optional; include if you add it to the schema later
+      // version: obj.videoVersion,
     });
-    return obj;
-  }
-
-  // 2) Already absolute URL (Cloudinary public or any full http(s) URL)
-  if (typeof obj.videoFile === 'string' && /^https?:\/\//i.test(obj.videoFile)) {
+  } else if (typeof obj.videoFile === 'string' && obj.videoFile.startsWith('http')) {
+    // 🌐 Public (or legacy absolute) URL
     obj.videoUrl = obj.videoFile;
-    return obj;
+  } else {
+    obj.videoUrl = '';
   }
-
-  // 3) Legacy local path
-  if (typeof obj.videoFile === 'string' && obj.videoFile.includes('/uploads/videos')) {
-    obj.videoUrl = absoluteLocalVideoUrl(obj.videoFile);
-    return obj;
-  }
-
-  // 4) Fallback
-  obj.videoUrl = '';
   return obj;
 }
 
