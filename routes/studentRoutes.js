@@ -1,13 +1,15 @@
+// routes/studentRoutes.js
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
-const User = require('../models/user');
-const { getEligibleTeachers } = require('../controllers/studentController');
 
-// ⬇️ Import models if they exist
-// const TuitionRequest = require('../models/tuitionRequest');
-// const Booking = require('../models/booking');
-// const Session = require('../models/session');
+const auth = require('../middleware/auth');
+const upload = require('../middleware/upload'); // ⬅️ same memoryStorage multer you use elsewhere
+const User = require('../models/user');
+
+const {
+  getEligibleTeachers,
+  updateStudentProfilePicture, // ⬅️ new controller
+} = require('../controllers/studentController');
 
 // ✅ GET: Full student dashboard
 router.get('/dashboard', auth('student'), async (req, res) => {
@@ -54,8 +56,13 @@ router.get('/dashboard', auth('student'), async (req, res) => {
   }
 });
 
-
-
+// ✅ PUT: Student profile picture upload (mirrors teacher endpoint)
+router.put(
+  '/profile-picture',
+  auth('student'),
+  upload.single('profileImage'), // field name must be "profileImage"
+  updateStudentProfilePicture
+);
 
 // ✅ GET: View eligible teachers
 router.get('/teachers', auth('student'), getEligibleTeachers);
