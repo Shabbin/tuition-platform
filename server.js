@@ -1,4 +1,3 @@
-// server.js
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 console.log('[ENV] region:', process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION);
 console.log('[ENV] bucket:', process.env.AWS_S3_BUCKET);
@@ -11,8 +10,9 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
-
+const auth = require('./middleware/auth');
 const connectDB = require('./config/db');
+
 // Routes
 const adminRoutes = require('./controllers/oneTimeAdminController');
 const subjectRoutes = require('./routes/subjectsRoutes');
@@ -22,7 +22,6 @@ const authRoutes = require('./routes/authRoutes');
 const teacherPostRoutes = require('./routes/teacherPostRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
-const videoRoutes = require('./routes/videoRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const tuitionGuardRoutes = require('./routes/tuitionGuardRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
@@ -33,29 +32,53 @@ const settlementRoutes = require('./routes/settlementRoutes');
 const changeRequestRoutes = require('./routes/changeRequestRoutes');
 const enrollmentInviteRoutes = require('./routes/enrollmentInviteRoutes');
 const privateCourse = require('./routes/privateCourseRoutes');
-// workers
+
+// 👇 THIS is the video router we want to use
+const videoRoom = require('./routes/videoRoomRoutes');
+
 const { startRoutineWorker } = require(path.join(__dirname, 'services', 'workers', 'routineWorker'));
 
-
-
 async function start() {
-  // --- DB first (so we fail fast if URI is wrong) ---
-  await connectDB(); // make sure connectDB returns a promise
+  await connectDB();
 
   const app = express();
-
-  // behind a proxy/CDN (needed if you ever set secure cookies)
   app.set('trust proxy', 1);
 
-  // --- Security headers ---
+  // ⬇️ CHANGED: add explicit CSP so the video iframe can load (Daily or Jitsi)
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
       crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          "default-src": ["'self'"],
+          "style-src": ["'self'", "https:", "'unsafe-inline'"],
+          "font-src": ["'self'", "https:", "data:"],
+          "img-src": ["'self'", "data:", "https:"],
+          "frame-ancestors": ["'self'"],
+          // allow embedding Daily/Jitsi call iframes
+          "frame-src": [
+            "'self'",
+            "https://*.daily.co",
+            "https://meet.jit.si"
+          ],
+          // allow XHR/WebSocket to providers
+          "connect-src": [
+            "'self'",
+            "https://*.daily.co",
+            "wss://*.daily.co",
+            "https://meet.jit.si",
+            "wss://meet.jit.si"
+          ],
+          "media-src": ["'self'", "blob:", "https://*.daily.co"],
+          "script-src": ["'self'", "https:"],
+        },
+      },
     })
   );
 
-  // --- CORS allow-list (comma-separated FRONTEND_ORIGINS supported) ---
+  // --- CORS allow-list ---
   const origins = (process.env.FRONTEND_ORIGINS || process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
     .split(',')
     .map(s => s.trim())
@@ -71,13 +94,12 @@ async function start() {
     })
   );
 
-  // --- Body/cookies, compression, basic rate limits ---
+  // --- Body/cookies, compression, rate limits ---
   app.use(express.json({ limit: '2mb' }));
   app.use(express.urlencoded({ extended: true }));
-  app.use(cookieParser());
+  app.use(cookieParser()); // ⬅️ cookie must be parsed BEFORE routes
   app.use(compression());
 
-  // global burst limiter (tune if needed)
   app.use(
     rateLimit({
       windowMs: 60_000,
@@ -86,8 +108,6 @@ async function start() {
       legacyHeaders: false,
     })
   );
-
-  // targeted limiter on auth & chat send
   app.use('/api/auth/', rateLimit({ windowMs: 15 * 60_000, limit: 100 }));
   app.use('/api/chat/messages', rateLimit({ windowMs: 10_000, limit: 50 }));
 
@@ -116,11 +136,12 @@ async function start() {
     return res.json({ ok: true, mongo: mongoState });
   });
 
-  // --- Static & non-API routes ---
+  // --- Static ---
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-  // --- Feature routes ---
-  app.use('/videos', videoRoutes);
+  // --- MOUNT FEATURE ROUTES (keep order; video first is fine) ---
+  console.log('MOUNT /api/video');
+  app.use('/api/video', videoRoom);
 
   console.log('MOUNT /api/auth');                app.use('/api/auth', authRoutes);
   console.log('MOUNT /api/students');            app.use('/api/students', require('./routes/studentRoutes'));
@@ -145,10 +166,15 @@ async function start() {
   console.log('MOUNT /pay (callbacks)');         app.use('/pay', paymentRoutes);
   console.log('MOUNT /api/private-courses');     app.use('/api/private-courses', privateCourse);
 
+  // 🔎 Global auth debug (JWT from cookie/Authorization)
+  app.get('/api/_debug/whoami', auth(), (req, res) => {
+    return res.json({ ok: true, user: req.user });
+  });
+
   // 404 (after routes)
   app.use((req, res) => res.status(404).json({ ok: false, error: 'NOT_FOUND' }));
 
-  // Error handler (JSON)
+  // Error handler
   // eslint-disable-next-line no-unused-vars
   app.use((err, _req, res, _next) => {
     console.error('[ERR]', err);
@@ -160,7 +186,6 @@ async function start() {
   const { init, getIO, shutdown: socketShutdown } = require('./socketUtils/socket');
   const io = init(server);
 
-  // background workers
   startRoutineWorker();
 
   const PORT = process.env.PORT || 5000;
@@ -169,12 +194,11 @@ async function start() {
     console.log(`CORS allowing origins: ${origins.join(', ')}`);
   });
 
-  // --- graceful shutdown ---
   async function closeGracefully(signal) {
     console.log(`\n[SHUTDOWN] ${signal} received`);
     try {
       server.close(() => console.log('[SHUTDOWN] HTTP server closed'));
-      if (io) await socketShutdown?.(); // closes Redis adapter if present
+      if (io) await socketShutdown?.();
       const mongoose = require('mongoose');
       await mongoose.connection.close(false);
       console.log('[SHUTDOWN] Mongo connection closed');
@@ -195,4 +219,4 @@ start().catch((e) => {
   process.exit(1);
 });
 
-module.exports = {}; // not used elsewhere now
+module.exports = {};
