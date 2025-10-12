@@ -1,19 +1,30 @@
 // controllers/authController.js
-
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const User = require('../models/user');
+const streamifier = require('streamifier');
+const User = require('../models/user'); // keep your existing path
+const cloudinary = require('../config/cloudinary');
 
 const generateToken = (user) => {
   return jwt.sign(
-    {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-    },
+    { id: user._id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
+};
+
+// helper: upload a buffer to cloudinary
+const uploadToCloudinary = (fileBuffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: 'image' },
+      (err, result) => {
+        if (err) return reject(err);
+        resolve(result); // has secure_url and public_id
+      }
+    );
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
 };
 
 const register = async (req, res) => {
@@ -38,9 +49,17 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const profileImage = req.file
-      ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-      : null;
+    // ⬇️ NEW: if avatar file present, upload to Cloudinary
+    let profileImage = null;
+    let profileImagePublicId = '';
+
+    if (req.file && req.file.buffer) {
+      const folder =
+        (process.env.CLOUDINARY_BASE_FOLDER || 'tuition-platform') + '/avatars';
+      const result = await uploadToCloudinary(req.file.buffer, folder);
+      profileImage = result.secure_url;
+      profileImagePublicId = result.public_id;
+    }
 
     const user = new User({
       name,
@@ -49,6 +68,7 @@ const register = async (req, res) => {
       role,
       age: role === 'teacher' ? age : undefined,
       profileImage,
+      profileImagePublicId,
     });
 
     await user.save();
@@ -57,10 +77,10 @@ const register = async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,        // must be false on localhost (no HTTPS)
-      sameSite: 'lax',      // lax is best for dev, strict blocks cross-site cookies
-      path: '/',            // 👈 ensure cookie is sent to ALL routes (e.g., /api/enrollment-invites)
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: false,  // keep false for localhost; set true behind HTTPS in prod
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(201).json({
@@ -73,11 +93,13 @@ const register = async (req, res) => {
         age: user.age,
         isEligible: user.isEligible,
         profileImage: user.profileImage,
+        profileImagePublicId: user.profileImagePublicId,
         coverImage: user.coverImage,
+        coverImagePublicId: user.coverImagePublicId,
       },
     });
   } catch (err) {
-    console.error('Register error:', err.message);
+    console.error('Register error:', err);
     res.status(500).json({ message: 'Server error during registration' });
   }
 };
@@ -85,29 +107,24 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
-    }
+    if (!user) return res.status(401).json({ message: 'Invalid email or password' });
 
     const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
-    }
+    if (!passwordMatch) return res.status(401).json({ message: 'Invalid email or password' });
 
     const token = generateToken(user);
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,         // ✅ must be false for localhost
-      sameSite: 'lax',       // ✅ lower-case; allows across localhost ports
-      path: '/',             // 👈 critical so requests to /api/* include cookie
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
@@ -120,11 +137,13 @@ const login = async (req, res) => {
         age: user.age,
         isEligible: user.isEligible,
         profileImage: user.profileImage,
+        profileImagePublicId: user.profileImagePublicId,
         coverImage: user.coverImage,
+        coverImagePublicId: user.coverImagePublicId,
       },
     });
   } catch (err) {
-    console.error('Login error:', err.message);
+    console.error('Login error:', err);
     res.status(500).json({ message: 'Server error during login' });
   }
 };
