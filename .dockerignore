@@ -1,0 +1,14 @@
+# Node artifacts
+node_modules
+npm-debug.log
+pnpm-lock.yaml
+yarn.lock
+
+# VCS / build files
+.git
+.gitignore
+Dockerfile
+.dockerignore
+
+# Local uploads (runtime data) — keep out of the image
+uploads/*
