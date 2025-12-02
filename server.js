@@ -33,7 +33,7 @@ const changeRequestRoutes = require('./routes/changeRequestRoutes');
 const enrollmentInviteRoutes = require('./routes/enrollmentInviteRoutes');
 const privateCourse = require('./routes/privateCourseRoutes');
 
-// 👇 THIS is the video router we want to use
+// video router
 const videoRoom = require('./routes/videoRoomRoutes');
 
 const { startRoutineWorker } = require(path.join(__dirname, 'services', 'workers', 'routineWorker'));
@@ -44,7 +44,31 @@ async function start() {
   const app = express();
   app.set('trust proxy', 1);
 
-  // ⬇️ CHANGED: add explicit CSP so the video iframe can load (Daily or Jitsi)
+  // --- CORS (hard-coded allowed origins) ---
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'https://teaching-platform-beige.vercel.app',
+  ];
+
+  const corsOptions = {
+    origin(origin, cb) {
+      // allow non-browser clients (curl/Postman) with no Origin
+      if (!origin) return cb(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return cb(null, true);
+      }
+
+      console.warn('[CORS] blocked origin:', origin);
+      return cb(null, false);
+    },
+    credentials: true,
+  };
+
+  app.use(cors(corsOptions));
+  // ⬅️ removed app.options('*', ...) to avoid path-to-regexp error
+
+  // CSP / security headers
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -57,13 +81,11 @@ async function start() {
           "font-src": ["'self'", "https:", "data:"],
           "img-src": ["'self'", "data:", "https:"],
           "frame-ancestors": ["'self'"],
-          // allow embedding Daily/Jitsi call iframes
           "frame-src": [
             "'self'",
             "https://*.daily.co",
             "https://meet.jit.si"
           ],
-          // allow XHR/WebSocket to providers
           "connect-src": [
             "'self'",
             "https://*.daily.co",
@@ -78,26 +100,10 @@ async function start() {
     })
   );
 
-  // --- CORS allow-list ---
-  const origins = (process.env.FRONTEND_ORIGINS || process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
-
-  app.use(
-    cors({
-      origin(origin, cb) {
-        if (!origin) return cb(null, true); // curl/postman
-        cb(null, origins.includes(origin));
-      },
-      credentials: true,
-    })
-  );
-
-  // --- Body/cookies, compression, rate limits ---
+  // Body/cookies, compression, rate limits
   app.use(express.json({ limit: '2mb' }));
   app.use(express.urlencoded({ extended: true }));
-  app.use(cookieParser()); // ⬅️ cookie must be parsed BEFORE routes
+  app.use(cookieParser());
   app.use(compression());
 
   app.use(
@@ -111,7 +117,7 @@ async function start() {
   app.use('/api/auth/', rateLimit({ windowMs: 15 * 60_000, limit: 100 }));
   app.use('/api/chat/messages', rateLimit({ windowMs: 10_000, limit: 50 }));
 
-  // Simple request logger
+  // Request logger
   app.use((req, _res, next) => {
     const hasToken = !!req.cookies?.token;
     console.log(
@@ -126,7 +132,7 @@ async function start() {
     next();
   });
 
-  // --- Health & readiness ---
+  // Health & readiness
   app.get('/healthz', (_req, res) => res.type('text/plain').send('ok'));
   app.get('/readyz', (_req, res) => {
     const mongoose = require('mongoose');
@@ -136,10 +142,10 @@ async function start() {
     return res.json({ ok: true, mongo: mongoState });
   });
 
-  // --- Static ---
+  // Static
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-  // --- MOUNT FEATURE ROUTES (keep order; video first is fine) ---
+  // Routes
   console.log('MOUNT /api/video');
   app.use('/api/video', videoRoom);
 
@@ -166,12 +172,12 @@ async function start() {
   console.log('MOUNT /pay (callbacks)');         app.use('/pay', paymentRoutes);
   console.log('MOUNT /api/private-courses');     app.use('/api/private-courses', privateCourse);
 
-  // 🔎 Global auth debug (JWT from cookie/Authorization)
+  // Debug route
   app.get('/api/_debug/whoami', auth(), (req, res) => {
     return res.json({ ok: true, user: req.user });
   });
 
-  // 404 (after routes)
+  // 404
   app.use((req, res) => res.status(404).json({ ok: false, error: 'NOT_FOUND' }));
 
   // Error handler
@@ -181,7 +187,7 @@ async function start() {
     res.status(err.status || 500).json({ ok: false, error: 'INTERNAL', message: err.message });
   });
 
-  // --- Server & sockets ---
+  // Server & sockets
   const server = http.createServer(app);
   const { init, getIO, shutdown: socketShutdown } = require('./socketUtils/socket');
   const io = init(server);
@@ -191,7 +197,7 @@ async function start() {
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`CORS allowing origins: ${origins.join(', ')}`);
+    console.log(`CORS allowing origins: ${allowedOrigins.join(', ')}`);
   });
 
   async function closeGracefully(signal) {
