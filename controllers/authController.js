@@ -2,7 +2,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const streamifier = require('streamifier');
-const User = require('../models/user'); // keep your existing path
+const User = require('../models/user');
 const cloudinary = require('../config/cloudinary');
 
 const generateToken = (user) => {
@@ -13,19 +13,20 @@ const generateToken = (user) => {
   );
 };
 
-// helper: upload a buffer to cloudinary
-const uploadToCloudinary = (fileBuffer, folder) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: 'image' },
-      (err, result) => {
-        if (err) return reject(err);
-        resolve(result); // has secure_url and public_id
-      }
-    );
-    streamifier.createReadStream(fileBuffer).pipe(stream);
-  });
+// 🔹 one shared place for cookie options
+const buildCookieOptions = () => {
+  const isProd = process.env.NODE_ENV === 'production';
+
+  return {
+    httpOnly: true,
+    secure: isProd,                           // required for SameSite=None
+    sameSite: isProd ? 'none' : 'lax',        // allow cross-site in prod
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000,          // 7 days
+  };
 };
+
+// ... uploadToCloudinary and other helpers stay the same ...
 
 const register = async (req, res) => {
   try {
@@ -49,7 +50,6 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ⬇️ NEW: if avatar file present, upload to Cloudinary
     let profileImage = null;
     let profileImagePublicId = '';
 
@@ -74,14 +74,7 @@ const register = async (req, res) => {
     await user.save();
 
     const token = generateToken(user);
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,  // keep false for localhost; set true behind HTTPS in prod
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('token', token, buildCookieOptions());
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -118,14 +111,7 @@ const login = async (req, res) => {
     if (!passwordMatch) return res.status(401).json({ message: 'Invalid email or password' });
 
     const token = generateToken(user);
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('token', token, buildCookieOptions());
 
     res.status(200).json({
       message: 'Login successful',
