@@ -43,14 +43,18 @@ router.get('/me', authenticateToken, async (req, res) => {
 
 
 // Logout user by clearing the token cookie
+const isProduction = process.env.NODE_ENV === 'production';
+
 router.post('/logout', (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
+    secure: isProduction, // true in prod, false locally
+    sameSite: isProduction ? 'none' : 'lax', // none for prod (cross-site), lax for localhost
+    path: '/',
   });
   res.json({ message: 'Logged out successfully' });
 });
+
 
 // 📌 Feature routes (modularized by role or resource)
 router.use('/student', require('./studentRoutes'));
