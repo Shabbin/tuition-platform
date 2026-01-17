@@ -47,7 +47,7 @@ async function start() {
   // --- CORS (hard-coded allowed origins) ---
   const allowedOrigins = [
     'http://localhost:3000',
-    'https://teaching-platform-beige.vercel.app',
+    'https://tutogoggy.vercel.app',
   ];
 
   const corsOptions = {
